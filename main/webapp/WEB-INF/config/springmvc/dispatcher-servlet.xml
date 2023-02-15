@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    수정일      수정자                      수정내용
+  =========     =======    =================================================
+  2011.09.07   	서준식     	 	로그인 체크 인터셉터 추가
+  2011.09.29	이기하			에러페이지 경로수정
+  2013.05.30	이기하			IP정보기록 로직 추가
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:aop="http://www.springframework.org/schema/aop"  xmlns:mvc="http://www.springframework.org/schema/mvc" 
+		xmlns:beans="http://www.springframework.org/schema/beans"
+		xmlns:util="http://www.springframework.org/schema/util"
+		xmlns:tx="http://www.springframework.org/schema/tx"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+							http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+							http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+							http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+							http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+	
+	<!-- 	DB설정부분이 application context쪽에 있을 경우 servlet context쪽에 설정된 Bean들에는 적용이 안되어 servlet context에 작성	 -->
+<!-- 	<tx:annotation-driven proxy-target-class="true" /> -->
+
+	<!-- favicon 선언 -->
+	<mvc:resources mapping="/favicon.ico" location="/common/images/favicon_16.ico" />
+
+	<!-- jsonView 선언 -->
+	<bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
+	
+	<bean id="beanNameViewReslver" class="org.springframework.web.servlet.view.BeanNameViewResolver"> 
+		<property name="order" value="0" /> 
+	</bean>
+	
+	<!-- The controllers are autodetected POJOs labeled with the @Controller annotation. -->
+	<context:component-scan base-package="egovframework, front">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository" />
+	</context:component-scan>
+	
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+	    <property name="customArgumentResolvers">
+	        <list>
+	            <bean class="emf.core.request.EmfWebCustomArgumentResolver" />
+	        </list>
+	    </property>
+	</bean>
+	
+	<mvc:annotation-driven></mvc:annotation-driven>
+	<!-- @RequestMapping 자동 설정 -->
+	  
+	<mvc:default-servlet-handler default-servlet-name="WorkerServlet"></mvc:default-servlet-handler>
+	<!-- 필터링 안되는 url 디폴트서블릿핸들러 처리, 아래가 비슷한 역할을 한다 -->
+	
+	<beans:bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<beans:property name="messageConverters">
+			<beans:list>
+				<beans:ref bean="jsonConverter"></beans:ref>    
+			</beans:list>
+		</beans:property>
+	</beans:bean> 
+	 
+	<beans:bean id="jsonConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+		<beans:property name="supportedMediaTypes" value="application/json"></beans:property>
+	</beans:bean>
+	<!-- @ResponseBody, @RequestBody 로 json형태의 데이터 교환 설정 -->
+	
+	<!-- For Pagination Tag -->
+	<bean id="imageRenderer" class="egovframework.com.cmm.ImagePaginationRenderer" />
+	<bean id="textRenderer" class="egovframework.com.cmm.AdminPageRenderer" />
+	
+	<bean id="paginationManager" class="egovframework.rte.ptl.mvc.tags.ui.pagination.DefaultPaginationManager">
+		<property name="rendererType">
+			<map>
+				<entry key="image" value-ref="imageRenderer" />
+				<entry key="text" value-ref="textRenderer" />
+			</map>
+		</property>
+	</bean>
+
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="webBindingInitializer">
+			<bean class="egovframework.com.cmm.web.EgovBindingInitializer" />
+		</property>
+		<property name="customArgumentResolvers">
+			<list>
+				<bean class="egovframework.rte.ptl.mvc.bind.CommandMapArgumentResolver" />
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 체크 -->
+	<mvc:interceptors>
+<!-- 		<mvc:interceptor>  
+			<mvc:mapping path="/**/*" />
+            <bean class="front.co.itcpt.ServiceCheckInterceptor">
+            </bean>
+        </mvc:interceptor> -->
+        
+		<mvc:interceptor>  
+			<mvc:mapping path="/**/**" />
+            <bean class="front.co.itcpt.PageInfoInterceptor">
+            	<property name="permittedURL" value=".*(action.do)$,.*(deleteMulti.do)$,.*ajax$,.*html$,.*php$,.*promotion$" />
+            </bean>
+        </mvc:interceptor>
+        
+        <mvc:interceptor>
+			<!-- mvc:mapping path="/main/index.do" / -->
+			<mvc:mapping path="/my-lifeway/**" />
+			<mvc:mapping path="/customer-center/personal-counseling/**" />
+			<mvc:mapping path="/customer-center/voc/**" />
+            <bean class="front.co.itcpt.AuthenticInterceptor">
+            	<property name="permittedURL" value=".*(action.do)$,.*(deleteMulti.do)$,.*ajax$" />
+            </bean>
+        </mvc:interceptor>
+        
+		<mvc:interceptor>  
+			<mvc:mapping path="/my-lifeway/join-product-information/**" />
+			<mvc:mapping path="/my-lifeway/membership-card/**" />
+			<mvc:mapping path="/my-lifeway/performance/**" />
+			<mvc:mapping path="/my-lifeway/chage-service/**" />
+			<mvc:mapping path="/my-lifeway/service-guide/**" />
+			<mvc:mapping path="/my-lifeway/obituary-notification/**" />
+			<mvc:mapping path="/my-lifeway/member/resortagree/**" />
+            <bean class="front.co.itcpt.MyLifewayInterceptor">
+            	<property name="permittedURL" value=".*(action.do)$,.*(deleteMulti.do)$,.*ajax$" />
+            </bean>
+        </mvc:interceptor>
+        
+    	<mvc:interceptor>
+			<mvc:mapping path="/my-lifeway/membership-card/search.ajax" />
+            <bean class="org.springframework.mobile.device.DeviceResolverHandlerInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors> 
+    
+	<mvc:interceptors>  
+		<!-- CSRF 토큰 생성 -->
+	    <mvc:interceptor>  
+	    	<mvc:mapping path="/customer-center/personal-counseling/index.do" />
+	    	<mvc:mapping path="/customer-center/join-counseling/index.do" />
+	    	<mvc:mapping path="/customer-center/join-counseling/event.do" />
+	    	<mvc:mapping path="/customer-center/alliance-counseling/index.do" /> 
+	    	
+	    	<mvc:mapping path="/my-lifeway/join-product-information/payment-account/search.ajax" />
+	    	<mvc:mapping path="/my-lifeway/membership-card/canvas.ajax" />
+	    	<mvc:mapping path="/my-lifeway/performance/request/write.do" /> 
+	    	
+	        <bean class="front.co.itcpt.LoadCsrfPreventionInterceptor" />
+	    </mvc:interceptor>	    
+
+	    <!-- CSRF 토큰 검증  -->
+	    <mvc:interceptor>  
+	   		<mvc:mapping path="/customer-center/personal-counseling/insert.do" />
+	    	<mvc:mapping path="/customer-center/join-counseling/insert.do" />
+	    	<mvc:mapping path="/customer-center/alliance-counseling/insert.do" /> 
+	    	<mvc:mapping path="/customer-center/alliance-counseling/insertJoinEventCnsl.do" />
+	    	
+	    	<mvc:mapping path="/my-lifeway/join-product-information/payment-account/insert.do" />
+	    	<mvc:mapping path="/cmm/*/download.do" />
+	    	<mvc:mapping path="/my-lifeway/performance/request/insert.do" /> 
+	    	
+	        <bean class="front.co.itcpt.ValidationCsrf" />
+	    </mvc:interceptor>
+    </mvc:interceptors> 
+    
+	<!--
+		- This bean resolves specific types of exceptions to corresponding logical
+		- view names for error views. The default behaviour of DispatcherServlet
+		- is to propagate all exceptions to the servlet container: this will happen
+		- here with all other types of exceptions.
+	-->
+ 	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="defaultErrorView" value="error/code404" />
+<!--
+		<property name="exceptionMappings">
+			<props>
+				파일이 없을때
+				<prop key="java.io.FileNotFoundException">error/filenotfound</prop>
+				파일의 용량이 지정한 숫자보다 클때
+				<prop key="egovframework.com.cmm.exception.FileNotSizeException">error/filenotsize</prop>
+				페이지 찾을수 없을 때	
+				<prop key="egovframework.com.cmm.exception.NotFoundException">error/notfound</prop>	
+				게시글, 콘텐츠 권한에러 history.back(-2)
+				<prop key="egovframework.com.cmm.exception.NotPermitException">error/notpermit</prop>
+			</props>
+		</property>
+ -->	
+	</bean>
+	<!-- 타일즈 설정 -->
+	<bean id="tilesViewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.tiles2.TilesView" />
+		<property name="order" value="1" />
+	</bean>
+	<bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+		<property name="definitions">
+			<list>
+				<value>classpath:/front/tiles/layouts.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="order" value="2" /> 
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" /> 
+		<property name="prefix" value="/WEB-INF/jsp/" /> 
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+</beans>

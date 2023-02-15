@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    
+     <bean id="egov.propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:/front/props/globals.properties</value>
+            </list>
+        </property>
+    </bean> 
+    
+    <!-- 
+    JNDI설정 (서버용) 
+    <jee:jndi-lookup id="dsNonHdgrs" jndi-name="dsNonHdgrs" resource-ref="true" />
+    -->
+    
+	<!-- DataSource -->
+	<alias name="dataSource-${Globals.DbType}" alias="egov.dataSource" />
+	<!-- smsDataSource -->
+	<alias name="dataSource-${Globals.smsDbType}" alias="egov.smsDataSource" />
+	<!-- outDataSource -->
+	<alias name="dataSource-${Globals.outDbType}" alias="egov.outDataSource" />
+	<!-- mallDataSource -->
+	<alias name="dataSource-${Globals.mallDbType}" alias="egov.mallDataSource" />
+
+	<bean id="dataSource-oracle1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${Globals.DatabaseDriverClassName}" />
+		<property name="url" value="${Globals.DatabaseUrl}" />
+		<property name="username" value="${Globals.DatabaseUserName}" />
+		<property name="password" value="${Globals.DatabasePassword}" />
+<!-- 기존 설정
+		<property name="maxActive" value="100" /> 
+        <property name="maxIdle" value="10" /> 
+        <property name="validationQuery" value="SELECT 1 FROM DUAL" />
+        <property name="testOnBorrow" value="true" />
+-->
+        <property name="maxWait" value="600"/>
+        <property name="initialSize" value="5" />
+        <property name="maxActive" value="30" />
+        <property name="maxIdle" value="30" />
+        <property name="minIdle" value="5" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <property name="testWhileIdle" value="true" />
+        <property name="validationQuery" value="SELECT 1 FROM DUAL" />
+        <property name="timeBetweenEvictionRunsMillis" value="150000" />
+        <property name="minEvictableIdleTimeMillis" value="-1" />
+		<property name="numTestsPerEvictionRun" value="5" />
+		<property name="connectionProperties" value="oracle.net.CONNECT_TIMEOUT=5000;oracle.jdbc.ReadTimeout=60000" />           
+	</bean>
+	
+	<bean id="dataSource-oracle2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${Globals.smsDatabaseDriverClassName}" />
+		<property name="url" value="${Globals.smsDatabaseUrl}" />
+		<property name="username" value="${Globals.smsDatabaseUserName}" />
+		<property name="password" value="${Globals.smsDatabasePassword}" />
+<!-- 기존 설정
+		<property name="maxActive" value="100" />
+        <property name="maxIdle" value="10" />
+        <property name="validationQuery" value="SELECT 1 FROM DUAL" />
+        <property name="testOnBorrow" value="true" />
+-->
+        <property name="maxWait" value="600"/>
+        <property name="initialSize" value="5" />
+        <property name="maxActive" value="30" />
+        <property name="maxIdle" value="30" />
+        <property name="minIdle" value="5" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <property name="testWhileIdle" value="true" />
+        <property name="validationQuery" value="SELECT 1 FROM DUAL" />
+        <property name="timeBetweenEvictionRunsMillis" value="150000" />
+        <property name="minEvictableIdleTimeMillis" value="-1" />
+		<property name="numTestsPerEvictionRun" value="5" />
+		<property name="connectionProperties" value="oracle.net.CONNECT_TIMEOUT=5000;oracle.jdbc.ReadTimeout=60000" />  
+	</bean>
+	<bean id="dataSource-mssql" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${Globals.outDatabaseDriverClassName}" />
+		<property name="url" value="${Globals.outDatabaseUrl}" />
+		<property name="username" value="${Globals.outDatabaseUserName}" />
+		<property name="password" value="${Globals.outDatabasePassword}" />
+<!-- 기존 설정
+		<property name="maxActive" value="50" />
+        <property name="maxIdle" value="10" />
+        <property name="validationQuery" value="SELECT 1 FROM DUAL" />
+        <property name="testOnBorrow" value="true" />
+-->
+        <property name="maxWait" value="600"/>
+        <property name="initialSize" value="5" />
+        <property name="maxActive" value="30" />
+        <property name="maxIdle" value="30" />
+        <property name="minIdle" value="5" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <property name="testWhileIdle" value="true" />
+        <property name="validationQuery" value="SELECT 1 FROM DUAL" />
+        <property name="timeBetweenEvictionRunsMillis" value="150000" />
+        <property name="minEvictableIdleTimeMillis" value="-1" />
+		<property name="numTestsPerEvictionRun" value="5" />
+		<property name="connectionProperties" value="oracle.net.CONNECT_TIMEOUT=5000;oracle.jdbc.ReadTimeout=60000" />     
+	</bean>
+	
+	<bean id="dataSource-mysql" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${Globals.mallDatabaseUrl}" />
+		<property name="username" value="${Globals.mallDatabaseUserName}" />
+		<property name="password" value="${Globals.mallDatabasePassword}" />
+<!-- 기존 설정
+		<property name="maxActive" value="50" />
+        <property name="maxIdle" value="10" />
+        <property name="validationQuery" value="SELECT 1 FROM DUAL" />
+        <property name="testOnBorrow" value="true" />
+-->
+        <property name="maxWait" value="600"/>
+        <property name="initialSize" value="5" />
+        <property name="maxActive" value="30" />
+        <property name="maxIdle" value="30" />
+        <property name="minIdle" value="5" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <property name="testWhileIdle" value="true" />
+        <property name="validationQuery" value="SELECT 1 FROM DUAL" />
+        <property name="timeBetweenEvictionRunsMillis" value="150000" />
+        <property name="minEvictableIdleTimeMillis" value="-1" />
+        <property name="numTestsPerEvictionRun" value="5" />    
+	</bean>
+</beans>

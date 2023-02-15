@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLAJoinPtcDAO">
+	
+	<!--
+         쿼리명 : MLAJoinPtcDAO.selectJoinPtcList
+         설  명 : 가입내역 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.15   허진영      최초생성
+    -->
+	<select id="MLAJoinPtcDAO.selectJoinPtcList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLAJoinPtcDAO.selectJoinPtcList */
+			   B.ACCNT_NO
+			   , NVL(C.PROD_PRT_NM , C.PROD_NM) AS PROD_NM
+			   , FN_MODEL_CL_NM(B.PROD_MODEL_KIND) AS PROD_MODEL
+			   , B.JOIN_DT
+			   , B.NEW_CHAN_GUNSU
+			   , C.PROD_CD
+			   , C.PROD_AMT
+			   , C.EXPR_NO
+			   , C.PAY_TYPE
+			   , (SELECT COUNT(SEQ) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS TRUE_CNT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS TRUE_AMT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG_DTL WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS RELAT_AMT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG_DTL1 WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS ADD_AMT
+			   , (SELECT MAX(RESN_CL) KEEP(DENSE_RANK LAST ORDER BY SEQ) FROM RESCISSION WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS RESN_CL
+			   , (SELECT MAX(RESN_PROC_YN) KEEP(DENSE_RANK LAST ORDER BY SEQ) FROM RESCISSION WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS RESN_PROC_YN
+			   , DECODE(FN_ACCNT_STAT(B.ACCNT_NO), 'Y', '정상', 'R', '해약', 'E', '행사', '청약철회') AS ACC_STAT
+			   , FN_YEN_CHE(B.ACCNT_NO) AS PAY_STAT
+			   , FN_EVENT_DAY(ACCNT_NO) AS EVNT_DAY -- 행사 날짜
+		  FROM MEMBER A, MEM_PROD_ACCNT B, PRODUCT C
+		 WHERE A.MEM_NO = B.MEM_NO
+		   AND B.PROD_CD = C.PROD_CD
+		   AND A.DEL_FG = 'N'
+		   AND B.DEL_FG = 'N'
+		   AND A.MEM_NO = #{memNo}
+		   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO)
+		   AND FN_ACCNT_STAT(B.ACCNT_NO) IN('Y', 'R', 'E') -- 청약 철회 제외
+		 ORDER BY B.REG_DM DESC
+	</select>
+	
+	<!--
+         쿼리명 : MLAJoinPtcDAO.selectSpplSrvcList
+         설  명 : 부가서비스 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.15   허진영      최초생성
+    -->
+	<select id="MLAJoinPtcDAO.selectSpplSrvcList" parameterType="emfMap" resultType="emfMap">
+		WITH TBL_SPPL_SRVC(ACCNT_NO, APP_NO, SVC_NM)
+		AS
+		(
+			SELECT A.ACCNT_NO
+				   , B.APP_NO
+			 	   , D.SVC_NM || '(' || C.ISU_CNT || '매)' AS SVC_NM
+			  FROM MEM_PROD_ACCNT_SVC A, PROD_OPT_SVC_MST B, PROD_OPT_SVC_DTL C, OPT_SVC D
+			 WHERE A.SEQ = B.SEQ 
+			   AND A.SEQ = C.SEQ 
+			   AND C.OPT_SVC_CD = D.SEQ
+			   AND B.USE_YN = 'Y'
+			   AND D.USE_YN = 'Y'
+			   AND START_DT <![CDATA[<=]]> (SELECT JOIN_DT FROM MEM_PROD_ACCNT WHERE ACCNT_NO = #{item.accntNo})			   
+			   AND A.ACCNT_NO IN
+			<foreach collection="joinPtcList" item="item" index="index" separator=", " open="(" close=")">
+	        	#{item.accntNo}
+	        </foreach>
+		)
+		SELECT /* MLAJoinPtcDAO.selectSpplSrvcList */
+		       ACCNT_NO
+			   , APP_NO
+			   , LISTAGG(SVC_NM, ', ') WITHIN GROUP(ORDER BY ACCNT_NO DESC, APP_NO) AS SVC_NM
+		  FROM TBL_SPPL_SRVC A
+		 GROUP BY ACCNT_NO, APP_NO
+	</select>
+
+</mapper>            

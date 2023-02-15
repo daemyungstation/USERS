@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLGObtrNotiDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="SMS_CNTN" column="SMS_CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : MLGObtrNotiDAO.selectObtrNotiInf
+         설  명 : 부고알리미 정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+    -->
+	<select id="MLGObtrNotiDAO.selectObtrNotiInf" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* MLGObtrNotiDAO.selectObtrNotiInf */ 
+		  	   SMS_CNTN
+		  	   , NVL(SMS_SEND_CNT, 0) AS SMS_SEND_CNT
+		  FROM CM_OBTR_NOTI_INF
+		 WHERE ID = #{id}
+		   AND ACCNT_NO = #{accntNo}
+	</select>
+	
+	<!--
+         쿼리명 : MLGObtrNotiDAO.updateObtrNotiInf
+         설  명 : 부고알리미 정보를 저장한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+    -->
+	<update id="MLGObtrNotiDAO.updateObtrNotiInf" parameterType="emfMap">
+		MERGE /* MLGObtrNotiDAO.updateObtrNotiInf */ INTO CM_OBTR_NOTI_INF
+		USING DUAL ON (
+			ID = #{id}
+			AND ACCNT_NO = #{accntNo}
+		)
+		WHEN MATCHED THEN
+			UPDATE 
+			   SET SMS_CNTN = #{smsCntn}
+				<if test="smsSendCnt != null and smsSendCnt != ''">
+					, SMS_SEND_CNT = NVL(SMS_SEND_CNT, 0) + #{smsSendCnt}
+				</if>
+			   	   , MOD_ID = #{modId}
+				   , MOD_IP = #{modIp}
+    	   	   	   , MOD_DTM = SYSDATE
+		WHEN NOT MATCHED THEN
+			INSERT
+	    		(ID
+				, ACCNT_NO
+				, SMS_CNTN
+			<if test="smsSendCnt != null and smsSendCnt != ''">
+				, SMS_SEND_CNT
+			</if>
+				, REG_ID
+				, REG_IP
+				, REG_DTM
+				, MOD_ID
+				, MOD_IP
+				, MOD_DTM
+	    		)
+	    	VALUES
+	    		(#{id}
+	    		, #{accntNo}
+	    		, #{smsCntn}
+			<if test="smsSendCnt != null and smsSendCnt != ''">
+				, #{smsSendCnt}
+			</if>
+	    		, #{regId}
+	    		, #{regIp}
+	    		, SYSDATE
+	    		, #{modId}
+	    		, #{modIp}
+	    		, SYSDATE
+    			)
+	</update>
+	
+</mapper>            

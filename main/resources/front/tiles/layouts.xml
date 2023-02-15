@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+ 
+<tiles-definitions>
+
+	<!-- 기본 페이지 start... -->
+ 	<definition name="front_layouts" template="/WEB-INF/jsp/front/tiles/front_layouts.jsp">
+  		<put-attribute name="header" value="/WEB-INF/jsp/front/tiles/front_header.jsp" />
+  		<put-attribute name="lnb" value="/WEB-INF/jsp/front/tiles/front_lnb.jsp" />
+  		<put-attribute name="footer" value="/WEB-INF/jsp/front/tiles/front_footer.jsp" />
+ 	</definition>
+ 
+ 	<definition name="*.front" extends="front_layouts">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}.jsp" />
+ 	</definition>
+ 	<definition name="*/*.front" extends="front_layouts">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}.jsp" />
+ 	</definition>
+ 	<definition name="*/*/*.front" extends="front_layouts">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}/{3}.jsp" />
+ 	</definition>
+ 	<definition name="*/*/*/*.front" extends="front_layouts">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}/{3}/{4}.jsp" />
+ 	</definition>
+ 	<definition name="*/*/*/*/*.front" extends="front_layouts">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}/{3}/{4}/{5}.jsp" />
+ 	</definition>
+ 	<!-- 기본 페이지 end... -->
+ 	
+	<definition name="*/*/*.ajax" template="/WEB-INF/jsp/layout_ajax.jsp">
+		<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}/{3}.jsp" />
+	</definition>
+	
+	<!-- 팝업 페이지 start... -->
+	<definition name="front_layouts_pop" template="/WEB-INF/jsp/front/tiles/front_layouts_pop.jsp">
+		<put-attribute name="header" value="/WEB-INF/jsp/front/tiles/front_header_pop.jsp" />
+	 	<put-attribute name="footer" value="/WEB-INF/jsp/front/tiles/front_footer_pop.jsp" />
+	</definition>
+	
+	<definition name="*.pop" extends="front_layouts_pop">
+		<put-attribute name="content"   value="/WEB-INF/jsp/{1}.jsp" />
+	</definition>
+	<definition name="*/*.pop" extends="front_layouts_pop">
+	 	<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}.jsp" />
+	</definition>
+	<definition name="*/*/*.pop" extends="front_layouts_pop">
+	 	<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}/{3}.jsp" />
+	</definition>
+	<definition name="*/*/*/*.pop" extends="front_layouts_pop">
+	 	<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}/{3}/{4}.jsp" />
+	</definition>
+	<definition name="*/*/*/*/*.pop" extends="front_layouts_pop">
+	 	<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}/{3}/{4}/{5}.jsp" />
+	</definition>
+ 	<!-- 팝업 페이지 end... -->
+ 	
+ 	<!-- 에러 페이지 start... -->
+  	<definition name="front_layouts_error" template="/WEB-INF/jsp/front/tiles/front_layouts_error.jsp">
+  	
+ 	</definition>
+ 
+  	<definition name="*.error" extends="front_layouts_error">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}.jsp" />
+ 	</definition>
+ 	<definition name="*/*.error" extends="front_layouts_error">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}.jsp" />
+ 	</definition>
+ 	<!-- 에러 페이지 end... -->
+ 
+  	<!-- iframe 페이지 start... -->
+  	<definition name="front_layouts_iframe" template="/WEB-INF/jsp/front/tiles/front_layouts_iframe.jsp">  	
+ 	</definition>
+  	<definition name="*.iframe" extends="front_layouts_iframe">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}.jsp" />
+ 	</definition>
+ 	<definition name="*/*.iframe" extends="front_layouts_iframe">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}.jsp" />
+ 	</definition> 	
+  	<definition name="*/*/*.iframe" extends="front_layouts_iframe">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}/{3}.jsp" />
+ 	</definition>
+ 	
+	<!-- gnb, lnb 없는 페이지 start... -->
+  	<definition name="front_layouts2" template="/WEB-INF/jsp/front/tiles/front_layouts2.jsp">
+ 		<put-attribute name="header" value="/WEB-INF/jsp/front/tiles/front_header2.jsp" />
+ 		<put-attribute name="footer" value="/WEB-INF/jsp/front/tiles/front_footer2.jsp" />
+ 	</definition>
+  	<definition name="*.front2" extends="front_layouts2">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}.jsp" />
+ 	</definition>
+ 	<definition name="*/*.front2" extends="front_layouts2">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}.jsp" />
+ 	</definition> 	
+  	<definition name="*/*/*.front2" extends="front_layouts2">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}/{3}.jsp" />
+ 	</definition> 	
+ 	
+  	<definition name="*/*/*/*.front2" extends="front_layouts2">
+  		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}/{3}/{4}.jsp" />
+ 	</definition> 	
+ 	 	
+</tiles-definitions>

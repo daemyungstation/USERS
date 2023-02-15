@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLAAcntChngOutDAO">
+	
+	<!--
+         쿼리명 : MLAAcntChngOutDAO.selectJoinPrdctList
+         설  명 : 가입상품 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+    -->
+
+	<select id="MLAAcntChngOutDAO.selectJoinPrdctList" parameterType="emfMap" resultType="emfMap">
+		SELECT
+		/* MLAAcntChngOutDAO.selectJoinPrdctList */
+		MPA.ACCNT_NO,
+		'[' || MPA.ACCNT_NO || '] ' || PD.PROD_NM AS PROD_NM
+		FROM MEM_PROD_ACCNT MPA
+		INNER JOIN PRODUCT PD ON MPA.PROD_CD = PD.PROD_CD
+		WHERE 1=1
+		AND MPA.MEM_NO = #{memNo}
+		<if test="qMembership == true">
+			<![CDATA[
+				AND ( KSTBIT = '02' OR ( KSTBIT = '04' AND ADD_MONTHS(TO_DATE(JOIN_DT, 'yyyymmdd'), 60) > SYSDATE ))
+				]]>
+		</if>
+		<if test="qMembership != true">
+			AND KSTBIT = '02'
+		</if>
+		AND MPA.DEL_FG = 'N'
+	</select>
+
+
+
+
+	<!--
+         쿼리명 : MLAAcntChngOutDAO.selectJoinPrdctListPaymentAccount
+         설  명 : 가입상품 목록을 조회한다.
+          수정일     수정자      수정내용
+        ==========   ======   ==============
+        2022.11.15   허진영      최초생성
+    -->
+	<select id="MLAAcntChngOutDAO.selectJoinPrdctListPaymentAccount" parameterType="emfMap" resultType="emfMap">
+		SELECT
+		/* MLAAcntChngOutDAO.selectJoinPrdctListPaymentAccount */
+		MPA.ACCNT_NO,
+		'[' || MPA.ACCNT_NO || '] ' || PD.PROD_NM AS PROD_NM
+		FROM MEM_PROD_ACCNT MPA
+		INNER JOIN PRODUCT PD ON MPA.PROD_CD = PD.PROD_CD
+		WHERE 1=1
+		AND MPA.MEM_NO = #{memNo}
+		AND ( FN_ACCNT_STAT(MPA.ACCNT_NO) = 'Y' OR EXISTS( SELECT 'X' FROM RESCISSION_DAMO WHERE DEL_FG = 'N' AND ACCNT_NO = MPA.ACCNT_NO AND RESN_CL NOT IN ('02','04')  AND CMS_WDRW_REQ_YN  = 'Y' )  ) -- 정상 , 결합상품유
+		AND MPA.DEL_FG = 'N'
+	</select>
+
+
+	<!--
+         쿼리명 : MLAAcntChngOutDAO.selectJoinPrdctListForLogin
+         설  명 : 가입상품 목록을 조회한다.
+          수정일     수정자      수정내용
+        ==========   ======   ==============
+        2022.11.00   허진영      최초생성
+    -->
+	<select id="MLAAcntChngOutDAO.selectJoinPrdctListForLogin" parameterType="emfMap" resultType="emfMap">
+
+		SELECT
+		/* MLAAcntChngOutDAO.selectJoinPrdctListForLogin */
+		MPA.ACCNT_NO,
+		'[' || MPA.ACCNT_NO || '] ' || PD.PROD_NM AS PROD_NM
+		, DECODE(FN_ACCNT_STAT(MPA.ACCNT_NO), 'Y', '정상', 'R', '해약', 'E', '행사', '청약철회') AS ACC_STAT
+		FROM MEM_PROD_ACCNT MPA INNER JOIN
+		PRODUCT PD ON MPA.PROD_CD = PD.PROD_CD
+		WHERE 1=1
+		AND MPA.MEM_NO = #{memNo}
+		AND MPA.DEL_FG = 'N'
+	</select>
+	
+	<!--
+         쿼리명 : MLAAcntChngOutDAO.selectPayMthd
+         설  명 : 납입방법을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+        2016.06.21   김필기      추가 { , (SELECT COUNT(SEQ) FROM PAY_MNG WHERE ACCNT_NO = B.ACCNT_NO AND DEL_FG = 'N') AS TRUE_CNT  }
+    -->
+	<select id="MLAAcntChngOutDAO.selectPayMthd" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLAAcntChngOutDAO.selectPayMthd */
+			   B.PAY_MTHD
+			   , B.PROD_CD
+			   , B.KB_NO
+			   , (SELECT COUNT(SEQ) FROM PAY_MNG WHERE ACCNT_NO = B.ACCNT_NO AND DEL_FG = 'N') AS TRUE_CNT
+		  FROM MEMBER A, MEM_PROD_ACCNT B
+		 WHERE A.MEM_NO = B.MEM_NO
+		   AND A.DEL_FG = 'N'
+		   AND B.DEL_FG = 'N'
+		   AND A.MEM_NO = #{memNo}
+		   AND B.ACCNT_NO = #{accntNo}
+		   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO)
+	</select>
+	
+	<!--
+         쿼리명 : MLAAcntChngOutDAO.selectCmsPmtAcntInf
+         설  명 : CMS 결제계좌 정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+    -->
+	<select id="MLAAcntChngOutDAO.selectCmsPmtAcntInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLAAcntChngOutDAO.selectCmsPmtAcntInf */
+			   ACCNT_NO
+			   , BANK_CD
+			   , FN_COM_NM('63', A.BANK_CD) AS BANK_NM
+			   , BANK_ACCNT_NO
+			   , ICHAE_DT
+		  FROM CMS_MEM A
+		 WHERE DEL_FG = 'N'
+		   AND MEM_NO = #{memNo}
+		   AND ACCNT_NO = #{accntNo}
+		   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = A.ACCNT_NO)
+	</select>
+	
+	<!--
+         쿼리명 : MLAAcntChngOutDAO.selectCardPmtAcntInf
+         설  명 : 카드 결제계좌 정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+    -->
+	<select id="MLAAcntChngOutDAO.selectCardPmtAcntInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLAAcntChngOutDAO.selectCardPmtAcntInf */
+			   ACCNT_NO
+			   , CARD_CD
+		       , NVL(
+			         CASE WHEN INI_YN = 'Y' THEN FN_COM_NM('0196', A.CARD_CD)
+			         ELSE FN_COM_NM('0120', A.CARD_CD)
+			         END, FN_COM_NM('0120', A.CARD_CD)
+			       ) AS CARD_NM
+			   , CARD_NO
+			   , EXPIRE_DATE
+			   , PAY_DT
+		       , A.INI_YN
+		  FROM CARD_MEM A
+		 WHERE DEL_FG = 'N'
+		   AND ACCNT_NO = #{accntNo} 
+		   AND EXISTS (SELECT ACCNT_NO FROM MEM_PROD_ACCNT WHERE ACCNT_NO = A.ACCNT_NO AND DEL_FG = 'N')
+	</select>
+	
+</mapper>            

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MallMemDAO">
+    <select id="getMallMemInfo" parameterType="emfMap" resultType="emfMap">
+        SELECT
+            CONVERT(AES_DECRYPT(UNHEX(cmd.name), #{key}) USING utf8) as name /* 이름 */
+            ,DATE_FORMAT(cmd.birthday, '%Y%m%d') as birthday -- 생일 (YYYYmmDD)
+            ,cmd.birthday_div -- 양력/음력구분값 1:양력,0:음력
+            ,cmd.sex_div -- 성별 M:남성, W:여성
+            ,cu.pw -- 비밀번호
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.mail), #{key}) USING utf8) as mail -- 이메일
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.pcs), #{key}) USING utf8) as pcs -- 휴대전화
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.tel), #{key}) USING utf8) as tel -- 전화번호
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.zip), #{key}) USING utf8) as zip -- 우편번호
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.addr1), #{key}) USING utf8) as addr1 -- 주소1
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.addr2), #{key}) USING utf8) as addr2 -- 주소2(상세주소)
+            ,cmd.add_etc1 -- 관심분야(필수) (헬스뷰티|웨딩 .. |구분값)
+            ,cmd.marketing_phone -- 마케팅 (전화 1:허용,0:미동의)
+            ,cmd.sms -- 마케팅 (문자 1:허용,0:미동의)
+            ,cmd.info -- 마케팅 (이메일 1:허용,0:미동의)
+            ,cmd.marketing_post -- 마케팅 (우편물 1:허용,0:미동의)
+            ,cmd.married -- 기혼 여부 (Y,N)
+            ,add_etc3 -- 자녀 여부  (0,1,2,3)
+            ,add_etc4 -- 관심정보(3가지선택) (홈페이지 코드로 맞추었으며 01, 02... , 구분값으로 되어 있음)
+            ,add_etc2 -- 관심푼야(선택) (골프|해외여행캠프|여행|칠순/돌잔치 .. |구분값)
+            ,add_etc5 -- 가입경로 (홈페이지 코드로 맞추었으며 07코드 대신 텍스트로 들어가있음)
+            ,add_etc6 -- 상품 가입시 가낭 끌렸던점 (홈페이지 코드로 맞추었으며 01, 02... , 구분값으로 되어 있음 05코드 대신 텍스트로 들어가있음)
+            ,uesr_editdate -- 회원 수정일 (YYYY-MM-DD 시:분:초)
+            FROM common_user as cu JOIN common_member_detail cmd ON (cu.code=cmd.code) WHERE cu.dlcc_member_id = #{unqNo}
+        UNION
+            SELECT
+            CONVERT(AES_DECRYPT(UNHEX(cmd.name), #{key}) USING utf8) as name -- 이름
+            ,DATE_FORMAT(cmd.birthday, '%Y%m%d') as birthday -- 생일 (YYYYmmDD)
+            ,cmd.birthday_div -- 양력/음력구분값 1:양력,0:음력
+            ,cmd.sex_div -- 성별 M:남성, W:여성
+            ,cu.pw -- 비밀번호
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.mail), #{key}) USING utf8) as mail -- 이메일
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.pcs), #{key}) USING utf8) as pcs -- 휴대전화
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.tel), #{key}) USING utf8) as tel -- 전화번호
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.zip), #{key}) USING utf8) as zip -- 우편번호
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.addr1), #{key}) USING utf8) as addr1 -- 주소1
+            ,CONVERT(AES_DECRYPT(UNHEX(cmd.addr2), #{key}) USING utf8) as addr2 -- 주소2(상세주소)
+            ,cmd.add_etc1 -- 관심분야(필수) (헬스|웨딩 .. |구분값)
+            ,cmd.marketing_phone -- 마케팅 (전화 1:허용,0:미동의)
+            ,cmd.sms -- 마케팅 (문자 1:허용,0:미동의)
+            ,cmd.info -- 마케팅 (이메일 1:허용,0:미동의)
+            ,cmd.marketing_post -- 마케팅 (우편물 1:허용,0:미동의)
+            ,cmd.married -- 기혼 여부 (Y,N)
+            ,add_etc3 -- 자녀 여부  (0,1,2,3)
+            ,add_etc4 -- 관심정보(3가지선택) (홈페이지 코드로 맞추었으며 01, 02... , 구분값으로 되어 있음)
+            ,add_etc2 -- 관심푼야(선택) (골프|해외여행캠프|여행|칠순/돌잔치 .. |구분값)
+            ,add_etc5 -- 가입경로 (홈페이지 코드로 맞추었으며 07코드 대신 텍스트로 들어가있음)
+            ,add_etc6 -- 상품 가입시 가낭 끌렸던점 (홈페이지 코드로 맞추었으며 01, 02... , 구분값으로 되어 있음 05코드 대신 텍스트로 들어가있음)
+            ,uesr_editdate -- 회원 수정일 (YYYY-MM-DD 시:분:초)
+            FROM common_user_sleep as cu JOIN common_member_detail_sleep cmd ON (cu.code=cmd.code) WHERE cu.dlcc_member_id = #{unqNo}
+    </select>
+</mapper>

@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="FAIRMainDao">
+
+	<select id="configList" parameterType="emfMap" resultType="emfMap">
+		SELECT
+            FCFG_SEQ
+			,FCFG_STIME
+			,FCFG_ETIME
+			,FCFG_TITLE
+			,FCFG_DDAY_TITLE
+			,TO_CHAR(FCFG_ETIME, 'YYYY/MM/DD HH24:MI:SS') AS FCFG_ETIME_DATE
+			,FCFG_STATUS
+		FROM FAIR_CONFIG
+		WHERE FCFG_STATUS = 'A'
+		OR
+		(
+		FCFG_STATUS = 'Y' 
+		AND TO_NUMBER(TO_CHAR(FCFG_STIME, 'yyyymmddhh24miss')) <![CDATA[<=]]> TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss'))
+		AND TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss')) <![CDATA[<]]> TO_NUMBER(TO_CHAR(FCFG_ETIME, 'yyyymmddhh24miss'))
+		)
+		ORDER BY REG_DTM DESC
+	</select>
+	
+	<select id="selectBanner" parameterType="emfMap" resultType="emfMap">
+		SELECT
+            FBT_SEQ
+			,FBT_IMAGE_BG_PATH
+			,FBT_IMAGE_BG_SAVE_NM
+			,FBT_IMAGE_BG_REAL_NM
+			,FBT_IMAGE_W_PATH
+			,FBT_IMAGE_W_SAVE_NM
+			,FBT_IMAGE_W_REAL_NM
+			,FBT_IMAGE_M_PATH
+			,FBT_IMAGE_M_SAVE_NM
+			,FBT_IMAGE_M_REAL_NM
+			,FBT_LINK
+			,FBT_LINK_TYPE
+			,FBT_ORDER
+			,FBT_STIME
+			,FBT_ETIME
+			,TO_CHAR(FBT_STIME, 'YYYY-MM-DD') AS FBT_STIME_DAY
+			,TO_CHAR(FBT_STIME, 'HH24') AS FBT_STIME_HH
+			,TO_CHAR(FBT_STIME, 'MI') AS FBT_STIME_MI
+			,TO_CHAR(FBT_STIME, 'SS') AS FBT_STIME_SS
+			,TO_CHAR(FBT_ETIME, 'YYYY-MM-DD') AS FBT_ETIME_DAY
+			,TO_CHAR(FBT_ETIME, 'HH2d4') AS FBT_ETIME_HH
+			,TO_CHAR(FBT_ETIME, 'MI') AS FBT_ETIME_MI
+			,TO_CHAR(FBT_ETIME, 'SS') AS FBT_ETIME_SS
+			,FBT_STATUS
+		FROM FAIR_BANNER_TOP
+		WHERE FBT_STATUS = 'A'
+		OR
+		(
+		FBT_STATUS = 'Y' 
+		AND TO_NUMBER(TO_CHAR(FBT_STIME, 'yyyymmddhh24miss')) <![CDATA[<=]]> TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss'))
+		AND TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss')) <![CDATA[<]]> TO_NUMBER(TO_CHAR(FBT_ETIME, 'yyyymmddhh24miss'))
+		)
+		ORDER BY FBT_ORDER ASC, REG_DTM DESC
+	</select>
+	
+	<select id="selectPoint" parameterType="emfMap" resultType="emfMap">
+		SELECT 
+			FM_SEQ
+			,FM_IMAGE_BG_PATH
+			,FM_IMAGE_BG_SAVE_NM
+			,FM_IMAGE_BG_REAL_NM
+			,FM_IMAGE_TITLE_PATH
+			,FM_IMAGE_TITLE_SAVE_NM
+			,FM_IMAGE_TITLE_REAL_NM
+		FROM FAIR_MAIN
+		WHERE ROWNUM <![CDATA[<=]]> 1
+		AND
+		(
+		FM_STATUS = 'A'
+		OR
+		(
+		FM_STATUS = 'Y' 
+		AND TO_NUMBER(TO_CHAR(FM_STIME, 'yyyymmddhh24miss')) <![CDATA[<=]]> TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss'))
+		AND TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss')) <![CDATA[<]]> TO_NUMBER(TO_CHAR(FM_ETIME, 'yyyymmddhh24miss'))
+		)
+		)
+		ORDER BY FM_SEQ DESC
+	</select>
+	
+	<select id="selectPointList" parameterType="emfMap" resultType="emfMap">
+		SELECT
+			FMS_SEQ
+			,FMS_IMAGE_W_PATH
+			,FMS_IMAGE_W_SAVE_NM
+			,FMS_IMAGE_W_REAL_NM
+			,FMS_IMAGE_M_PATH
+			,FMS_IMAGE_M_SAVE_NM
+			,FMS_IMAGE_M_REAL_NM
+			,FMS_DESC
+			,FMS_BGCOLOR
+		FROM FAIR_MAIN_SUB
+		WHERE FMS_STATUS = 'A'
+		OR
+		(
+		FMS_STATUS = 'Y' 
+		AND TO_NUMBER(TO_CHAR(FMS_STIME, 'yyyymmddhh24miss')) <![CDATA[<=]]> TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss'))
+		AND TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss')) <![CDATA[<]]> TO_NUMBER(TO_CHAR(FMS_ETIME, 'yyyymmddhh24miss'))
+		)
+		ORDER BY FMS_ORDER ASC, FMS_SEQ DESC   
+	</select>
+	
+	<select id="selectCategory" parameterType="emfMap" resultType="emfMap">
+		SELECT 
+			FC_SEQ
+			,FC_IMAGE_W_PATH
+			,FC_IMAGE_W_SAVE_NM
+			,FC_IMAGE_W_REAL_NM
+			,FC_IMAGE_M_PATH
+			,FC_IMAGE_M_SAVE_NM
+			,FC_IMAGE_M_REAL_NM
+			,FC_BGCOLOR
+			,FC_TITLE
+			,FC_SUBTITLE
+			,FC_CATEGORY_TITLE
+			,FC_CATEGORY_TITLE_COLOR
+			,FC_ORDER
+			,FC_STIME
+			,FC_ETIME
+			,TO_CHAR(FC_STIME, 'YYYY-MM-DD') AS FC_STIME_DAY
+			,TO_CHAR(FC_STIME, 'HH24') AS FC_STIME_HH
+			,TO_CHAR(FC_STIME, 'MI') AS FC_STIME_MI
+			,TO_CHAR(FC_STIME, 'SS') AS FC_STIME_SS
+			,TO_CHAR(FC_ETIME, 'YYYY-MM-DD') AS FC_ETIME_DAY
+			,TO_CHAR(FC_ETIME, 'HH24') AS FC_ETIME_HH
+			,TO_CHAR(FC_ETIME, 'MI') AS FC_ETIME_MI
+			,TO_CHAR(FC_ETIME, 'SS') AS FC_ETIME_SS
+			,FC_STATUS
+			,FC_MAIN_MAX_COUNT
+        FROM FAIR_CATEGORY
+        WHERE FC_STATUS = 'A'
+		OR
+		(
+		FC_STATUS = 'Y' 
+		AND TO_NUMBER(TO_CHAR(FC_STIME, 'yyyymmddhh24miss')) <![CDATA[<=]]> TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss'))
+		AND TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss')) <![CDATA[<]]> TO_NUMBER(TO_CHAR(FC_ETIME, 'yyyymmddhh24miss'))
+		)
+		ORDER BY FC_ORDER ASC, REG_DTM DESC 
+	</select>
+	
+	<select id="selectProductList" parameterType="emfMap" resultType="emfMap">
+		SELECT
+			   TBL.* 
+		FROM (
+			SELECT ROWNUM AS RNUM, T1.* 
+			  FROM (
+				SELECT COUNT(*) OVER() AS TOT_CNT
+		                ,FP_SEQ
+		                ,FP_MAIN_IMAGE_BG_PATH
+						,FP_MAIN_IMAGE_BG_SAVE_NM
+						,FP_MAIN_IMAGE_BG_REAL_NM
+						,FP_MAIN_IMAGE_W_PATH
+						,FP_MAIN_IMAGE_W_SAVE_NM
+						,FP_MAIN_IMAGE_W_REAL_NM
+						,FP_MAIN_IMAGE_M_PATH
+						,FP_MAIN_IMAGE_M_SAVE_NM
+						,FP_MAIN_IMAGE_M_REAL_NM
+						,FP_MAIN_TITLE
+						,FP_MAIN_SUBTITLE
+						,cast(FP_MAIN_DESC as varchar2(4000)) FP_MAIN_DESC
+						,cast(FP_INPUT as varchar2(4000)) FP_INPUT
+						,cast(FP_LABEL as varchar2(4000)) FP_LABEL
+						,cast(FP_THUMNAIL as varchar2(4000)) FP_THUMNAIL
+						,cast(FP_DETAIL as varchar2(4000)) FP_DETAIL
+						,FP_ORDER
+						,FP_STIME
+						,FP_ETIME
+						,TO_CHAR(FP_STIME, 'YYYY-MM-DD') AS FP_STIME_DAY
+						,TO_CHAR(FP_STIME, 'HH24') AS FP_STIME_HH
+						,TO_CHAR(FP_STIME, 'MI') AS FP_STIME_MI
+						,TO_CHAR(FP_STIME, 'SS') AS FP_STIME_SS
+						,TO_CHAR(FP_ETIME, 'YYYY-MM-DD') AS FP_ETIME_DAY
+						,TO_CHAR(FP_ETIME, 'HH24') AS FP_ETIME_HH
+						,TO_CHAR(FP_ETIME, 'MI') AS FP_ETIME_MI
+						,TO_CHAR(FP_ETIME, 'SS') AS FP_ETIME_SS
+						,FP_STATUS
+						,FAIR_CATEGORY_FC_SEQ
+		         FROM FAIR_PRODUCT
+		         WHERE FAIR_CATEGORY_FC_SEQ = #{fcseq}
+		         AND
+		        (
+		        FP_STATUS = 'A'
+				OR
+				(
+				FP_STATUS = 'Y' 
+				AND TO_NUMBER(TO_CHAR(FP_STIME, 'yyyymmddhh24miss')) <![CDATA[<=]]> TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss'))
+				AND TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss')) <![CDATA[<]]> TO_NUMBER(TO_CHAR(FP_ETIME, 'yyyymmddhh24miss'))
+				)
+				)   
+				ORDER BY FP_ORDER ASC, REG_DTM DESC   
+			) T1
+		) TBL
+		WHERE RNUM BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}           
+	</select>	
+	
+	<select id="selectProduct" parameterType="emfMap" resultType="emfMap">
+		SELECT
+            FP_SEQ
+            ,FP_MAIN_IMAGE_BG_PATH
+			,FP_MAIN_IMAGE_BG_SAVE_NM
+			,FP_MAIN_IMAGE_BG_REAL_NM
+			,FP_MAIN_IMAGE_W_PATH
+			,FP_MAIN_IMAGE_W_SAVE_NM
+			,FP_MAIN_IMAGE_W_REAL_NM
+			,FP_MAIN_IMAGE_M_PATH
+			,FP_MAIN_IMAGE_M_SAVE_NM
+			,FP_MAIN_IMAGE_M_REAL_NM
+			,FP_MAIN_TITLE
+			,FP_MAIN_SUBTITLE
+			,cast(FP_MAIN_DESC as varchar2(4000)) FP_MAIN_DESC
+			,cast(FP_INPUT as varchar2(4000)) FP_INPUT
+			,cast(FP_LABEL as varchar2(4000)) FP_LABEL
+			,cast(FP_THUMNAIL as varchar2(4000)) FP_THUMNAIL
+			,cast(FP_DETAIL as varchar2(4000)) FP_DETAIL
+			,FP_ORDER
+			,FP_STIME
+			,FP_ETIME
+			,TO_CHAR(FP_STIME, 'YYYY-MM-DD') AS FP_STIME_DAY
+			,TO_CHAR(FP_STIME, 'HH24') AS FP_STIME_HH
+			,TO_CHAR(FP_STIME, 'MI') AS FP_STIME_MI
+			,TO_CHAR(FP_STIME, 'SS') AS FP_STIME_SS
+			,TO_CHAR(FP_ETIME, 'YYYY-MM-DD') AS FP_ETIME_DAY
+			,TO_CHAR(FP_ETIME, 'HH24') AS FP_ETIME_HH
+			,TO_CHAR(FP_ETIME, 'MI') AS FP_ETIME_MI
+			,TO_CHAR(FP_ETIME, 'SS') AS FP_ETIME_SS
+			,FP_STATUS
+			,FAIR_CATEGORY_FC_SEQ
+        FROM FAIR_PRODUCT
+        WHERE FAIR_CATEGORY_FC_SEQ = #{fcSeq}
+        AND ROWNUM <![CDATA[<=]]> #{fcMainMaxCount}
+        AND
+        (
+        FP_STATUS = 'A'
+		OR
+		(
+		FP_STATUS = 'Y' 
+		AND TO_NUMBER(TO_CHAR(FP_STIME, 'yyyymmddhh24miss')) <![CDATA[<=]]> TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss'))
+		AND TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss')) <![CDATA[<]]> TO_NUMBER(TO_CHAR(FP_ETIME, 'yyyymmddhh24miss'))
+		)
+		)   
+		ORDER BY FP_ORDER ASC, REG_DTM DESC  
+	</select>
+	
+	<select id="selectProductDetail" parameterType="emfMap" resultType="emfMap">
+		SELECT
+            FP_SEQ
+            ,FP_MAIN_IMAGE_BG_PATH
+			,FP_MAIN_IMAGE_BG_SAVE_NM
+			,FP_MAIN_IMAGE_BG_REAL_NM
+			,FP_MAIN_IMAGE_W_PATH
+			,FP_MAIN_IMAGE_W_SAVE_NM
+			,FP_MAIN_IMAGE_W_REAL_NM
+			,FP_MAIN_IMAGE_M_PATH
+			,FP_MAIN_IMAGE_M_SAVE_NM
+			,FP_MAIN_IMAGE_M_REAL_NM
+			,FP_MAIN_TITLE
+			,FP_MAIN_SUBTITLE
+			,cast(FP_MAIN_DESC as varchar2(4000)) FP_MAIN_DESC
+			,cast(FP_INPUT as varchar2(4000)) FP_INPUT
+			,cast(FP_LABEL as varchar2(4000)) FP_LABEL
+			,cast(FP_THUMNAIL as varchar2(4000)) FP_THUMNAIL
+			,cast(FP_DETAIL as varchar2(4000)) FP_DETAIL
+			,FP_ORDER
+			,FP_STIME
+			,FP_ETIME
+			,TO_CHAR(FP_STIME, 'YYYY-MM-DD') AS FP_STIME_DAY
+			,TO_CHAR(FP_STIME, 'HH24') AS FP_STIME_HH
+			,TO_CHAR(FP_STIME, 'MI') AS FP_STIME_MI
+			,TO_CHAR(FP_STIME, 'SS') AS FP_STIME_SS
+			,TO_CHAR(FP_ETIME, 'YYYY-MM-DD') AS FP_ETIME_DAY
+			,TO_CHAR(FP_ETIME, 'HH24') AS FP_ETIME_HH
+			,TO_CHAR(FP_ETIME, 'MI') AS FP_ETIME_MI
+			,TO_CHAR(FP_ETIME, 'SS') AS FP_ETIME_SS
+			,FP_STATUS
+			,FAIR_CATEGORY_FC_SEQ
+        FROM FAIR_PRODUCT
+        WHERE FP_SEQ = #{fpSeq}
+        AND
+        (
+        FP_STATUS = 'A'
+		OR
+		(
+		FP_STATUS = 'Y' 
+		AND TO_NUMBER(TO_CHAR(FP_STIME, 'yyyymmddhh24miss')) <![CDATA[<=]]> TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss'))
+		AND TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss')) <![CDATA[<]]> TO_NUMBER(TO_CHAR(FP_ETIME, 'yyyymmddhh24miss'))
+		)
+		)  
+	</select>
+	
+	<select id="selectProductDetailBenefit" parameterType="emfMap" resultType="emfMap">
+		SELECT
+            FB_SEQ
+			,FB_IMAGE_W_PATH
+			,FB_IMAGE_W_SAVE_NM
+			,FB_IMAGE_W_REAL_NM
+			,FB_IMAGE_M_PATH
+			,FB_IMAGE_M_SAVE_NM
+			,FB_IMAGE_M_REAL_NM
+			,FB_TITLE
+			,FB_SUBTITLE
+			,FB_MODEL
+			,FB_PRICE
+			,FB_USER_TARGET
+			,FB_PRODUCT_TARGET
+			,FB_ORDER
+			,FB_STIME
+			,FB_ETIME
+			,FB_STATUS
+        FROM FAIR_BENEFIT
+        WHERE FB_SEQ in 
+        <foreach collection="inSeq" item="item" index="index" separator="," open="(" close=")">
+        #{item}
+        </foreach>
+        AND
+        (
+        FB_STATUS = 'A'
+		OR
+		(
+		FB_STATUS = 'Y' 
+		AND TO_NUMBER(TO_CHAR(FB_STIME, 'yyyymmddhh24miss')) <![CDATA[<=]]> TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss'))
+		AND TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss')) <![CDATA[<]]> TO_NUMBER(TO_CHAR(FB_ETIME, 'yyyymmddhh24miss'))
+		)
+		)  
+	</select>
+	
+	<select id="selectEvent" parameterType="emfMap" resultType="emfMap">
+		SELECT
+            FE_SEQ
+			,FE_IMAGE_1_W_PATH
+			,FE_IMAGE_1_W_SAVE_NM
+			,FE_IMAGE_1_W_REAL_NM
+			,FE_IMAGE_1_M_PATH
+			,FE_IMAGE_1_M_SAVE_NM
+			,FE_IMAGE_1_M_REAL_NM
+			,FE_IMAGE_2_W_PATH
+			,FE_IMAGE_2_W_SAVE_NM
+			,FE_IMAGE_2_W_REAL_NM
+			,FE_IMAGE_2_M_PATH
+			,FE_IMAGE_2_M_SAVE_NM
+			,FE_IMAGE_2_M_REAL_NM
+			,FE_IMAGE_3_W_PATH
+			,FE_IMAGE_3_W_SAVE_NM
+			,FE_IMAGE_3_W_REAL_NM
+			,FE_IMAGE_3_M_PATH
+			,FE_IMAGE_3_M_SAVE_NM
+			,FE_IMAGE_3_M_REAL_NM
+			,FE_LINK_1
+			,FE_LINK_1_TYPE
+			,FE_LINK_2
+			,FE_LINK_2_TYPE
+			,FE_LINK_3
+			,FE_LINK_3_TYPE
+			,FE_TYPE
+        FROM FAIR_EVENT
+        WHERE
+        FE_STATUS = 'A'
+		OR
+		(
+		FE_STATUS = 'Y' 
+		AND TO_NUMBER(TO_CHAR(FE_STIME, 'yyyymmddhh24miss')) <![CDATA[<=]]> TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss'))
+		AND TO_NUMBER(TO_CHAR(SYSDATE, 'yyyymmddhh24miss')) <![CDATA[<]]> TO_NUMBER(TO_CHAR(FE_ETIME, 'yyyymmddhh24miss'))
+		)
+		ORDER BY FE_ORDER ASC, REG_DTM DESC  
+	</select>
+	
+	<insert id="insertUser" parameterType="emfMap">
+		INSERT INTO FAIR_USER_PRODUCT
+			(
+			FUP_SEQ
+			,FUP_VALUE
+			,FUP_REGDATE
+			,FAIR_PRODUCT_FP_SEQ
+			,FUP_FROMURL
+			)
+		VALUES
+			(
+			#{fupSeq}
+			,#{fupValue, jdbcType=VARCHAR}
+			,SYSDATE
+			,#{fairProductFpSeq}
+			,#{fupFromurl, jdbcType=VARCHAR}
+			)					
+	</insert>
+</mapper>

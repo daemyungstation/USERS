@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LPAOnlinePrdctDAO">
+
+	<resultMap id="emfMap" type="emf.core.vo.EmfMap">
+		<result property="CNTN" column="CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+		<result property="TRS_INFO" column="TRS_INFO" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+
+	<!--
+         쿼리명 : LPAOnlinePrdctDAO.selectTopTerms
+         설  명 : 최근에 적용된 약관을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.07   김필기      최초생성
+    -->
+	<select id="LPAOnlinePrdctDAO.selectTopTerms" parameterType="emfMap" resultMap="emfMap">
+		SELECT TRS_MST_SEQ, TRS_GB, APPLY_DT
+				, (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'TRS_GB' AND CD = TRS_GB) AS CD_NM 
+		FROM
+		(
+		  SELECT * FROM CM_TRS_MST
+		  WHERE TRS_GB = (SELECT CD FROM CO_CD_DTL
+		                  WHERE CD_ID = 'TRS_GB' AND CD = #{cd} AND USE_YN = 'Y')
+		    AND DEL_YN = 'N'
+		    AND APPLY_DT <![CDATA[ <=  ]]> SYSDATE
+		  ORDER BY APPLY_DT DESC
+		) A
+		WHERE ROWNUM <![CDATA[ < ]]> 2	
+	</select>
+	
+	<!--
+         쿼리명 : LPAOnlinePrdctDAO.selectOnlinePrdctList
+         설  명 : 온라인 상품 그룹 목록을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.07   김필기     최초 생성
+    -->
+    <select id="LPAOnlinePrdctDAO.selectOnlinePrdctList" parameterType="emfMap" resultType="emfMap">
+    	SELECT PRDCT_GB
+    		,	PRDCT_GRP_CD
+    		,	PRDCT_PRT_NM
+    		,	SORT
+    		,	PRDCT_CD
+    	FROM
+    		CM_ONLINE_PRDCT_LIST
+    	WHERE 
+    		PRDCT_GB = #{prdctCsGb}
+	</select>	
+	
+	<!--
+         쿼리명 : LPAOnlinePrdctDAO.insertOnlinePrdctCsMng
+         설  명 : 온라인 상담신청 고객정보를 등록한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   김필기     최초 생성
+    -->	
+	<insert id="LPAOnlinePrdctDAO.insertOnlinePrdctCsMng" parameterType="emfMap">
+		INSERT INTO /* LPAOnlinePrdctDAO.insertOnlinePrdctCsMng */
+			CM_ONLINE_PRDCT_CS_MST(
+				ONLINE_PRDCT_CS_SEQ
+			,	PRDCT_CS_GB
+			,	NAME
+			,	BIRTH
+			,	EMAIL
+			,	HP
+			,	TEL
+			,	SEX
+			,	ZIPCD1
+			,	ADR
+			,	ADR_DTL
+			,	ZIPCD2
+			,	ADR2
+			,	ADR_DTL2
+			,	REG_ID
+			,	REG_IP	
+			,	PRCS_CD
+			,	B2BCODE
+			,	MARKETING_YN
+			)
+		VALUES (
+			#{onlinePrdctCsMstSeq}
+		,	#{prdctCsGb}
+		,	#{name}
+		,	#{birth}
+		,	#{email}
+		,	#{hp}
+		,	#{tel, jdbcType=VARCHAR}
+		,	#{sex, jdbcType=VARCHAR}
+		,	#{zipcd1}
+		,	#{adr}
+		,	#{adrDtl}
+		,	#{zipcd2, jdbcType=VARCHAR}
+		,	#{adr2, jdbcType=VARCHAR}
+		,	#{adrDtl2, jdbcType=VARCHAR}
+		,	#{regId, jdbcType=VARCHAR}
+		,	#{regIp}
+		,	'01'
+		,	#{b2bCode, jdbcType=VARCHAR}
+		,	#{marketingYn, jdbcType=VARCHAR}
+		)			
+	</insert>
+
+	<!--
+         쿼리명 : LPAOnlinePrdctDAO.insertOnlinePrdctInf
+         설  명 : 온라인 상담신청 상품정보를 등록한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   김필기     최초 생성
+    -->	
+	<insert id="LPAOnlinePrdctDAO.insertOnlinePrdctInf" parameterType="emfMap">
+		INSERT INTO /* LPAOnlinePrdctDAO.insertOnlinePrdctInf */
+			CM_ONLINE_PRDCT_INF(
+				ONLINE_PRDCT_CS_SEQ
+			,	PRDCT_NM
+			,	PRDCT_CD
+			,	PRDCT_DTL_NM
+			,	PRDCT_DTL_CD
+			,	PRDCT_ACNT
+			,	PAY_MTD
+			,	ASGN_YN			
+			,	ASGN_NM
+			,	ASGN_CD
+			,	CO_NM
+			,	CO_CD
+			,	DEPT
+			,	STF
+			,	ALT
+			,	PRDCT_GRP_CD			
+			)
+		VALUES (
+			#{onlinePrdctCsMstSeq}
+		,	#{prdctNm}
+		,	#{prdctCd}
+		,	#{prdctDtlNm,  jdbcType=VARCHAR}
+		,	#{prdctDtlCd,  jdbcType=VARCHAR}
+		,	#{prdctAcnt,  jdbcType=VARCHAR}
+		,	#{payMtd}
+		,	#{asgnYn,  jdbcType=VARCHAR}		
+		,	#{asgnNm,  jdbcType=VARCHAR}
+		,	#{asgnCd,  jdbcType=VARCHAR}
+		,	#{coNm, jdbcType=VARCHAR}
+		,	#{coCd, jdbcType=VARCHAR}
+		,	#{dept, jdbcType=VARCHAR}
+		,	#{stf, jdbcType=VARCHAR}
+		,	#{alt, jdbcType=VARCHAR}
+		,	#{prdctGrpCd}				
+		)		
+	</insert>
+	
+	<!--
+         쿼리명 : LPAOnlinePrdctDAO.insertOnlinePrdctAcntInf
+         설  명 : 온라인 상담신청 계좌정보를 등록한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   김필기     최초 생성
+    -->	
+	<insert id="LPAOnlinePrdctDAO.insertOnlinePrdctAcntInf" parameterType="emfMap">
+		INSERT INTO /* LPAOnlinePrdctDAO.insertOnlinePrdctAcntInf */
+			CM_ONLINE_PRDCT_ACNT_INF(
+				ONLINE_PRDCT_CS_SEQ
+			,	PMT_GB
+			,	ACNTHD
+			,	ACNT_BIRTH
+			,	ACNT_HP
+			,	PMT_CO_GB
+			,	PMT_CO_GRP_GB
+			,	PMT_NO
+			,	EXP_YR
+			,	EXP_MM
+			,	PMT_DAY_GB
+			,	HAPPY_CALL_GB			
+			)
+		VALUES (
+			#{onlinePrdctCsMstSeq}
+		,	#{pmtGb}			
+		,	#{acnthd}
+		,	#{acntBirth}
+		,	#{acntHp}
+		,	#{pmtCoGb}
+		,	#{pmtCoGrpGb}
+		,	#{pmtNo}
+		,	#{expYr, jdbcType=VARCHAR}
+		,	#{expMm, jdbcType=VARCHAR}
+		,	#{pmtDayGb}
+		,	#{happyCallGb}	
+		)		
+	</insert>
+	
+	<!--
+         쿼리명 : LPAOnlinePrdctDAO.selectCompanyList
+         설  명 : 온라인 상담신청 목록을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.22   김필기     최초 생성
+    -->
+    <select id="LPAOnlinePrdctDAO.selectCompanyList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* LPAOnlinePrdctDAO.selectCompanyList */
+			TBL.*
+		FROM (
+			SELECT ROWNUM AS RNUM, A.* 
+			FROM (
+				SELECT COUNT(*) OVER() AS TOT_CNT
+					 ,	CO_CD
+					 ,	CO_NM
+			     FROM CM_ONLINE_PRDCT_CO_MST
+				 WHERE 1=1
+				<if test="q != null and q != ''">	
+					<if test="f == 1">	
+				 		<![CDATA[	AND CO_NM LIKE '%' || #{q} || '%'	]]>
+					</if>
+				</if>
+				 ORDER BY CO_CD DESC
+			) A
+		) TBL
+		WHERE RNUM BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}	         
+	</select>	
+	
+	
+<!--
+         쿼리명 : LPAOnlinePrdctDAO.selectTermsGrpCd
+         설  명 : 선택한 상품에 따른 약관 그룹 코드 조회
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.30   김필기     최초 생성
+    -->
+    <select id="LPAOnlinePrdctDAO.selectTermsGrpCd" parameterType="emfMap" resultType="emfMap">
+		  SELECT CD_ID
+		  FROM
+		  (
+		    SELECT B.CD_ID
+		    FROM CM_TRS_GRP_PRDCT_MST A, CM_TRS_GRP_DTL B
+		    WHERE 1=1
+		      AND A.PRDCT_CD = #{prodCd} 
+		      AND A.TRS_GRP_PRDCT_SEQ = B.TRS_GRP_PRDCT_SEQ
+		      AND B.TRS_EXPS_YN = 'Y'  
+		  ) AA
+		  LEFT JOIN
+		  (
+		    SELECT CD
+		    FROM CO_CD_DTL
+		    WHERE CD_ID = 'TRS_GB'
+		      AND USE_YN = 'Y'
+		  ) BB
+		  ON AA.CD_ID = BB.CD
+	</select>	
+		
+	<!--
+         쿼리명 : LPAOnlinePrdctDAO.selectTermsDtl
+         설  명 : 약관별관리 상세내용을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.04   김필기     최초 생성
+    -->
+    <select id="LPAOnlinePrdctDAO.selectTermsDtl" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* LPAOnlinePrdctDAO.selectTermsDtl */
+			PARENT_SEQ
+		,	LEV
+		,	CNTN
+		,	TRS_MST_SEQ
+		,	TRS_DTL_SEQ
+		FROM CM_TRS_DTL
+		WHERE 1=1
+			AND TRS_MST_SEQ = #{trsMstSeq}
+			AND LEV = #{lev} 
+		ORDER BY TRS_DTL_SEQ ASC
+	</select>		
+		
+	<!--
+         쿼리명 : LPAOnlinePrdctDAO.selectMemTermMst
+         설  명 : 가입신청일자를 기준으로 적용된 약관 및 계약안내를 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.07   김필기     최초 생성
+    -->
+    <select id="LPAOnlinePrdctDAO.selectMemTermMst" parameterType="emfMap" resultMap="emfMap">
+    	SELECT /* LPAOnlinePrdctDAO.selectMemTermMst */
+    		   *
+    	FROM (
+			SELECT TRS_MST_SEQ
+			       , TITLE
+			       , TRS_DESC
+			       , TRS_INFO
+			  FROM CM_TRS_MST
+			 WHERE TRS_GB = #{cdId}
+			   AND APPLY_DT <![CDATA[<=]]> TO_DATE(#{joinDt}, 'yyyyMMdd') 
+			ORDER BY APPLY_DT DESC
+		)
+		WHERE ROWNUM <![CDATA[<]]> 2
+	</select>				
+		
+	<!--
+         쿼리명 : LPAOnlinePrdctDAO.selectAdminEmail
+         설  명 : 특정 메뉴 권한을 가진 관리자 이메일 정보 가져오기
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.06   김필기     최초 생성
+    -->
+    <select id="LPAOnlinePrdctDAO.selectAdminEmail" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* LPAOnlinePrdctDAO.selectAdminEmail */ 
+			   NAME
+    	       , EMAIL
+		  FROM CO_ADM_MST
+	     WHERE USE_YN = 'Y' 
+		   AND ADM_SEQ IN(SELECT ADM_SEQ FROM CO_ADM_MENU_INF WHERE MENU_SEQ = #{menuSeq})
+	</select>	
+	
+	<!--
+         쿼리명 : LPAOnlinePrdctDAO.selectCheckTermGrp
+         설  명 : 약관 및 계약안내 설정 확인
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.07   김필기     최초 생성
+    -->	
+    <select id="LPAOnlinePrdctDAO.selectCheckTermGrp" parameterType="emfMap" resultType="emfMap">
+        SELECT * 
+        FROM
+        (
+        	SELECT B.CD_ID
+		    FROM CM_TRS_GRP_PRDCT_MST A, CM_TRS_GRP_DTL B
+		    WHERE 1=1
+		      AND A.PRDCT_CD = #{prdctCd} 
+		      AND A.TRS_GRP_PRDCT_SEQ = B.TRS_GRP_PRDCT_SEQ
+		      AND B.TRS_EXPS_YN = 'Y'  
+        ) AA
+        WHERE AA.CD_ID IN (
+          SELECT CD
+          FROM CO_CD_DTL
+          WHERE CD_ID = #{cdId}
+            AND USE_YN = 'Y'        
+        )		  
+	</select>		
+</mapper>            

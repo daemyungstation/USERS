@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OCAOutsourcingDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="TERMS" column="TERMS" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : OCAOutsourcingDAO.insertOutsourcingInf
+         설  명 : 외주업체 상담 신청을 저장한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.23   김필기      최초생성
+    -->
+	<insert id="OCAOutsourcingDAO.insertOutsourcingInf" parameterType="emfMap">
+		INSERT /* OCAOutsourcingDAO.insertOutsourcingInf */ INTO OM_OSC_CNSL_MST
+			(OSC_CNSL_SEQ
+			, AGENT_NM
+			, AGENT_EMP_NM
+			, NAME
+			, ZIPCD
+			, ADR
+			, ADR_DTL
+			, TEL
+			, HP
+			, EMAIL
+			, CALLTIME
+			, CALL_STTS
+			, MEMO
+			, B2B_CD
+			, B2B_STTS
+			, B2B_NM
+			, B2B_EMP_CD
+			, PRDCT_CD
+			, PRDCT_NM
+			, PRDCT_CD2
+			, PRDCT_NM2
+			, PRDCT_CD3
+			, PRDCT_NM3
+			, AGENT_EMP_ID
+			, AGENT_EMP_TEL
+			, TELECOM
+			, AGENT_CALL_STTS
+			, SUB_HP
+			, EMART_A
+			, CI
+			, BIRTH
+			, SEX
+			, ID_NO
+			, CODE_1
+			, CODE_2
+			, CODE_3
+			, CODE_4
+			, REG_IP
+			, REG_DTM
+			, COMPANY_NM
+			, FUSION_PRDCT_CD
+			, FUSION_PRDCT_NM
+			, LGU_HOME_NO
+			, LGU_MOBILE_NO
+			, PREPAID_CARD_NUM
+			, AGENT_CD
+			, SKB_JOIN
+			, STORE_NM
+			, SID
+			, LOT_CARD_NUM
+			, AGENT_CODE1
+			, ORDER_NUM
+			, AGENT_EMP_NUM
+			, AGENT_NUM
+			, AGENT_CODE2
+			, AGENT_ETC
+			, AGENT_UNQ_NUM
+			, SLLR_NUM
+			, SLLR_PART
+			, SLLR_CTEL
+			, CSTMR_CODE1
+			, CSTMR_UNQ_NUM
+			, CARD_NUM
+			, CSTMR_NUM
+			, CSTMR_CODE2
+			, CSTMR_ETC
+			, HANSS_MBSP_NUM
+			, MBSP_NUM
+			, FUNNEL
+			, TRAVEL
+			, JAU_NUM
+			, DM_TOUR_NUM
+			, LOTTE_CARD
+			, SLLR_AGENT_NM
+			, LOTTE_CARD_PAY
+			, TOUR_BOOK_NO
+			, JOIN_PROD
+			<if test="b2bStts == 'LGU' ">
+			, AGENT_GUBUN
+			, HOME_PRD_NUM
+			, U_DLR_CD
+			, U_INDC_EMPNO
+			, U_INTG_USER_ID
+			</if>
+			, MAIN_CONT_TYPE
+			, CARD_PAY
+			, FUSION_PRDCT_CD2
+			, FUSION_PRDCT_NM2
+			<if test = "b2bStts == 'EXPIRATION'">
+			, EXPIRE_RENEW_GIFT_NO
+			, EXPIRE_RENEW_ACCNT_NO
+			, EXPIRE_RENEW_ACCNT_NAME
+			, EXPIRE_RENEW_ACCNT_CNT
+			, UNQ_NO
+			</if>
+			, CONTRACT_NO
+			<if test="b2bStts eq 'CHUNGHO'">
+			, SERIAL_NO
+			, PRODUCT_NM
+			</if>
+			, DISCOUNT_CTN
+			, DISCOUNT_PIN
+			, ESTIMATE_PRICE
+			, WEDDING_DATE
+			, SALES_TYPE
+			, INVITE_CODE
+			, WH_POS_CD
+			, WH_STORE_NM
+			, U_PROD_NM
+			, U_CMMN_CD
+			, U_CMMN_CD_NM
+			, U_DLR_NM
+			, U_PROD_NO
+			, CONTRACTOR_NAME
+			, CONTRACTOR_BIRTH
+			, CONTRACTOR_PHONE
+			, CARD_COMPANY
+			, CREDIT_CARD_NUM
+			, VALID_THRU
+			, PLATE_NUM
+			, MAIN_CONT_SERVICE_1
+			, MAIN_CONT_SERVICE_2
+			, ORDER_QTY
+			, TERM_AGREE
+			)
+		VALUES
+			(#{seq}
+			, TRIM(#{agentNm, jdbcType=VARCHAR})
+			, TRIM(#{agentEmpNm, jdbcType=VARCHAR})
+			, TRIM(#{name, jdbcType=VARCHAR})
+			, TRIM(#{zipcd, jdbcType=VARCHAR})
+			, TRIM(#{adr, jdbcType=VARCHAR})
+			, TRIM(#{adrDtl, jdbcType=VARCHAR})
+			, TRIM(#{tel, jdbcType=VARCHAR})
+			, TRIM(#{hp, jdbcType=VARCHAR})
+			, TRIM(#{email, jdbcType=VARCHAR})
+			, TRIM(#{calltime, jdbcType=VARCHAR})
+			, TRIM(#{callStts, jdbcType=VARCHAR})
+			, #{memo, jdbcType=VARCHAR}
+			, TRIM(#{b2bCd, jdbcType=VARCHAR})
+			, TRIM(#{b2bStts, jdbcType=VARCHAR})
+			, TRIM(#{b2bNm, jdbcType=VARCHAR})
+			, TRIM(#{b2bEmpCd, jdbcType=VARCHAR})
+			, TRIM(#{prdctCd, jdbcType=VARCHAR})
+			, TRIM(#{prdctNm, jdbcType=VARCHAR})
+			, TRIM(#{prdctCd2, jdbcType=VARCHAR})
+			, TRIM(#{prdctNm2, jdbcType=VARCHAR})
+			, TRIM(#{prdctCd3, jdbcType=VARCHAR})
+			, TRIM(#{prdctNm3, jdbcType=VARCHAR})
+			, TRIM(#{agentEmpId, jdbcType=VARCHAR})
+			, TRIM(#{agentEmpTel, jdbcType=VARCHAR})
+			, TRIM(#{telecom, jdbcType=VARCHAR})
+			, TRIM(#{agentCallStts, jdbcType=VARCHAR})
+			, TRIM(#{subHp, jdbcType=VARCHAR})
+			, TRIM(#{emartA, jdbcType=VARCHAR})
+			, TRIM(#{ci, jdbcType=VARCHAR})
+			, TRIM(#{birth, jdbcType=VARCHAR})
+			, TRIM(#{sex, jdbcType=VARCHAR})
+			, TRIM(#{idNo, jdbcType=VARCHAR})
+			, TRIM(#{code1, jdbcType=VARCHAR})
+			, TRIM(#{code2, jdbcType=VARCHAR})
+			, TRIM(#{code3, jdbcType=VARCHAR})
+			, TRIM(#{code4, jdbcType=VARCHAR})
+			, TRIM(#{regIp, jdbcType=VARCHAR})
+			, SYSDATE
+			, TRIM(#{companyNm, jdbcType=VARCHAR})
+			, TRIM(#{fusionPrdctCd, jdbcType=VARCHAR})
+			, TRIM(#{fusionPrdctNm, jdbcType=VARCHAR})
+			, TRIM(#{lguHomeNo, jdbcType=VARCHAR})
+			, TRIM(#{lguMobileNo, jdbcType=VARCHAR})
+			, TRIM(#{prepaidCardNum, jdbcType=VARCHAR})
+			, TRIM(#{agentCd, jdbcType=VARCHAR})
+			, TRIM(#{skbJoin, jdbcType=VARCHAR})
+			, TRIM(#{storeNm, jdbcType=VARCHAR})
+			, TRIM(#{sid, jdbcType=VARCHAR})
+			, TRIM(#{lotCardNum, jdbcType=VARCHAR})
+			, TRIM(#{agentCode1, jdbcType=VARCHAR})
+			, TRIM(#{orderNum, jdbcType=VARCHAR})
+			, TRIM(#{agentEmpNum, jdbcType=VARCHAR})
+			, TRIM(#{agentNum, jdbcType=VARCHAR})
+			, TRIM(#{agentCode2, jdbcType=VARCHAR})
+			, TRIM(#{agentEtc, jdbcType=VARCHAR})
+			, TRIM(#{agentUnqNum, jdbcType=VARCHAR})
+			, TRIM(#{sllrNum, jdbcType=VARCHAR})
+			, TRIM(#{sllrPart, jdbcType=VARCHAR})
+			, TRIM(#{sllrCtel, jdbcType=VARCHAR})
+			, TRIM(#{cstmrCode1, jdbcType=VARCHAR})
+			, TRIM(#{cstmrUnqNum, jdbcType=VARCHAR})
+			, TRIM(#{cardNum, jdbcType=VARCHAR})
+			, TRIM(#{cstmrNum, jdbcType=VARCHAR})
+			, TRIM(#{cstmrCode2, jdbcType=VARCHAR})
+			, TRIM(#{cstmrEtc, jdbcType=VARCHAR})
+			, TRIM(#{hanssMbspNum, jdbcType=VARCHAR})
+			, TRIM(#{mbspNum, jdbcType=VARCHAR})
+			, TRIM(#{funnel, jdbcType=VARCHAR})
+			, TRIM(#{travel, jdbcType=VARCHAR})
+			, TRIM(#{jauNum, jdbcType=VARCHAR})
+			, TRIM(#{dmTourNum, jdbcType=VARCHAR})
+			, TRIM(#{lotteCard, jdbcType=VARCHAR})
+			, TRIM(#{sllrAgentNm, jdbcType=VARCHAR})
+			, TRIM(#{lotteCardPay, jdbcType=VARCHAR})
+			, TRIM(#{tourBookNo, jdbcType=VARCHAR})
+			, TRIM(#{joinProd, jdbcType=VARCHAR})
+			<if test="b2bStts == 'LGU' ">
+			, TRIM(#{agentGubun, jdbcType=VARCHAR})
+			, TRIM(#{homePrdNum, jdbcType=VARCHAR})
+			, TRIM(#{uDlrCd, jdbcType=VARCHAR})
+			, TRIM(#{uIndcEmpno, jdbcType=VARCHAR})
+			, TRIM(#{uIntgUserId, jdbcType=VARCHAR})
+			</if>
+			, TRIM(#{mainContType, jdbcType=VARCHAR})
+			, TRIM(#{cardPay, jdbcType=VARCHAR})
+			, TRIM(#{fusionPrdctCd2, jdbcType=VARCHAR})
+			, TRIM(#{fusionPrdctNm2, jdbcType=VARCHAR})
+			<if test = "b2bStts == 'EXPIRATION'">
+			, TRIM(#{expireRenewGiftNo, jdbcType=INTEGER})
+			, TRIM(#{expireRenewAccntNo, jdbcType=INTEGER})
+			, TRIM(#{expireRenewAccntName, jdbcType=VARCHAR})
+			, TRIM(#{trueCnt, jdbcType=VARCHAR})
+			, TRIM(#{memNo, jdbcType=VARCHAR})
+			</if>
+			, TRIM(#{contractNo, jdbcType=VARCHAR})
+			<if test="b2bStts eq 'CHUNGHO'">
+			, #{fusionPrdctSerialNum}
+			, #{productNm}
+			</if>
+			, TRIM(#{discountCtn, jdbcType=VARCHAR})
+			, TRIM(#{discountPin, jdbcType=VARCHAR})
+			, TRIM(#{estimatePrice, jdbcType=INTEGER})
+			, TRIM(#{weddingDate, jdbcType=VARCHAR})
+			, TRIM(#{salesType, jdbcType=VARCHAR})
+			, TRIM(#{inviteCode, jdbcType=VARCHAR})
+			, TRIM(#{whPosCd, jdbcType=VARCHAR})
+			, TRIM(#{whStoreNm, jdbcType=VARCHAR})
+			, TRIM(#{uProdNm, jdbcType=VARCHAR})
+			, TRIM(#{uCmmnCd, jdbcType=VARCHAR})
+			, TRIM(#{uCmmnCdNm, jdbcType=VARCHAR})
+			, TRIM(#{uDlrNm, jdbcType=VARCHAR})
+			, TRIM(#{uProdNo, jdbcType=VARCHAR})
+			, TRIM(#{contractorName, jdbcType=VARCHAR})
+			, TRIM(#{contractorBirth, jdbcType=VARCHAR})
+			, TRIM(#{contractorPhone, jdbcType=VARCHAR})
+			, TRIM(#{cardCompany, jdbcType=VARCHAR})
+			, TRIM(#{creditCardNum, jdbcType=VARCHAR})
+			, TRIM(#{validThru, jdbcType=VARCHAR})
+			, TRIM(#{plateNum, jdbcType=VARCHAR})
+			, TRIM(#{mainContService1, jdbcType=VARCHAR})
+			, TRIM(#{mainContService2, jdbcType=VARCHAR})
+			, TRIM(#{orderQty, jdbcType=VARCHAR})
+			, TRIM(#{termAgree, jdbcType=VARCHAR})
+			)
+	</insert>
+	
+	<!--
+         쿼리명 : OCAOutsourcingDAO.selectOutsourcingPageMngInfo
+         설  명 : 외주업체 코드별 관리 정보를 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.05.16   김필기     최초 생성
+    -->
+    <select id="OCAOutsourcingDAO.selectOutsourcingPageMngInfo" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* OCAOutsourcingDAO.selectOutsourcingPageMngInfo */
+	    	   *
+		  FROM OM_OSC_INPUT_MST
+		 WHERE OSC_CD = #{oscCd}
+    </select>
+    
+    	<!--
+         쿼리명 : OCAOutsourcingDAO.selectOverrapSid
+         설  명 : sid가 중복되는 내용 검색
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.05.16   김필기     최초 생성
+    -->
+    <select id="OCAOutsourcingDAO.selectOverrapSid" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* OCAOutsourcingDAO.selectOverrapSid */
+			COUNT(*) AS CNT
+		FROM OM_OSC_CNSL_MST
+		WHERE NAME = #{name}
+			AND HP = #{hp}
+			AND B2B_STTS = #{b2bStts}
+		<if test="idNo != null and idNo != ''">
+			AND ID_NO = #{idNo}
+		</if>
+		<if test="prdctCd != null and prdctCd != ''">
+			AND PRDCT_CD = #{prdctCd}
+		</if>
+		   AND ROUND((SYSDATE - REG_DTM) * 24 * 60) <![CDATA[<]]> 60 * 24 * 1
+    </select>    
+    
+    	<!--
+         쿼리명 : OCAOutsourcingDAO.selectOverrapSid
+         설  명 : sid가 중복되는 내용 검색
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.05.16   김필기     최초 생성
+    -->
+    <select id="OCAOutsourcingDAO.agentAuthCheck" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* OCAOutsourcingDAO.agentAuthCheck */
+               COUNT(*) AS CNT
+               , CI
+		  FROM OM_AGENT_AUTH_INFO
+		 WHERE 1=1
+		<choose>
+			<when test="ci eq '' or ci eq null">
+				AND NAME = #{agentEmpNm}
+			    AND HP = replace(#{sllrCtel}, '-', '')
+			    AND BIRTH_DAY = #{birthDay}
+			</when>
+			<otherwise>
+				AND CI = #{ci}
+			</otherwise>
+		</choose>	
+         GROUP BY CI
+    </select>    
+
+	<!--
+         쿼리명 : OCAOutsourcingDAO.insertAuthInf
+         설  명 : 판매자 인증 정보를 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2018.01.25          강재석		최초생성
+    -->
+	<insert id="OCAOutsourcingDAO.insertAuthInf" parameterType="emfMap">
+		INSERT INTO OM_AGENT_AUTH_INFO (
+		        AGENT_AUTH_SEQ
+		        , AUTH_PHONE_IPIN_GUBUN
+		        , NAME
+		        , HP
+		        , BIRTH_DAY
+		        , CI
+		        , DI
+		        , CARD
+		        , REG_IP
+		        , REG_DATE
+		    ) VALUES (
+		        AGENT_AUTH_SEQ.nextval
+		        , TRIM(#{authPhoneIpinGubun, jdbcType=VARCHAR})
+		        , TRIM(#{name, jdbcType=VARCHAR})
+		        , TRIM(replace(#{hp, jdbcType=VARCHAR}, '-', ''))
+				, TRIM(NVL(#{birth, jdbcType=VARCHAR}, #{birthDay, jdbcType=VARCHAR}))
+		        , TRIM(#{ci, jdbcType=VARCHAR})
+		        , TRIM(#{di, jdbcType=VARCHAR})
+		        , TRIM(#{card, jdbcType=VARCHAR})
+		        , TRIM(#{regIp, jdbcType=VARCHAR})
+		        , SYSDATE
+		    )
+
+	</insert>
+	
+	<!--
+         쿼리명 : OCAOutsourcingDAO.getAgentNmByAgentCd
+         설  명 : 점코드 확인(매장명 조회)
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.05.16   김필기     최초 생성
+    -->
+    <select id="OCAOutsourcingDAO.getAgentNmByAgentCd" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* OCAOutsourcingDAO.getAgentNmByAgentCd */
+			AGENT_NM
+		FROM OM_SDP_AGENT
+		WHERE AGENT_CD = #{agentCd}
+    </select>
+
+	<select id="selectTelegramNo"  parameterType="emfMap" resultType="Integer">
+		/* DoznBanking.selectTelegramNo */
+		SELECT SEQ_TELEGRAM_NO.NEXTVAL FROM DUAL
+	</select>
+    
+</mapper>            

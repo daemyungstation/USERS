@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SMABanrMngDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="atchFileDsc" column="ATCH_FILE_DSC" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : SMABanrMngDAO.selectBanrList
+         설  명 : 배너 목록을 조회한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.25  허진영     최초생성
+    -->
+	<select id="SMABanrMngDAO.selectBanrList" parameterType="emfMap" resultType="emfMap">	
+		SELECT /* SMABanrMngDAO.selectBanrList */
+			   TBL.*
+		FROM (
+			SELECT ROWNUM AS RNUM, A.*
+			FROM (
+				SELECT COUNT(*) OVER() AS TOT_CNT
+			           , BANR_SEQ
+		               , BANR_NM
+					   , PTUP_STRT_DTM
+				  	   , PTUP_END_DTM
+				  	   , ODTM_YN
+		               , PTUP_YN
+		               , SORT_SEQ
+		               , LEAD(BANR_SEQ, 1) OVER(ORDER BY SORT_SEQ DESC) AS NXT_BANR_SEQ 
+    			   	   , LAG(BANR_SEQ, 1) OVER(ORDER BY SORT_SEQ DESC) AS PRV_BANR_SEQ
+			  		   , LEAD(SORT_SEQ, 1) OVER(ORDER BY SORT_SEQ DESC) AS NXT_SORT_SEQ
+      			   	   , LAG(SORT_SEQ, 1) OVER(ORDER BY SORT_SEQ DESC) AS PRV_SORT_SEQ
+		               , REG_ID
+					   , REG_DTM
+					   , ATCH_FILE_ID
+					   , LINK
+					   , WND_YN
+			      FROM SM_BANR_MST
+			     WHERE 1=1
+					AND PTUP_YN = 'Y'
+				 ORDER BY SORT_SEQ DESC
+			) A
+	    ) TBL
+	    WHERE RNUM BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}
+	</select>
+	
+	<!--
+         쿼리명 : SMABanrMngDAO.selectBanr
+         설  명 : 배너 상세를 조회한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.27  허진영     최초생성
+    -->
+	<select id="SMABanrMngDAO.selectBanr" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* SMABanrMngDAO.selectBanr */ 
+               BANR_SEQ
+               , BANR_NM
+               , PTUP_STRT_DTM
+               , PTUP_END_DTM
+               , ODTM_YN
+               , ATCH_FILE_ID
+               , ATCH_FILE_DSC
+               , LINK
+               , WND_YN
+               , PTUP_YN
+		  FROM SM_BANR_MST
+		 WHERE BANR_SEQ = #{banrSeq}
+	</select>
+	
+</mapper>

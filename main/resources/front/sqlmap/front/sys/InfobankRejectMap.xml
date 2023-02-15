@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="InfobankRejectMap">
+
+    <!-- 수신거부 전화번호 수신내역 Insert -->
+    <insert id="InfobankRejectMap.insertInfobankRejectCallnum" parameterType="map">
+        INSERT /* InfobankRejectMap.insertInfobankRejectCallnum */
+          INTO PS_WILLVI.TB_INFOBANK_REJCALL
+        (
+               CID          /* 고유번호 */
+             , RDATETIME    /* 수신일시 */
+             , CALLNUM      /* 수신거부요청번호 */
+        )
+        VALUES
+        (
+               #{sCid}
+             , SYSTIMESTAMP
+             , #{sRejectnumber}
+        )
+    </insert>
+
+    <!-- 수신거부 기 등록자 조회  -->
+    <select id="InfobankRejectMap.selectInfobankRejectCallnum" parameterType="map" resultType="int">
+    SELECT /* InfobankRejectMap.selectInfobankRejectCallnum */
+           COUNT(*)
+      FROM PS_WILLVI.TB_INFOBANK_REJCALL
+     WHERE 1=1
+        <if test="sCid != null and sCid != ''">
+            AND CID LIKE '%' || #{sCid} || '%'
+        </if>
+        <if test="sRejectnumber != null and sRejectnumber != ''">
+            AND CALLNUM LIKE '%' || #{sRejectnumber} || '%'
+        </if>
+        </select>
+
+</mapper>

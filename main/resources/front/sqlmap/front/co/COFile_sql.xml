@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="FileManageDAO">
+
+	<!--
+         쿼리명 : FileManageDAO.selectFileInfs
+         설  명 : 파일 목록을 조회한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->
+ 	<select id="FileManageDAO.selectFileInfs" parameterType="emfMap" resultType="emfMap">
+		SELECT /* FileManageDAO.selectFileInfs */
+			   A.ATCH_FILE_ID
+			   , B.FILE_SEQ
+			   , B.PHY_PATH
+			   , B.SAVE_FILE_NM
+			   , B.REAL_FILE_NM
+			   , B.FILE_EXTN
+			   , B.FILE_DSC
+			   , B.FILE_SIZE
+			   , A.REG_DTM
+		  FROM CO_FILE_MST A, CO_FILE_DTL B
+		 WHERE A.ATCH_FILE_ID = B.ATCH_FILE_ID
+		   AND A.ATCH_FILE_ID = #{atchFileId}
+		   AND A.USE_YN = 'Y' 
+		   AND B.USE_YN = 'Y'
+		ORDER BY B.FILE_SEQ	
+ 	</select>
+
+	<!--
+         쿼리명 : FileManageDAO.selectFileInf
+         설  명 : 파일 상세를 조회한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->
+ 	<select id="FileManageDAO.selectFileInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* FileManageDAO.selectFileInf */
+			   ATCH_FILE_ID
+			   , FILE_DSC
+			   , FILE_SEQ
+			   , PHY_PATH
+			   , SAVE_FILE_NM
+			   , FILE_EXTN
+			   , REAL_FILE_NM
+			   , FILE_SIZE
+		  FROM CO_FILE_DTL
+		 WHERE USE_YN = 'Y'
+		   AND ATCH_FILE_ID = #{atchFileId}
+		   AND FILE_SEQ = #{fileSeq}
+ 	</select>
+
+	<!--
+         쿼리명 : FileManageDAO.insertFileMaster
+         설  명 : 파일 마스터를 등록한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->
+	<insert id="FileManageDAO.insertFileMaster" parameterType="emfMap">
+		INSERT /*FileManageDAO.insertFileMaster*/ INTO CO_FILE_MST
+			(ATCH_FILE_ID
+			, USE_YN
+			, REG_ID
+			, REG_IP 
+			, REG_DTM
+			, MOD_ID
+			, MOD_IP 
+			, MOD_DTM
+			)
+		VALUES
+			(#{atchFileId}
+			, 'Y'
+			, #{regId, jdbcType=VARCHAR}
+			, #{regIp, jdbcType=VARCHAR}
+			, SYSDATE
+			, #{modId, jdbcType=VARCHAR}
+			, #{modIp, jdbcType=VARCHAR}
+			, SYSDATE
+			)
+	</insert>
+
+	<!--
+         쿼리명 : FileManageDAO.insertFileDetail
+         설  명 : 파일 상세정보를 등록한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->	
+	<insert id="FileManageDAO.insertFileDetail" parameterType="emfMap" >
+		INSERT /*FileManageDAO.insertFileDetail*/ INTO CO_FILE_DTL
+			(ATCH_FILE_ID
+			, FILE_SEQ
+			, PHY_PATH
+			, SAVE_FILE_NM
+			, REAL_FILE_NM
+			, FILE_EXTN
+			, FILE_DSC
+			, FILE_SIZE
+			, USE_YN
+			, REG_ID
+			, REG_IP 
+			, REG_DTM
+			, MOD_ID
+			, MOD_IP 
+			, MOD_DTM
+			)
+		VALUES
+			(#{atchFileId}
+			, #{fileSeq}
+			, #{phyPath}
+			, #{saveFileNm}
+			, #{realFileNm}
+			, #{fileExtn}
+			, #{fileDsc, jdbcType=VARCHAR}
+			, #{fileSize}
+			, 'Y'
+			, #{regId, jdbcType=VARCHAR}
+			, #{regIp, jdbcType=VARCHAR}
+			, SYSDATE
+			, #{modId, jdbcType=VARCHAR}
+			, #{regIp, jdbcType=VARCHAR}
+			, SYSDATE
+			)			
+	</insert>
+	
+	<!--
+         쿼리명 : FileManageDAO.updateFileDetail
+         설  명 : 파일 상세를 수정한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->
+ 	<update id="FileManageDAO.updateFileDetail" parameterType="emfMap" >
+		UPDATE /* FileManageDAO.updateFileDetail */ CO_FILE_DTL
+		   SET FILE_DSC = #{fileDsc}
+		       , MOD_ID = #{modId, jdbcType=VARCHAR}
+			   , MOD_IP = #{modIp, jdbcType=VARCHAR}
+			   , MOD_DTM = SYSDATE
+		 WHERE ATCH_FILE_ID = #{atchFileId}
+		   AND FILE_SEQ = #{fileSeq}
+	</update>
+	
+	<!--
+         쿼리명 : FileManageDAO.deleteFileDetail
+         설  명 : 파일을 삭제한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->	
+	<delete id="FileManageDAO.deleteFileDetail" parameterType="emfMap">
+		DELETE /* FileManageDAO.deleteFileDetail */ 
+		  FROM CO_FILE_DTL
+		 WHERE ATCH_FILE_ID = #{atchFileId}
+		   AND FILE_SEQ = #{fileSeq}	
+	</delete>
+	
+	<!--
+         쿼리명 : FileManageDAO.deleteAllFileInf
+         설  명 : 전체 파일을 삭제한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->	
+	<update id="FileManageDAO.deleteAllFileInf" parameterType="emfMap">
+		UPDATE /* FileManageDAO.deleteAllFileInf */ CO_FILE_MST
+		  SET USE_YN = 'N'
+		WHERE ATCH_FILE_ID = #{atchFileId}
+	</update>
+	
+	<!--
+		쿼리명 : FileMnageDAO.deleteFileInf
+        설  명 : 파일 삭제 flag 변화
+        수정일      수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용     최초생성
+    -->
+	<update id="FileManageDAO.deleteFileInf" parameterType="emfMap">
+		UPDATE /* FileMnageDAO.deleteFileInf */ CO_FILE_DTL 
+		   SET USE_YN = 'N'
+		   	   , MOD_ID = #{modId, jdbcType=VARCHAR}
+			   , MOD_IP = #{modIp, jdbcType=VARCHAR}
+			   , MOD_DTM = SYSDATE
+ 		 WHERE ATCH_FILE_ID = #{atchFileId}
+ 		   AND FILE_SEQ = #{fileSeq}
+ 	</update>
+
+ 	<!--
+         쿼리명 : FileManageDAO.selectParentFileCnt
+         설  명 : 파일 구분자에 대한 최대값을 구한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->	
+	<select id="FileManageDAO.selectParentFileCnt" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT /* FileManageDAO.selectParentFileCnt */ 
+			   COUNT(*)
+		  FROM CO_FILE_MST
+		 WHERE ATCH_FILE_ID = #{atchFileId}
+	</select>
+	
+	<!--
+         쿼리명 : FileManageDAO.selectFileListByFileNm
+         설  명 : 파일명 검색에 대한 목록을 조회한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->
+ 	<select id="FileManageDAO.selectFileListByFileNm" parameterType="emfMap" resultType="emfMap">
+		SELECT /* FileManageDAO.selectFileListByFileNm */
+ 			   TBL.* 
+		FROM (
+			SELECT ROWNUM RNUM, T1.* 
+			FROM (
+				SELECT A.ATCH_FILE_ID
+					   , B.FILE_SEQ
+					   , B.PHY_PATH
+					   , B.SAVE_FILE_NM
+					   , B.REAL_FILE_NM
+					   , B.FILE_EXTN
+					   , B.FILE_DSC
+					   , B.FILE_SIZE
+					   , A.REG_DTM
+			      FROM CO_FILE_MST A, CO_FILE_DTL B
+	   			 WHERE A.ATCH_FILE_ID = B.ATCH_FILE_ID
+		 	 	   AND A.USE_YN = 'Y'
+				<if test="searchWrd != null and searchWrd != ''">
+					<![CDATA[	AND (B.SAVE_FILE_NM LIKE '%' || #{searchWrd} || '%' OR B.REAL_FILE_NM LIKE '%' || #{searchWrd} || '%')	]]>
+				</if>
+	   		     ORDER BY A.ATCH_FILE_ID, B.FILE_SEQ	
+			) T1 
+		) TBL 
+		WHERE RNUM BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}
+ 	</select>
+ 	
+ 	<!--
+         쿼리명 : FileManageDAO.selectImageFileList
+         설  명 : 이미지 파일에 대한 목록을 조회한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->
+  	<select id="FileManageDAO.selectImageFileList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* FileManageDAO.selectImageFileList */
+			   A.ATCH_FILE_ID
+			   , B.FILE_SEQ
+			   , B.PHY_PATH
+			   , B.SAVE_FILE_NM
+			   , B.REAL_FILE_NM
+			   , B.FILE_EXTN
+			   , B.FILE_DSC
+			   , B.FILE_SIZE
+			   , A.REG_DTM
+		  FROM CO_FILE_MST A, CO_FILE_DTL B
+		 WHERE A.ATCH_FILE_ID = B.ATCH_FILE_ID
+		   AND A.ATCH_FILE_ID = #{atchFileId}
+		   AND A.USE_YN = 'Y'
+		   AND UPPER(B.FILE_EXTN) IN('GIF','JPG','BMP','PNG')				
+		 ORDER BY B.FILE_SEQ	
+ 	</select>
+ 	
+ 	<!--
+         쿼리명 : FileManageDAO.getParntFileCnt
+         설  명 : 파일 마스터에 데이터가 있는지 확인한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->
+ 	<select id="FileManageDAO.getParntFileCnt" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT /* FileManageDAO.getParntFileCnt */ 
+			   COUNT(*)
+	      FROM CO_FILE_MST
+		 WHERE ATCH_FILE_ID = #{atchFileId}
+ 	</select>
+ 	
+	<!--
+         쿼리명 : FileManageDAO.getMaxFileSeq
+         설  명 : 파일ID에 대한 최대 파일순번을 가져온다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->	
+	<select id="FileManageDAO.getMaxFileSeq" parameterType="emfMap" resultType="java.lang.Integer">
+		SELECT /* FileManageDAO.getMaxFileSeq */ 
+			   NVL(MAX(FILE_SEQ), 0) + 1 AS FILE_SEQ
+		  FROM CO_FILE_DTL
+		 WHERE ATCH_FILE_ID = #{atchFileId}
+	</select>
+	
+	<!--
+         쿼리명 : FileManageDAO.getFileListCnt
+         설  명 : 파일의 갯수를 가져온다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.24  안진용    	 최초 생성
+    -->
+ 	<select id="FileManageDAO.getFileListCnt" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT /* FileManageDAO.getFileListCnt */
+			   COUNT(ATCH_FILE_ID)
+		  FROM CO_FILE_DTL
+		 WHERE ATCH_FILE_ID = #{value}
+		   AND USE_YN = 'Y'		
+ 	</select>
+ 	
+ 		<!--
+         쿼리명 : FileManageDAO.updateFileCnt
+         설  명 : 다운로드 횟수를 변경한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2016.07.12  김필기    	 최초 생성
+    -->
+ 	<update id="FileManageDAO.updateFileCnt" parameterType="emfMap" >
+		UPDATE /* FileManageDAO.updateFileCnt */ CO_FILE_DTL
+		   SET CNT = CNT + 1
+		 WHERE ATCH_FILE_ID = #{atchFileId}
+		   AND FILE_SEQ = #{fileSeq}
+	</update>
+ 	
+</mapper>            

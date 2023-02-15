@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CSAVocDAO">
+	<!--
+         쿼리명 : CSAVocDAO.selectMaxVoc
+         설  명 : VOC max PK 를 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2021.02.23   장준일     최초 생성
+    -->
+    <select id="CSAVocDAO.selectMaxVoc" parameterType="emfMap"  resultType="java.lang.String">
+     	SELECT /* CSAVocDAO.selectMaxVoc */      
+			nvl(max(VOC_NO), '') as vocNo
+	    FROM KM_VOC_INIT A
+   	</select>
+	
+	
+	<!--
+         쿼리명 : CSAVocDAO.insertVoc
+         설  명 : VOC를 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2021.02.23   장준일     최초 생성
+    -->
+	<insert id="CSAVocDAO.insertVoc" parameterType="emfMap">
+		INSERT /* CSAVocDAO.insertVoc */ INTO KM_VOC_INIT 
+			(
+			VOC_NO
+			, IND
+			, TITLE
+			, GUEST_NM
+			, MOBL_NO
+			, EMAIL_ADDR
+			, GEN
+			, AGE
+			, LOCATE
+			, STORE_CD
+			, STORE_DATE
+			, DTL_DESC
+			, RESIND
+			, REG_DT
+			, ID
+			, REG_ID
+			, REG_IP
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			, DEL_FG
+			, CATEGORY1
+			, CATEGORY2
+			
+			, ORG_SNTNC_NO
+			, TYPE_CD
+			, IND_TYPE_CD
+			, GRAD_CD
+			, RCEPT_EMPL_NO
+			, RCEPT_DT
+			, CEPT_OPINION
+			, MEM
+			, ZIPNO
+			, INIT_ADDR
+			, DTL_ADDR
+			, REG_EMPL_NO
+			, SEND_YN
+			, SEND_DATE
+			)
+		VALUES 
+			(
+			#{vocNo, jdbcType=VARCHAR}
+			, #{ind, jdbcType=VARCHAR}
+			, #{title, jdbcType=VARCHAR}
+			, #{guestNm, jdbcType=VARCHAR}
+			, #{moblNo, jdbcType=VARCHAR}
+			, #{emailAddr, jdbcType=VARCHAR}
+			, #{gen, jdbcType=VARCHAR}
+			, #{age, jdbcType=VARCHAR}
+			, #{locate, jdbcType=VARCHAR}
+			, #{storeCd, jdbcType=VARCHAR}
+			, ''
+			, #{dtlDesc, jdbcType=VARCHAR}
+			, #{resind, jdbcType=VARCHAR}
+			, SYSDATE
+			, #{id, jdbcType=VARCHAR}
+			, #{regId, jdbcType=VARCHAR}
+			, #{regIp, jdbcType=VARCHAR}
+			, ''
+			, ''
+			, ''
+			, 'N'
+			, #{category1, jdbcType=VARCHAR}
+			, #{category2, jdbcType=VARCHAR}
+			
+			
+			, ''
+			, ''
+			, ''
+			, ''
+			, ''
+			, #{storeDate, jdbcType=VARCHAR}
+			, ''
+			, ''
+			, ''
+			, ''
+			, ''
+			, ''
+			, 'N'
+			, ''
+			)
+	</insert>
+	
+   
+</mapper>            

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLDChngPtcDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="reqnCntn" column="REQN_CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+		<result property="prdctCntn" column="PRDCT_CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : MLDChngPtcDAO.selectChngPtcList
+         설  명 : 전환서비스 신청내역 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   허진영      최초생성
+    -->
+	<select id="MLDChngPtcDAO.selectChngPtcList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLDChngPtcDAO.selectChngPtcList */
+		       RQST_SEQ
+			   , ACCNT_NO
+			   , ITMDT_PAY
+			   , PRCS_CD
+		  FROM CM_CHNG_RQST_MST
+		 WHERE ID = #{id}
+		   AND PRCS_CD != '00'
+		 ORDER BY REG_DTM DESC
+	</select>
+	
+	<!--
+         쿼리명 : MLDChngPtcDAO.selectChngPtcDtl
+         설  명 : 전환서비스 신청내역 상세를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   허진영      최초생성
+    -->
+	<select id="MLDChngPtcDAO.selectChngPtcDtl" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* MLDChngPtcDAO.selectChngPtcDtl */
+			   ACCNT_NO
+			   , (SELECT NAME FROM MB_MEM_MST WHERE ID = #{id}) AS NAME
+			   , MEM_EMAIL
+			   , USER_NM
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'MEM_REL_GB' AND CD = A.USER_REL_CD) AS USER_REL_NM
+			   , USER_CTEL
+			   , USER_EMAIL
+			   , PRDCT_USE_REQN_DT
+			   , REQN_CNTN
+			   , PRDCT_SEQ
+			   , PRDCT_DTL_SEQ
+			   , ITMDT_PAY
+			   , PRCS_CD
+		  FROM CM_CHNG_RQST_MST A
+		 WHERE ID = #{id}
+		   AND PRCS_CD != '00'
+		   AND RQST_SEQ = #{rqstSeq}
+	</select>
+	
+	<!--
+         쿼리명 : MLDChngPtcDAO.selectChngPtcLog
+         설  명 : 전환서비스 신청내역 상세 로그를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   허진영      최초생성
+    -->
+	<select id="MLDChngPtcDAO.selectChngPtcLog" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLDChngPtcDAO.selectChngPtcLog */
+			   T1.CD
+			   , T2.MOD_DTM
+		FROM (
+		  SELECT B.CD
+		         , B.CD_ORD
+		    FROM CO_CD_MST A, CO_CD_DTL B
+		   WHERE A.CD_ID = B.CD_ID(+)
+		     AND A.CD_ID = 'CHNG_PRCS_STTS'
+		     AND B.USE_YN = 'Y'
+		) T1, (
+		  SELECT ROW_NUMBER() OVER(PARTITION BY PRCS_CD ORDER BY MOD_DTM DESC) RNK
+		         , PRCS_CD
+		         , MOD_DTM
+		    FROM CM_CHNG_RQST_LOG
+		   WHERE RQST_SEQ = #{rqstSeq}
+		) T2
+		WHERE T1.CD = T2.PRCS_CD(+)
+		  AND T1.CD != '00'
+		  AND (T2.RNK IS NULL OR T2.RNK = 1)
+		ORDER BY T1.CD_ORD
+	</select>
+	
+	<!--
+         쿼리명 : MLDChngPtcDAO.selectChngPrdctInf
+         설  명 : 전환서비스 상품정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   허진영      최초생성
+    -->
+	<select id="MLDChngPtcDAO.selectChngPrdctInf" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* MLDChngPtcDAO.selectChngPrdctInf */
+			   (SELECT CHNG_COND_CD FROM CM_CHNG_SYS_MST WHERE GRP_SEQ = (SELECT GRP_SEQ FROM CM_CHNG_PRDCT_INF WHERE OUT_PRDCT_CD = #{memInfo.prodCd})) AS CHNG_COND_CD
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'PRDCT_GB' AND CD = A.PRDCT_CD) AS PRDCT_GB
+			   , PRDCT_NM
+			<if test="userInfo.prdctDtlSeq != null and userInfo.prdctDtlSeq != ''">
+				, (SELECT PRDCT_TITL FROM CM_PRDCT_DTL WHERE PRDCT_DTL_SEQ = #{userInfo.prdctDtlSeq}) AS PRDCT_DTL_NM
+				, (SELECT LINK FROM CM_PRDCT_DTL WHERE PRDCT_DTL_SEQ = #{userInfo.prdctDtlSeq}) AS LINK
+			</if>
+			   , PRDCT_CNTN
+		  FROM CM_PRDCT_MST A
+		 WHERE PRDCT_SEQ = #{userInfo.prdctSeq}
+	</select>
+	
+	<!--
+         쿼리명 : MLDChngPtcDAO.updateChngRqstCncl
+         설  명 : 전환서비스 신청을 취소한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   허진영      최초생성
+    -->
+	<update id="MLDChngPtcDAO.updateChngRqstCncl" parameterType="emfMap">
+		UPDATE /* MLDChngPtcDAO.updateChngRqstCncl */ CM_CHNG_RQST_MST
+		   SET PRCS_CD = '00'
+		 WHERE ID = #{id}
+		   AND PRCS_CD = '01'
+		   AND RQST_SEQ = #{rqstSeq}
+	</update>
+	
+	<!--
+         쿼리명 : MLDChngPtcDAO.insertRqstPrcsLog
+         설  명 : 전환서비스 신청 처리현황 로그를 등록한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+    -->   
+   	<insert id="MLDChngPtcDAO.insertRqstPrcsLog" parameterType="emfMap">
+        INSERT /* MLDChngPtcDAO.insertRqstPrcsLog */ INTO CM_CHNG_RQST_LOG
+        	(RQST_SEQ
+			, PRCS_CD
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+        	)
+        VALUES
+        	(#{rqstSeq}
+        	, '00'
+           	, #{modId}
+          	, #{modIp}
+           	, SYSDATE
+        	)
+   </insert>
+	
+</mapper>            

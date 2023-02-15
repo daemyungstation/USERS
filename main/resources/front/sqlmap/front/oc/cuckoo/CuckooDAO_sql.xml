@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CuckooDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="TERMS" column="TERMS" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	<select id="CuckooDAO.getUserRecord" parameterType="emfMap" resultType="emfMap">
+		SELECT
+			TBL.ACCNT_NO,
+			TBL.MEM_NO,
+			TBL.MEM_NM, --회원명
+			TBL.PROD_NM, --가입상품
+			TBL.CELL, --휴대전화
+			TBL.ACC_STAT, --가입상태
+			TBL.PAY_STATE,
+			TBL.JOIN_DT, --가입일자
+			TO_CHAR ( TBL.REG_DM, 'YYYY-MM-DD' ) AS REG_DM, --등록일자
+			( SELECT CD_NM FROM COM_CD WHERE GRP_CD = 'SS02' AND COM_CD = TBL.PROD_CD ) AS CC_ALOW, --수당
+			TBL.ID_NO
+
+		FROM
+			(
+				SELECT
+					MPA.ACCNT_NO,
+					MPA.MEM_NO,
+					MPA.PROD_CD,
+					MB.MEM_NM,
+					FN_PROD_NM ( MPA.PROD_CD ) AS PROD_NM,
+					MB.CELL,
+					DECODE(FN_ACCNT_STAT@DMLIFE(MPA.ACCNT_NO), 'Y', '정상', 'R', '해약', 'E', '행사', '청약철회') AS ACC_STAT,
+					FN_YEN_CHE ( MPA.ACCNT_NO ) AS PAY_STATE,
+					MPA.JOIN_DT,
+					MPA.REG_DM,
+					( SELECT MAX( NO ) FROM PAY_MNG WHERE ACCNT_NO = MPA.ACCNT_NO AND DEL_FG = 'N' ) AS TRUE_COUNT,
+					PD.SECTION_THR,
+					B2B_EMPLE_CI,
+					MPA.ID_NO
+				FROM
+					MEM_PROD_ACCNT MPA
+						INNER JOIN MEMBER MB ON MPA.MEM_NO = MB.MEM_NO
+						AND MPA.DEL_FG = 'N'
+						INNER JOIN PRODUCT PD ON MPA.PROD_CD = PD.PROD_CD
+			) TBL
+		WHERE TBL.SECTION_THR = '0035'
+		  AND TBL.JOIN_DT 	BETWEEN  (#{startDate} ||'01')   AND TO_CHAR(LAST_DAY(TO_DATE(#{endDate}, 'YYYYMM')), 'YYYYMMDD')
+		  AND TRUE_COUNT > 0
+		  AND ACC_STAT != '청약철회'
+		  AND TBL.PROD_CD IN ( 'OJ', 'OK')
+	     		AND B2B_EMPLE_CI = #{ci} --판매사 로그인일때만 적용
+	</select>
+
+	<select id="CuckooDAO.getUserRecordTotalCount" parameterType="emfMap" resultType="int">
+		SELECT COUNT(*)
+		FROM (
+				 SELECT TBL.ACCNT_NO,
+						TBL.MEM_NO,
+						TBL.MEM_NM,                                                                          --회원명
+						TBL.PROD_NM,                                                                         --가입상품
+						TBL.CELL,                                                                            --휴대전화
+						TBL.ACC_STAT,                                                                        --가입상태
+						TBL.PAY_STATE,
+						TBL.JOIN_DT,                                                                         --가입일자
+						TO_CHAR(TBL.REG_DM, 'YYYY-MM-DD')                                         AS REG_DM, --등록일자
+						(SELECT CD_NM FROM COM_CD WHERE GRP_CD = 'SS02' AND COM_CD = TBL.PROD_CD) AS CC_ALOW, --수당
+						TBL.ID_NO
+				 FROM (
+						  SELECT MPA.ACCNT_NO,
+								 MPA.MEM_NO,
+								 MPA.PROD_CD,
+								 MB.MEM_NM,
+								 FN_PROD_NM(MPA.PROD_CD)  AS PROD_NM,
+								 MB.CELL,
+								 DECODE(FN_ACCNT_STAT@DMLIFE(MPA.ACCNT_NO), 'Y', '정상', 'R', '해약', 'E',
+										'행사', '청약철회')     AS ACC_STAT,
+								 FN_YEN_CHE(MPA.ACCNT_NO) AS PAY_STATE,
+								 MPA.JOIN_DT,
+								 MPA.REG_DM,
+								 (SELECT MAX(NO)
+								  FROM PAY_MNG
+								  WHERE ACCNT_NO = MPA.ACCNT_NO
+									AND DEL_FG = 'N')     AS TRUE_COUNT,
+								 PD.SECTION_THR,
+								 B2B_EMPLE_CI,
+								 MPA.ID_NO
+						  FROM MEM_PROD_ACCNT MPA
+								   INNER JOIN MEMBER MB ON MPA.MEM_NO = MB.MEM_NO
+							  AND MPA.DEL_FG = 'N'
+								   INNER JOIN PRODUCT PD ON MPA.PROD_CD = PD.PROD_CD
+					  ) TBL
+				 WHERE TBL.SECTION_THR = '0035'
+				   AND TBL.JOIN_DT 	BETWEEN  (#{startDate} ||'01')   AND TO_CHAR(LAST_DAY(TO_DATE(#{endDate}, 'YYYYMM')), 'YYYYMMDD')
+				   AND TRUE_COUNT > 0
+				   AND ACC_STAT != '청약철회'
+				   AND TBL.PROD_CD IN ( 'OJ', 'OK')
+	     		AND B2B_EMPLE_CI = #{ci} --판매사 로그인일때만 적용
+			 )
+	</select>
+</mapper>

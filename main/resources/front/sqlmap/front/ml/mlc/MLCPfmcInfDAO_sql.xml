@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLCPfmcInfDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="REQN" column="REQN" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : MLCPfmcInfDAO.selectPfmcInfList
+         설  명 : 공연정보 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="MLCPfmcInfDAO.selectPfmcInfList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLCPfmcInfDAO.selectPfmcInfList */
+			   PFMC_SEQ
+		       , PFMC_GB
+		       , PFMC_NM
+		       , PLCE
+		       , CAST
+		       , VWNG_GRD
+		       , PRDC_CO
+		       , PFMC_STRT_DT
+		       , PFMC_END_DT
+		       , PFMC_TIME
+		       , TCKT_PRC
+		       , DSCNT_PCT
+		       , RSVTN_MNS
+		       , PRCTN
+		       , ATCH_FILE_ID
+		       , (SELECT COUNT(*) FROM CM_RSVTN_DTM_INF WHERE PFMC_SEQ = A.PFMC_SEQ AND TO_CHAR(RSVTN_DTM, 'yyyyMMdd') <![CDATA[>=]]> TO_CHAR(SYSDATE + 7, 'yyyyMMdd')) AS RSVTN_CNT
+		  FROM CM_PFMC_MST A
+		 WHERE TO_DATE(PFMC_END_DT, 'yyyy-MM-dd') + 1 <![CDATA[>]]> SYSDATE
+		 ORDER BY PFMC_GB DESC, REG_DTM DESC
+	</select>
+	
+	<!--
+         쿼리명 : MLCPfmcInfDAO.selectPfmcInf
+         설  명 : 공연정보 상세를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="MLCPfmcInfDAO.selectPfmcInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLCPfmcInfDAO.selectPfmcInf */
+			   PFMC_SEQ
+		       , PFMC_GB
+		       , PFMC_NM
+		       , PLCE
+		       , CAST
+		       , VWNG_GRD
+		       , PRDC_CO
+		       , PFMC_STRT_DT
+		       , PFMC_END_DT
+		       , PFMC_TIME
+		       , TCKT_PRC
+		       , DSCNT_PCT
+		       , RSVTN_MNS
+		       , PRCTN
+		       , ATCH_FILE_ID
+		       , SEAT_R_USE_YN
+			   , SEAT_S_USE_YN
+			   , SEAT_A_USE_YN
+		  FROM CM_PFMC_MST
+		 WHERE TO_DATE(PFMC_END_DT, 'yyyy-MM-dd') + 1 <![CDATA[>]]> SYSDATE
+		   AND PFMC_GB = 'free'
+		   AND PFMC_SEQ = #{pfmcSeq}
+	</select>
+	
+	<!--
+         쿼리명 : MLCPfmcInfDAO.selectRsvtnDtmList
+         설  명 : 공연예약일시를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="MLCPfmcInfDAO.selectRsvtnDtmList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLCPfmcInfDAO.selectRsvtnDtmList */
+			   RSVTN_DTM_SEQ
+			   , RSVTN_DTM
+		  FROM CM_RSVTN_DTM_INF
+		 WHERE PFMC_SEQ = #{pfmcInfo.pfmcSeq}
+		   AND TO_CHAR(RSVTN_DTM, 'yyyyMMdd') <![CDATA[>=]]> TO_CHAR(SYSDATE + 7, 'yyyyMMdd')
+	</select>
+	
+	<!--
+         쿼리명 : MLCPfmcInfDAO.getPfmcRsvtnInf
+         설  명 : 공연예약 등록을 위한 유효성 조회
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="MLCPfmcInfDAO.getPfmcRsvtnInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLCPfmcInfDAO.getPfmcRsvtnInf */
+    		   TBL.*
+    		   , TO_CHAR(TBL.LAST_RSVTN_DTM, 'yyyyMMdd') AS LAST_RSVTN_DT
+    	FROM (
+			SELECT LAST_RSVTN_DTM
+			       , PRCS_CD
+			  FROM CM_PFMC_RSVTN_MST
+			 WHERE PFMC_SEQ = #{pfmcSeq}
+			   AND ID = #{id}
+			   AND ACCNT_NO = #{accntNo} 
+			   AND PRCS_CD != '00'
+		) TBL
+	</select>
+	
+	<!--
+         쿼리명 : MLCPfmcInfDAO.getCheckMonth
+         설  명 : 공연예약 등록을 위한 월 1회 유효성 조회
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.07.04   김필기      최초생성
+    -->
+	<select id="MLCPfmcInfDAO.getCheckMonth" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLCPfmcInfDAO.getCheckMonth */
+    		   TBL.*
+    	FROM (
+			SELECT LAST_RSVTN_DTM
+			       , PRCS_CD
+			  FROM CM_PFMC_RSVTN_MST
+			 WHERE ID = #{id}
+			   AND ACCNT_NO = #{accntNo} 
+			   AND PRCS_CD NOT IN ('00', '04')
+			   AND (TO_CHAR(REG_DTM, 'yyyy') = TO_CHAR(SYSDATE, 'yyyy') AND TO_CHAR(REG_DTM, 'mm') = TO_CHAR(SYSDATE, 'mm'))
+		) TBL
+	</select>
+	
+	<!--
+         쿼리명 : MLCPfmcInfDAO.insertPfmcRsvtn
+         설  명 : 공연예약을 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<insert id="MLCPfmcInfDAO.insertPfmcRsvtn" parameterType="emfMap">
+		<selectKey keyProperty="rsvtnSeq" resultType="java.lang.Integer" order="BEFORE">
+			SELECT NVL(MAX(RSVTN_SEQ), 0) +1 FROM CM_PFMC_RSVTN_MST
+		</selectKey>
+		INSERT /* MLCPfmcInfDAO.insertPfmcRsvtn */ INTO CM_PFMC_RSVTN_MST
+			(RSVTN_SEQ
+			, PFMC_SEQ
+			, GUBUN
+			, ID
+			, ACCNT_NO
+			, SEAT_CNT
+			, SEAT_GB
+			, FST_RSVTN_DTM
+			, SECN_RSVTN_DTM
+			, REQN
+			, GBIT
+			, PRCS_CD
+			, REG_ID
+			, REG_IP
+			, REG_DTM
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			)
+		VALUES
+			(#{rsvtnSeq}
+			, #{pfmcInfo.pfmcSeq}
+			, '2'
+			, #{id}
+			, #{pfmcInfo.accntNo}
+			, #{seatCnt}
+			, #{seatGb}
+			, (SELECT RSVTN_DTM FROM CM_RSVTN_DTM_INF WHERE RSVTN_DTM_SEQ = #{fstRsvtnDtmSeq})
+			, (SELECT RSVTN_DTM FROM CM_RSVTN_DTM_INF WHERE RSVTN_DTM_SEQ = #{secnRsvtnDtmSeq})
+			, #{reqn}
+			, '2'
+			, '01'
+			, #{regId}
+			, #{regIp}
+			, SYSDATE
+			, #{modId}
+			, #{modIp}
+			, SYSDATE
+			)
+	</insert>
+	
+	<!--
+         쿼리명 : MLCPfmcInfDAO.insertRsvtnPrcsLog
+         설  명 : 공연예약 처리현황 로그를 등록한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+    -->   
+   	<insert id="MLCPfmcInfDAO.insertRsvtnPrcsLog" parameterType="emfMap">
+        INSERT /* MLCPfmcInfDAO.insertRsvtnPrcsLog */ INTO CM_PFMC_RSVTN_LOG
+        	(RSVTN_SEQ
+			, PRCS_CD
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+        	)
+        VALUES
+        	(#{rsvtnSeq}
+        	, '01'
+           	, #{modId}
+          	, #{modIp}
+           	, SYSDATE
+        	)
+   	</insert>
+   
+   	<!--
+         쿼리명 : MLCPfmcInfDAO.selectPfmcRsvtnAdmList
+         설  명 : 제휴 문의 관련 관리자 목록을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.11   허진영     최초 생성
+    -->
+    <select id="MLCPfmcInfDAO.selectPfmcRsvtnAdmList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLCPfmcInfDAO.selectPfmcRsvtnAdmList */ 
+			   NAME
+    	       , EMAIL
+		  FROM CO_ADM_MST
+		 WHERE USE_YN = 'Y' 
+		   AND ROLE_CD = 'ROLE_00004'
+		    
+		UNION
+		    
+		SELECT NAME
+		       , EMAIL
+		  FROM CO_ADM_MST
+		 WHERE USE_YN = 'Y' 
+		   AND ADM_SEQ IN(SELECT ADM_SEQ FROM CO_ADM_MENU_INF WHERE MENU_SEQ = 94)
+   	</select>
+   
+</mapper>            

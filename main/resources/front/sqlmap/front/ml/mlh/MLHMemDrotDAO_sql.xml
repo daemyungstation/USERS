@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLHMemDrotDAO">
+
+	<!--
+         쿼리명 : MLHMemDrotDAO.updateMemDrot
+         설  명 : 회원탈퇴를 한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   허진영      최초생성
+    -->
+	<update id="MLHMemDrotDAO.updateMemDrot" parameterType="emfMap">
+		UPDATE /* MLHMemDrotDAO.updateMemDrot */ MB_MEM_MST
+		   SET PWD = null
+			   , UNQ_NO = null
+			   , NAME = null
+			   , BIRTH = null
+			   , EMAIL = null
+			   , HP = null
+			   , TEL = null
+			   , ZIPCD = null
+			   , ADR = null
+			   , ADR_DTL = null
+			   , SMS_RCV_YN = null
+			   , TEL_RCV_YN = null
+			   , CTLG_RCV_YN = null
+			   , EMAIL_RCV_YN = null
+			   , USE_YN = null
+			   , LAST_LGN_DTM = null
+			   , DROT_YN = 'Y'
+			<choose>
+				<when test="drotRsn eq '기타'">
+					, DROT_RSN = #{drotRsnEtc}
+				</when>
+				<otherwise>
+					, DROT_RSN = #{drotRsn}
+				</otherwise>
+			</choose>			   
+			   , DROT_DTM = SYSDATE
+			   , QSCN_YN = null
+			   , USER_GB = null
+			   , OLD_AUTH_YN = null
+			   , CI = null
+			   , REG_ID = null
+			   , REG_IP = null
+			   , REG_DTM = null
+			   , MOD_ID = null
+			   , MOD_IP = null
+			   , MOD_DTM = null
+		 WHERE ID = #{id}
+	</update>
+	
+	<!--
+         쿼리명 : MLHMemDrotDAO.deleteIdntInf
+         설  명 : 부가식별정보를 삭제한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   허진영     최초 생성
+    -->
+    <delete id="MLHMemDrotDAO.deleteIdntInf" parameterType="emfMap">
+		DELETE /* MLHMemDrotDAO.deleteIdntInf */
+		  FROM MB_IDNT_INF 
+         WHERE ID = #{id}
+   	</delete>
+
+    <delete id="MLHMemDrotDAO.deleteMemEtcDrot" parameterType="String">
+		DELETE /* MLHMemDrotDAO.deleteIdntInf */
+		  FROM MB_ETC_INF
+         WHERE ID = #{id}
+   	</delete>
+
+	<!--
+         쿼리명 : MLHMemDrotDAO.insertMemDropInfo
+         설  명 : 회원정보테이블에서 탈퇴회원정보로 등록.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2017.12.28   KJS     최초 생성
+    -->
+	<insert id="MLHMemDrotDAO.insertMemDropInfo" parameterType="emfMap">
+	INSERT INTO MB_DROT_MEM_MST(
+			SELECT ID
+			     , SEX
+			     , DROT_RSN
+			     , SYSDATE
+			     , MARKETING_YN
+			     , AGREEMENT_FOR_THIRD_PARTY
+			     , MARKETING_INFO_YN
+			     , RETRY
+			     , REG_ID
+			     , REG_IP
+			     , SYSDATE
+			     , '' as EMAIL
+			  FROM MB_MEM_MST
+			 WHERE ID = #{id}
+	)
+	</insert>
+
+	<!--
+         쿼리명 : MLHMemDrotDAO.deleteMemDrot
+         설  명 : 회원정보테이블에서 삭제.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2017.12.28   KJS     최초 생성
+    -->
+	<delete id="MLHMemDrotDAO.deleteMemDrot" parameterType="emfMap">
+		 DELETE FROM MB_MEM_MST
+		 WHERE ID = #{id}
+	</delete>
+
+	<!--
+         쿼리명 : MLHMemDrotDAO.insertMemDropInfoFromQscn
+         설  명 : 휴면회원정보테이블에서 탈퇴회원정보로 등록.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2019.08.16   WJH     최초 생성
+    -->
+	<insert id="MLHMemDrotDAO.insertMemDropInfoFromQscn" parameterType="emfMap">
+	INSERT INTO MB_DROT_MEM_MST(
+			SELECT ID
+			     , SEX
+				<choose>
+					<when test="dropReason != null">
+						, #{dropReason}
+					</when>
+					<otherwise>
+						, DROT_RSN
+					</otherwise>
+				</choose>			   
+			     , SYSDATE
+			     , MARKETING_YN
+			     , AGREEMENT_FOR_THIRD_PARTY
+			     , MARKETING_INFO_YN
+			     , RETRY
+			     , REG_ID
+			     , REG_IP
+			     , SYSDATE
+			     , '' as EMAIL
+			  FROM MB_QSCN_MEM_MST
+			 WHERE ID = #{id}
+	)
+	</insert>
+
+	<!--
+         쿼리명 : MLHMemDrotDAO.deleteMemDrotFromQscn
+         설  명 : 회원정보테이블에서 삭제.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2019.08.16   WJH     최초 생성
+    -->
+	<delete id="MLHMemDrotDAO.deleteMemDrotFromQscn" parameterType="emfMap">
+		 DELETE FROM MB_QSCN_MEM_MST
+		 WHERE ID = #{id}
+	</delete>
+
+</mapper>            
+	

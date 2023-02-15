@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLARefndPtcDAO">
+	
+	<!--
+         쿼리명 : MLARefndPtcDAO.selectRefndPtcList
+         설  명 : 가입상품 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.15   허진영      최초생성
+        2016.10.10	 허진영      수정(행사, 해약, 청약철회 등 가입상태가 정상이 아니면 미노출)
+        2016.11.02	 허진영      수정(가입상태, 해약 환급금 산식, 중도해약 환급금 추가)
+    -->
+	<select id="MLARefndPtcDAO.selectRefndPtcList" parameterType="emfMap" resultType="emfMap">
+		WITH TBL_RESN_PTC(ACCNT_NO, NO, RESN_AMT)
+		AS
+		(
+			SELECT T2.ACCNT_NO
+				   , T3.NO
+				   , T3.RESN_AMT
+			FROM MEMBER T1, MEM_PROD_ACCNT T2, 
+			(   					
+				SELECT A.SEQ
+					   , A.PROD_CD
+					   , A.MODEL_CL_CD
+					   , A.APP_DAY
+					   , B.NO
+					   , B.RESN_AMT
+			      FROM RESNSTD_M A, RESNSTD_d B
+			     WHERE A.SEQ = B.MST_SEQ
+			       AND A.USE_YN = 'Y'
+			) T3
+			WHERE T1.MEM_NO = T2.MEM_NO
+			  AND T2.PROD_CD = T3.PROD_CD
+			  AND T2.PROD_MODEL_KIND = T3.MODEL_CL_CD
+			  AND T1.DEL_FG = 'N'
+		      AND T2.DEL_FG = 'N'
+			  AND T1.MEM_NO = #{memNo}
+			  AND T3.APP_DAY = (SELECT MAX(APP_DAY) FROM RESNSTD_M WHERE USE_YN = 'Y' AND PROD_CD = T2.PROD_CD AND MODEL_CL_CD = T2.PROD_MODEL_KIND AND APP_DAY <![CDATA[<=]]> T2.JOIN_DT)
+		)
+		SELECT /* MLARefndPtcDAO.selectRefndPtcList */
+				NVL(C.PROD_PRT_NM , C.PROD_NM) AS PROD_NM
+			   , B.ACCNT_NO
+			   , C.PROD_AMT
+			   , C.EXPR_NO
+			   , C.PAY_TYPE
+			   , (SELECT COUNT(SEQ) FROM PAY_MNG WHERE ACCNT_NO = B.ACCNT_NO AND DEL_FG = 'N') AS TRUE_CNT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS TRUE_AMT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG_DTL WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS RELAT_AMT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG_DTL1 WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS ADD_AMT
+			   , (SELECT RESN_AMT FROM TBL_RESN_PTC WHERE ACCNT_NO = B.ACCNT_NO AND NO = (SELECT COUNT(SEQ) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO)) AS RESN_AMT
+			   , DECODE(FN_ACCNT_STAT(B.ACCNT_NO), 'Y', '정상', 'R', '해약', 'E', '행사', '청약철회') AS ACC_STAT
+		  FROM MEMBER A, MEM_PROD_ACCNT B, PRODUCT C
+		 WHERE A.MEM_NO = B.MEM_NO
+		   AND B.PROD_CD = C.PROD_CD
+		   AND A.DEL_FG = 'N'
+		   AND B.DEL_FG = 'N'
+		   AND A.MEM_NO = #{memNo}
+		   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO)
+		   AND FN_ACCNT_STAT(B.ACCNT_NO) = 'Y'
+		 ORDER BY B.REG_DM DESC
+	</select>
+	
+	<!--
+         쿼리명 : MLARefndPtcDAO.selectRefndPtcDtlList
+         설  명 : 해약환급금 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.15   허진영      최초생성
+    -->
+	<select id="MLARefndPtcDAO.selectRefndPtcDtlList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLARefndPtcDAO.selectRefndPtcDtlList */	   
+			   (SELECT PROD_PRT_NM FROM PRODUCT_MODEL_CL_CD WHERE MODEL_CL_CD = T2.PROD_MODEL_KIND) AS PROD_NM
+			   , T3.NO
+			   , T3.RESN_AMT
+		FROM MEMBER T1, MEM_PROD_ACCNT T2,
+		(   					
+			SELECT A.SEQ
+				   , A.PROD_CD
+				   , A.APP_DAY
+				   , A.MODEL_CL_CD
+				   , B.NO
+				   , B.RESN_AMT
+		      FROM RESNSTD_M A, RESNSTD_d B
+		     WHERE A.SEQ = B.MST_SEQ
+		       AND A.USE_YN = 'Y'
+		) T3
+		WHERE T1.MEM_NO = T2.MEM_NO
+		  AND T2.PROD_CD = T3.PROD_CD
+		  AND T2.PROD_MODEL_KIND = T3.MODEL_CL_CD
+		  AND T1.DEL_FG = 'N'
+		  AND T2.DEL_FG = 'N'
+		  AND T1.MEM_NO = #{memNo}
+		  AND T2.ACCNT_NO = #{accntNo}
+		  AND T3.APP_DAY = (SELECT MAX(APP_DAY) FROM RESNSTD_M WHERE USE_YN = 'Y' AND PROD_CD = T2.PROD_CD AND MODEL_CL_CD = T2.PROD_MODEL_KIND AND APP_DAY <![CDATA[<=]]> T2.JOIN_DT)
+		ORDER BY T3.NO
+	</select>
+
+	<select id="MLARefndPtcDAO.getCashShoppingHistory" parameterType="emfMap" resultType="emfMap">
+	SELECT
+		COUNT(*) OVER() AS TOT_CNT,
+		MEMBER_ID,
+		GOODS_ID AS ACCNT_NO,
+		CASE TYPE
+			WHEN 'A' THEN '적립'
+			WHEN 'U' THEN '사용'
+			WHEN 'C' THEN '취소'
+		END AS TYPE,
+		CASE TYPE
+			WHEN 'A' THEN AMT
+			WHEN 'U' THEN -AMT
+			WHEN 'C' THEN AMT
+		END AS AMT,
+		MEMO,
+		CREATE_DATE,
+		CREATE_ID,
+		YEN_CHE_FG,
+		INCREMENT_AMT
+	FROM
+		CASH_SHOPPING_HISTORY
+	WHERE
+		GOODS_ID = #{accntNo}
+	ORDER BY
+		CREATE_DATE DESC
+	</select>
+
+	<select id="MLARefndPtcDAO.getCashShoppingAmt" parameterType="emfMap" resultType="emfMap">
+		SELECT
+			#{resnAmt} + SUM(
+				CASE
+					WHEN TYPE = 'U' THEN -AMT
+					ELSE AMT
+				END
+			) AS SUM
+		FROM
+			CASH_SHOPPING_HISTORY
+		WHERE
+			GOODS_ID = #{accntNo}
+	</select>
+
+
+</mapper>            

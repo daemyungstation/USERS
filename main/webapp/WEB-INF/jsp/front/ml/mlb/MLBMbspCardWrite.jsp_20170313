@@ -1,0 +1,151 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8"%><%@include file="/WEB-INF/jsp/include/el.jspf" %>
+						
+						<c:set var="mbspInfo" value="${rtnMap.mbspInfo}" />
+						
+						<c:set var="ocbInfo" value="${rtnMap.ocbInfo}" />
+						
+						<c:choose>
+							<c:when test="${empty mbspInfo.resortNo}">
+								<div class="noCpro mt30">
+									본 상품은 멤버십 카드 서비스에 해당되지 않습니다. <br />관련 문의는 컨택센터(1588-8511)로 문의해주시기 바랍니다.
+								</div>
+							</c:when>
+							<c:otherwise>
+								<form id="frm" method="post" action="./insert.do">
+									<input type="hidden" name="csrfPreventionSalt" value="${csrfPreventionSalt}" class="notRequired" />
+									<input type="hidden" name="accntNo" value="" />
+								
+									<p class="memCardTxt"><strong>${mbspInfo.memNm}(${mbspInfo.accntNo})님</strong>의 멤버십카드 정보 (최종발급일자: ${egov:convertDate(mbspInfo.joinDt, 'yyyy-MM-dd HH:mm:ss', 'yyyy년 MM월 dd일', '')})</p>
+		
+									<div class="memCardImg <c:if test="${not empty ocbInfo}">thr</c:if> mt35">
+										<div class="cardImg1">
+											<p class="name">${mbspInfo.memNm}</p>
+											<p class="number">${mbspInfo.accntNo}</p>
+										</div>
+			
+										<div class="cardImg2 <c:if test="${not empty ocbInfo}">type2</c:if>">
+											<p class="barName">리조트 우대번호</p>
+											<p id="mbspCard" class="barCode" style="margin:auto">
+
+											</p><!-- 바코드영역 -->
+											<p class="number">${mbspInfo.resortNo}</p>
+										</div>
+										
+										<c:if test="${not empty ocbInfo}">
+											<div class="cardImg2">
+												<p class="barName">OK 캐쉬백</p>
+												<p id="ocbCard" class="barCode" style="margin:auto">
+	
+												</p><!-- 바코드영역 -->
+												<p class="number">${ocbInfo.ocbCd}</p>
+											</div>
+										</c:if>
+									</div>
+									<div class="memCard mt40">
+										<c:if test="${not empty ocbInfo}">
+											<dl class="type1">
+												<dt>OK 캐쉬백 안내</dt>
+												<dd>
+													OK 캐쉬백 카드번호를 <a href="http://www.okcashbag.com" target="_blank" class="red" style="text-decoration:underline"><strong>[OK 캐쉬백 사이트]</strong></a>에서 등록해야 사용이 가능합니다. (PC만 가능)&nbsp;&nbsp;&nbsp;
+													<a href="javascript:" id="btnGuidePop" title="새창열림" class="situ1">OK캐쉬백 등록방법</a>
+												</dd>
+											</dl>
+										</c:if>
+										<dl class="type1 <c:if test="${not empty ocbInfo}">mt30</c:if>">
+											<dt>안내사항 <a class="situ1" href="/membership-service/contentsid/227/index.do" target="_blank" title="새창열림">혜택 상세보기</a></dt>
+											<dd>회원님의 멤버십카드 내에 기재된 회원번호와 리조트 우대번호 (바코드)확인이 가능합니다.</dd>
+											<dd>상단의 멤버십카드와 리조트 우대번호 (바코드)로 이용이 가능한 서비스 항목을 안내드립니다.</dd>
+											<dd>본 멤버십카드는 2016년 5월자로 리뉴얼된 이미지를 담고 있습니다. 실제 사용에는 리뉴얼 전 카드도 병행사용이 가능합니다.</dd>
+										</dl>
+										<dl class="type2">
+											<dt>멤버십카드</dt>
+											<dd>- 대명문화공장 공연 관람을 위한 현장 티켓 수령 시 이용</dd>
+											<dt>리조트 우대번호(바코드)</dt>
+											<dd>- 대명리조트의 전국 리조트 객실 입실</dd>
+											<dd>- 오션월드, 아쿠아월드, 오션베이, 스키월드 등의 부대시설 매표 시 이용 </dd>
+										</dl>
+									</div>
+			
+									<div class="warnBox mt20">
+										멤버십 카드를 분실하셨다고요? 멤버십 카드 재발급을 원하시면 신청 버튼을 눌러주세요.
+										<a href="javascript:" class="btnRed wide" id="memCardReq">멤버십카드 신청</a>
+									</div>
+			
+									<div class="memCard2 mt20" style="display: none">
+										<p class="tit">멤버십카드 수령지</p>
+										<div class="inputArea">
+											<div class="left">
+												<div>
+													<input type="text" name="zipcd" value="${sessionScope.userLgnMap.zipcd}" title="우편번호" class="type1" maxlength="7" readonly="readonly" placeholder="우편번호" />
+													<input type="text" name="adr" value="${sessionScope.userLgnMap.adr}" title="주소" class="type2" maxlength="100" readonly="readonly" placeholder="주소" />
+													<a href="javascript:" id="zipcode" class="btn333">우편번호 찾기</a>
+												</div>
+												<div class="mt5"><input type="text" name="adr_dtl" value="${sessionScope.userLgnMap.adrDtl}" title="상세주소" class="type3" maxlength="100" readonly="readonly" placeholder="상세주소" /></div>
+											</div>
+											<a href="javascript:" id="submitLink" class="right">신청</a>
+											<input type="submit" value="전송" style="display:none;" />
+										</div>
+										<p class="txt">멤버십카드 신청 후 1개월 이내에 일반우편으로 배송되오니 우편함 확인바랍니다. </p>
+										<p class="txt">멤버십카드 신청 후 1개월 이내에는 재신청이 불가합니다. </p>
+										<p class="txt">회원정보에 등록된 기본정보로만 등록이 가능합니다. 회원정보 수정은 [나의 라이프웨이 &gt; 개인정보 변경]에서 가능합니다. 변경 후 재신청 바랍니다.</p>
+									</div>
+								</form>
+							</c:otherwise>
+						</c:choose>
+						
+						<script type="text/javascript">
+						//<![CDATA[
+						           
+							jQuery(document).ready(function(){
+								setBarCode("${mbspInfo.resortNo}", "code128", jQuery("#mbspCard"));
+								
+								setBarCode("${ocbInfo.ocbCd}", "code128", jQuery("#ocbCard"));
+								
+								jQuery("#memCardReq").on("click", function(){
+									jQuery(".memCard2").stop().slideToggle(200);
+								});
+								
+								jQuery("#btnGuidePop").on("click", function(){
+									setPopup("./guide.do", "ocbGudiePop", 685, 800);
+								});
+								
+								jQuery("#zipcode").on("click", function(e){
+									alert("회원정보에 등록된 기본정보로만 등록이 가능합니다");
+									/*
+									e.preventDefault();
+									
+									new daum.Postcode({
+										oncomplete: function(data) {
+											// 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
+									        // 예제를 참고하여 다양한 활용법을 확인해 보세요.
+											jQuery("input[name='zipcd']").val(data.postcode);
+									        jQuery("input[name='adr']").val(data.roadAddress);
+										}
+									}).open();
+									*/
+								});
+								
+								//유효성 체크
+								jQuery("#frm").validation();
+								
+								jQuery("#submitLink").on("click", function(e){
+									//기본이벤트 제거
+									e.preventDefault();
+									
+									<c:choose>
+										<c:when test="${empty ocbInfo}">
+											Feel.Validation.confirm = "멤버십카드 신청을 진행하시겠습니까?"; 
+										</c:when>
+										<c:otherwise>
+											Feel.Validation.confirm = "[재발급 전 필수 확인]\n기존 OK캐쉬백 번호를 OK캐쉬백 사이트에서 등록하셨습니까?\n재발급 신청 시 새로운 카드번호가 발급되며, 해당날짜부터 적립금이 부여되어 이전 적립급 내역이 보이지 않을 수 있음을 알려드립니다.\n등록 후에 재발급 신청을 하시기 바랍니다."; 
+										</c:otherwise>
+									</c:choose>
+									
+									jQuery("input[name='accntNo']").val("${mbspInfo.accntNo}");
+									
+									jQuery("input[type='submit']").trigger("click");
+								});
+							});
+
+						//]]>
+						</script>

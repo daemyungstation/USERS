@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLDChngRqstOutDAO">
+	
+	<!--
+         쿼리명 : MLDChngRqstOutDAO.selectJoinPrdct
+         설  명 : 가입상품 상세를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   허진영      최초생성
+    -->
+	<select id="MLDChngRqstOutDAO.selectJoinPrdct" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLDChngRqstOutDAO.selectJoinPrdct */
+			   A.MEM_NM
+			   , A.BRTH_MON_DAY
+			   , A.CELL
+			   , A.EMAIL
+			   , B.ACCNT_NO
+			   , C.PROD_CD
+			   , NVL(C.PROD_PRT_NM , C.PROD_NM) AS PROD_NM
+			   , C.PROD_AMT
+			   , C.EXPR_NO
+			   , (SELECT COUNT(SEQ) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS TRUE_CNT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS TRUE_AMT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG_DTL WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS RELAT_AMT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG_DTL1 WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS ADD_AMT
+			   , B.JOIN_DT
+		  FROM MEMBER A, MEM_PROD_ACCNT B, PRODUCT C
+		 WHERE A.MEM_NO = B.MEM_NO
+		   AND B.PROD_CD = C.PROD_CD
+		   AND A.DEL_FG = 'N'
+		   AND B.DEL_FG = 'N'
+		   AND A.MEM_NO = #{memNo}
+		   AND B.ACCNT_NO = #{accntNo}
+		   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO)
+		   AND FN_ACCNT_STAT(B.ACCNT_NO) IN('Y', 'E')
+	</select>
+	
+</mapper>            

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OGAOprtGuideDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+	    <result property="cntn" column="CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : OGAOprtGuideDAO.selectRvsnDtList
+         설  명 : 라이프웨이 매거진 발간년도을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="OGAOprtGuideDAO.selectRvsnDtList" resultType="emfMap">
+		SELECT /* OGAOprtGuideDAO.selectRvsnDtList */
+			   OPRT_GUIDE_SEQ
+			   , PTUP_DT
+		  FROM SM_OPRT_GUIDE_MST
+		 WHERE USE_YN = 'Y'
+		<choose>
+			<when test="oprtGuideGb eq 'privacy'.toString()">
+				AND OPRT_GUIDE_GB = 'prsn'
+			</when>
+			<when test="oprtGuideGb eq 'terms'.toString()">
+				AND OPRT_GUIDE_GB = 'trms'
+			</when>
+			<when test="oprtGuideGb eq 'important'.toString()">
+				AND OPRT_GUIDE_GB = 'iptnt'
+			</when>
+			<when test="oprtGuideGb eq 'outsourcing'.toString()">
+				AND OPRT_GUIDE_GB = 'otsc'
+			</when>
+			<when test="oprtGuideGb eq 'legal'.toString()">
+				AND OPRT_GUIDE_GB = 'legal'
+			</when>
+			<otherwise>
+				AND OPRT_GUIDE_GB = 'none'
+			</otherwise>
+		</choose>
+		 ORDER BY PTUP_DT DESC
+	</select>
+
+	<!--
+         쿼리명 : OGAOprtGuideDAO.selectOprtGuide
+         설  명 : 이용안내를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="OGAOprtGuideDAO.selectOprtGuide" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* OGAOprtGuideDAO.selectOprtGuide */
+			   CNTN
+		  FROM SM_OPRT_GUIDE_MST
+		 WHERE USE_YN = 'Y'
+		   AND OPRT_GUIDE_SEQ = #{oprtGuideSeq}
+	</select>
+	
+</mapper>            

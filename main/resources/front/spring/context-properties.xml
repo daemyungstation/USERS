@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	<bean name="propertiesService" class="egovframework.rte.fdl.property.impl.EgovPropertyServiceImpl" destroy-method="destroy">
+      <property name="properties">
+         <map>
+         	<!-- 페이징 크기 -->
+            <entry key="pageUnit" value="10"/>
+            <!-- 페이징 사이즈 -->
+            <entry key="pageSize" value="10"/>
+            <!-- 파일 업로드 경로 -->
+            <entry key="fileStorePath" value="D:/uploadfiles/upload"/>
+            <!-- 에디터 파일 업로드 경로 -->
+            <entry key="editorFileStorePath" value="D:/uploadfiles/editor"/>
+         </map>
+      </property>
+	</bean>
+</beans>	

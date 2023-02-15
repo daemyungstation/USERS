@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLDChngRqstDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="PRDCT_CNTN" column="PRDCT_CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+		<result property="OPRT_GUIDE" column="OPRT_GUIDE" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : MLDChngRqstDAO.selectChngSys
+         설  명 : 전환서비스 체계를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   허진영      최초생성
+    -->
+	<select id="MLDChngRqstDAO.selectChngSys" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* MLDChngRqstDAO.selectChngSys */
+			   A.GRP_SEQ
+			   , A.GRP_NM
+			   , A.CHNG_COND_CD
+			   , B.PRDCT_CD
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'PRDCT_GB' AND CD = B.PRDCT_CD) AS PRDCT_GB
+			   , (SELECT CD_ORD FROM CO_CD_DTL WHERE CD_ID = 'PRDCT_GB' AND CD = B.PRDCT_CD) AS PRDCT_ORD
+			   , B.PRDCT_SEQ
+			   , C.PRDCT_NM
+	           , C.PRDCT_CNTN
+	           , (SELECT COUNT(*) 
+	           		FROM CM_PRDCT_DTL 
+	           	   WHERE USE_YN = 'Y' 
+	           	     AND PRDCT_CD = B.PRDCT_CD
+	           	     AND (ODTM_YN = 'Y' OR (RQST_STRT_DT <![CDATA[<=]]> TO_CHAR(SYSDATE, 'yyyyMMdd') AND RQST_END_DT <![CDATA[>=]]> TO_CHAR(SYSDATE, 'yyyyMMdd')))
+					 AND (PRCS_CD IS NULL OR PRCS_CD = '02')) AS DTL_CNT
+		  FROM CM_CHNG_SYS_MST A, CM_CHNG_SYS_DTL B, CM_PRDCT_MST C
+		 WHERE A.GRP_SEQ = B.GRP_SEQ
+           AND B.PRDCT_SEQ = C.PRDCT_SEQ
+           AND B.PRDCT_CD IN ('PRDCT04','PRDCT06','PRDCT07','PRDCT10','PRDCT11','PRDCT12','PRDCT13')
+		   AND A.GRP_SEQ = (SELECT GRP_SEQ FROM CM_CHNG_PRDCT_INF WHERE OUT_PRDCT_CD = #{prdctInfo.prodCd})
+		 ORDER BY PRDCT_ORD
+	</select>
+	
+	<!--
+         쿼리명 : MLDChngRqstDAO.selectPrdctDtlList
+         설  명 : 전환서비스 체계 상품상세 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.22   허진영      최초생성
+    -->
+	<select id="MLDChngRqstDAO.selectPrdctDtlList" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* MLDChngRqstDAO.selectPrdctDtlList */
+			   TBL.* 
+		FROM (
+			SELECT ROWNUM AS RNUM, A.* 
+			FROM (
+				SELECT COUNT(*) OVER() AS TOT_CNT
+				       , PRDCT_DTL_SEQ
+			   		   , PRDCT_TITL
+			   		   , RQST_STRT_DT
+			   		   , RQST_END_DT
+			   		   , ODTM_YN
+			   		   , SCHD
+			   		   , THNL_FILE_ID
+			   		   , LINK
+			   		   , PRCS_CD
+				  FROM CM_PRDCT_DTL
+				 WHERE USE_YN = 'Y'
+				<choose>
+					<when test="chngSrvcCntsYn == 'Y'.toString()">
+						AND PRDCT_CD = #{prdctCd}
+					</when>
+					<otherwise>
+						AND PRDCT_CD = (SELECT PRDCT_CD FROM CM_PRDCT_MST WHERE PRDCT_SEQ = #{prdctSeq})
+						AND (ODTM_YN = 'Y' OR (RQST_STRT_DT <![CDATA[<=]]> TO_CHAR(SYSDATE, 'yyyyMMdd') AND RQST_END_DT <![CDATA[>=]]> TO_CHAR(SYSDATE, 'yyyyMMdd')))
+						AND (PRCS_CD IS NULL OR PRCS_CD = '02')
+					</otherwise>
+				</choose>
+				 ORDER BY REG_DTM DESC
+			) A
+		) TBL
+	    WHERE RNUM BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}      
+	</select>
+	
+	<!--
+         쿼리명 : MLDChngRqstDAO.selectPrdctDtlInf
+         설  명 : 전환서비스 체계 상품상세 정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   허진영      최초생성
+    -->
+	<select id="MLDChngRqstDAO.selectPrdctDtlInf" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* MLDChngRqstDAO.selectPrdctDtlInf */
+			   PRDCT_DTL_SEQ
+			   , PRDCT_TITL
+			   , RQST_STRT_DT
+	   		   , RQST_END_DT
+	   		   , ODTM_YN
+	   		   , SCHD
+			   , PRDCT_CNTN
+			   , ATCH_FILE_ID
+			   , PRCS_CD
+		  FROM CM_PRDCT_DTL
+		 WHERE PRDCT_DTL_SEQ = #{prdctDtlSeq}
+		<choose>
+			<when test="rqstYn == 'Y'.toString()">
+				AND USE_YN = 'Y'
+			   	AND (ODTM_YN = 'Y' OR (RQST_STRT_DT <![CDATA[<=]]> TO_CHAR(SYSDATE, 'yyyyMMdd') AND RQST_END_DT <![CDATA[>=]]> TO_CHAR(SYSDATE, 'yyyyMMdd')))
+			   	AND (PRCS_CD IS NULL OR PRCS_CD = '02')
+			</when>
+			<when test="authYn != 'Y'.toString()">
+				AND USE_YN = 'Y'
+			</when>
+			<otherwise>
+			
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!--
+         쿼리명 : MLDChngRqstDAO.selectPrdctDtlInfPtc
+         설  명 : 전환서비스 체계 상품상세 정보 내역을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.08   허진영      최초생성
+    -->
+	<select id="MLDChngRqstDAO.selectPrdctDtlInfPtc" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* MLDChngRqstDAO.selectPrdctDtlInfPtc */
+			   TITL
+			   , CNTN
+		  FROM CM_PRDCT_INF 
+		 WHERE PRDCT_DTL_SEQ = #{prdctDtlSeq}
+	</select>
+	
+	<!--
+         쿼리명 : MLDChngRqstDAO.selectPrdctInf
+         설  명 : 상품정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.17   허진영      최초생성
+    -->
+	<select id="MLDChngRqstDAO.selectPrdctInf" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* MLDChngRqstDAO.selectPrdctInf */
+			   (SELECT CHNG_COND_CD FROM CM_CHNG_SYS_MST WHERE GRP_SEQ = #{chkInfo.grpSeq}) AS CHNG_COND_CD
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'PRDCT_GB' AND CD = A.PRDCT_CD) AS PRDCT_GB
+			   , PRDCT_NM
+			<if test="chkInfo.prdctDtlSeq != null and chkInfo.prdctDtlSeq != ''">
+				, (SELECT PRDCT_TITL 
+					 FROM CM_PRDCT_DTL 
+					WHERE USE_YN = 'Y' 
+					  AND PRDCT_DTL_SEQ = #{chkInfo.prdctDtlSeq}
+					  AND (ODTM_YN = 'Y' OR (RQST_STRT_DT <![CDATA[<=]]> TO_CHAR(SYSDATE, 'yyyyMMdd') AND RQST_END_DT <![CDATA[>=]]> TO_CHAR(SYSDATE, 'yyyyMMdd')))
+					  AND (PRCS_CD IS NULL OR PRCS_CD = '02')) AS PRDCT_DTL_NM
+			</if>
+			   , PRDCT_CNTN
+			   , OPRT_GUIDE
+		  FROM CM_PRDCT_MST A
+		 WHERE PRDCT_SEQ = #{chkInfo.prdctSeq}
+	</select>
+	
+	<!--
+         쿼리명 : MLDChngRqstDAO.selectChngRqstCnt
+         설  명 : 전환서비스신청을 위한 유효성 체크.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.21   허진영      최초생성
+    -->
+	<select id="MLDChngRqstDAO.selectChngRqstCnt" parameterType="emfMap" resultType="java.lang.Integer">
+		SELECT /* MLDChngRqstDAO.selectChngRqstCnt */ 
+		       COUNT(*)
+		  FROM CM_CHNG_RQST_MST
+		 WHERE ID = #{id}
+		   AND ACCNT_NO = #{accntNo}
+		   AND PRCS_CD != '00'
+	</select>
+	
+	<!--
+         쿼리명 : MLDChngRqstDAO.insertChngSrvcRqst
+         설  명 : 전환서비스신청을 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.18   허진영      최초생성
+    -->
+	<insert id="MLDChngRqstDAO.insertChngSrvcRqst" parameterType="emfMap">
+		INSERT /* MLDChngRqstDAO.insertChngSrvcRqst */ INTO CM_CHNG_RQST_MST
+			(RQST_SEQ
+			, ID
+			, ACCNT_NO
+			, MEM_EMAIL
+			, USER_NM
+			, USER_REL_CD
+			, USER_CTEL
+			, USER_EMAIL
+			, PRDCT_USE_REQN_DT
+			, REQN_CNTN
+			, PRDCT_SEQ
+			, PRDCT_DTL_SEQ
+			, PRCS_CD
+			, REG_ID
+			, REG_IP
+			, REG_DTM
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			) 
+		VALUES
+			(#{rqstSeq}
+			, #{id}
+			, #{chkInfo.accntNo}
+			, #{rqstInfo.memEmail}
+			, #{rqstInfo.userNm}
+			, #{rqstInfo.userRelCd}
+			, #{rqstInfo.userCtel}
+			, #{rqstInfo.userEmail}
+			, #{rqstInfo.prdctUseReqnYr} || #{rqstInfo.prdctUseReqnMm} || #{rqstInfo.prdctUseReqnDay}
+			, #{rqstInfo.reqnCntn}
+			, #{chkInfo.prdctSeq}
+			, #{chkInfo.prdctDtlSeq, jdbcType=VARCHAR}
+			, '01'
+			, #{regId}
+			, #{regIp}
+			, SYSDATE
+			, #{modId}
+			, #{modIp}
+			, SYSDATE
+			)
+	</insert>
+	
+	<!--
+         쿼리명 : MLDChngRqstDAO.insertRqstPrcsLog
+         설  명 : 전환서비스 신청 처리현황 로그를 등록한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+    -->   
+   	<insert id="MLDChngRqstDAO.insertRqstPrcsLog" parameterType="emfMap">
+        INSERT /* MLDChngRqstDAO.insertRqstPrcsLog */ INTO CM_CHNG_RQST_LOG
+        	(RQST_SEQ
+			, PRCS_CD
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+        	)
+        VALUES
+        	(#{rqstSeq}
+        	, '01'
+           	, #{modId}
+          	, #{modIp}
+           	, SYSDATE
+        	)
+   </insert>
+   
+   <!--
+         쿼리명 : MLDChngRqstDAO.selectChngSrvcAdmList
+         설  명 : 전환서비스 관리자 목록을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.11   허진영     최초 생성
+    -->
+    <select id="MLDChngRqstDAO.selectChngSrvcAdmList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLDChngRqstDAO.selectChngSrvcAdmList */ 
+			   NAME
+    	       , EMAIL
+		  FROM CO_ADM_MST
+		 WHERE USE_YN = 'Y' 
+		   AND ROLE_CD = 'ROLE_00005'
+		    
+		UNION
+		    
+		SELECT NAME
+		       , EMAIL
+		  FROM CO_ADM_MST
+		 WHERE USE_YN = 'Y' 
+		   AND ADM_SEQ IN(SELECT ADM_SEQ FROM CO_ADM_MENU_INF WHERE MENU_SEQ = 92)
+   	</select>
+	
+</mapper>            

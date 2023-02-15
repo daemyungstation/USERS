@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LGBMemJoinDAO">
+
+	<!--
+         쿼리명 : LGBMemJoinDAO.insertMemInf
+         설  명 : 회원정보를 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.02   김필기      최초생성
+    -->
+	<insert id="LGBMemJoinDAO.insertMemInf" parameterType="emfMap">
+		INSERT /* LGBMemJoinDAO.insertMemInf */ 
+		INTO MB_MEM_MST
+		(
+			ID
+		,	PWD
+		,	UNQ_NO
+		,	NAME
+		,	BIRTH
+		,	EMAIL
+		,	HP
+		,	ZIPCD
+		,	ADR
+		,	ADR_DTL
+		,	SMS_RCV_YN
+		,	TEL_RCV_YN
+		,	CTLG_RCV_YN
+		,	EMAIL_RCV_YN
+		,	USE_YN
+		,	DROT_YN
+		,	QSCN_YN
+		,	REG_ID
+		,	REG_IP
+		,	REG_DTM
+		,	CI
+		,	USER_GB
+		,	MARKETING_YN
+		,	SEX
+		,	MARKETING_INFO_YN
+		,	AGREEMENT_FOR_THIRD_PARTY
+		)		
+		VALUES
+		(
+			#{id}
+		,	#{pwd}
+		,	#{unqNo, jdbcType=VARCHAR}
+		,	#{name}
+		,	#{birth}
+		,	#{email}
+		,	#{hp}
+		,	#{zipcd}
+		,	#{adr}
+		,	#{adrDtl}
+		,	#{smsRcvYn, jdbcType=CHAR}
+		,	#{telRcvYn, jdbcType=CHAR}
+		,	#{ctlgRcvYn, jdbcType=CHAR}
+		,	#{emailRcvYn, jdbcType=CHAR}
+		,	'Y'
+		,	'N'
+		,	'N'
+		,	#{regId}
+		,	#{regIp}
+		,	SYSDATE
+		,	#{ci}
+		,	'N'
+		,	#{marketingYn, jdbcType=VARCHAR}
+		, 	#{sex, jdbcType=VARCHAR}
+		, 	#{marketingYn, jdbcType=VARCHAR}
+		,	#{agreementForThirdParty, jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<select id="LGBMemJoinDAO.selectMemLgnCnt" parameterType="String" resultType="emfMap">
+		SELECT
+			ID,
+			LGN_TRY_CNT
+			,LAST_LGN_TRY_DTM
+		FROM MB_MEM_LGN_TRY_INFO
+		WHERE ID = #{id}
+	</select>
+	
+	<select id="LGBMemJoinDAO.selectMemLgnCntByCi" parameterType="String" resultType="emfMap">
+		SELECT
+			A.ID
+			, A.LGN_TRY_CNT
+			, A.LAST_LGN_TRY_DTM
+		FROM MB_MEM_LGN_TRY_INFO A
+		INNER JOIN MB_MEM_MST B ON B.ID = A.ID 
+		WHERE B.CI = #{ci}
+	</select>
+
+	<insert id="LGBMemJoinDAO.insertMemLgnCnt" parameterType="String">
+		MERGE INTO MB_MEM_LGN_TRY_INFO /* LGBMemJoinDAO.insertMemLgnCnt */
+		USING DUAL
+		ON (ID = #{id})
+		WHEN MATCHED THEN
+		UPDATE SET
+		LGN_TRY_CNT = 1,
+		LAST_LGN_TRY_DTM = SYSDATE
+		WHEN NOT MATCHED THEN
+		INSERT
+		(ID, LGN_TRY_CNT, LAST_LGN_TRY_DTM)
+		VALUES
+		(#{id}, 1, SYSDATE)
+	</insert>
+	
+	<update id="LGBMemJoinDAO.updateMemLgnCnt_old" parameterType="emfMap">
+		UPDATE /* LGBMemJoinDAO.updateMemLgnCnt */
+			MB_MEM_LGN_TRY_INFO
+		SET
+			LGN_TRY_CNT =
+			CASE
+				WHEN LAST_LGN_TRY_DTM <![CDATA[ < ]]> SYSDATE - 1
+				THEN 1
+				ELSE LGN_TRY_CNT + 1
+			END
+			,LAST_LGN_TRY_DTM = SYSDATE
+		WHERE ID = #{lgnTryId}
+	</update>
+	<update id="LGBMemJoinDAO.updateMemLgnCnt" parameterType="emfMap">
+		MERGE INTO MB_MEM_LGN_TRY_INFO /* LGBMemJoinDAO.updateMemLgnCnt */
+		USING DUAL
+		ON (ID = #{lgnTryId})
+		WHEN MATCHED THEN
+		UPDATE SET
+			LGN_TRY_CNT =
+				CASE
+					WHEN LAST_LGN_TRY_DTM <![CDATA[ < ]]> SYSDATE - 1
+					THEN 1
+					ELSE LGN_TRY_CNT + 1
+				END
+			, LAST_LGN_TRY_DTM = SYSDATE
+		WHEN NOT MATCHED THEN
+		INSERT
+		(ID, LGN_TRY_CNT, LAST_LGN_TRY_DTM)
+		VALUES
+		(#{lgnTryId}, 1, SYSDATE)
+	</update>
+
+
+	<delete id="LGBMemJoinDAO.deleteMemLgnCnt" parameterType="String">
+		DELETE FROM MB_MEM_LGN_TRY_INFO
+		WHERE ID = #{id}
+	</delete>
+
+	<!--
+         쿼리명 : LGBMemJoinDAO.insertMemEtcInf
+         설  명 : 회원 추가정보를 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.02   김필기      최초생성
+    -->
+	<insert id="LGBMemJoinDAO.insertMemEtcInf" parameterType="emfMap">
+		INSERT /* LGBMemJoinDAO.insertMemEtcInf */ 
+		INTO MB_ETC_INF
+		(
+			ID
+		,	MRRG_YN
+		,	CHDRN_GB
+		,	INTR_PTC
+		,	JOIN_PATH
+		,	JOIN_PATH_ETC
+		,	PFRN_PTC
+		,	PFRN_ETC
+		,	REG_ID
+		,	REG_IP
+		,	REG_DTM
+		,	INTR_FIELD
+		)		
+		VALUES
+		(
+			#{id}
+		,	#{mrrgYn , jdbcType=VARCHAR}
+		,	#{chdrnGb, jdbcType=VARCHAR}
+		,	#{intrPtc , jdbcType=VARCHAR}
+		,	#{joinPath , jdbcType=VARCHAR}
+		,	#{joinPathEtc, jdbcType=VARCHAR}
+		,	#{pfrnPtc , jdbcType=VARCHAR}
+		,	#{pfrnEtc, jdbcType=VARCHAR}
+		,	#{regId}
+		,	#{regIp}
+		,	SYSDATE
+		,	#{optionintrfield}
+		)
+	</insert>	
+	
+	<!--
+         쿼리명 : LGBMemJoinDAO.insertIdntInf
+         설  명 : 본인 인증 정보를 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.14   김필기      최초생성
+    -->
+	<insert id="LGBMemJoinDAO.insertIdntInf" parameterType="emfMap">
+		INSERT /* LGBMemJoinDAO.insertIdntInf */
+		INTO MB_IDNT_INF
+		(
+			ID
+		,	DI
+		,	REG_ID
+		,	REG_IP
+		,	REG_DTM
+		,	MOD_ID
+		,	MOD_IP
+		,	MOD_DTM
+		)
+		VALUES
+		(
+			#{id}
+		,	#{di}
+		,	#{regId, jdbcType=VARCHAR}
+		,	#{regIp, jdbcType=VARCHAR}
+		,	SYSDATE
+		,	#{modId, jdbcType=VARCHAR }
+		,	#{modIp, jdbcType=VARCHAR}
+		,	SYSDATE
+		)
+	</insert>
+
+	
+	
+	<!--
+         쿼리명 : LGBMemJoinDAO.selectMemInf
+         설  명 : 회원 정보를 조회한다.(아이디, 이메일 중복검사 혼용)
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   김필기     최초 생성
+    -->
+	<select id="LGBMemJoinDAO.selectMemInf" parameterType="emfMap" resultType="emfMap">
+		SELECT  /* LGBMemJoinDAO.selectMemInf */
+				ID
+			,	PWD
+			,	UNQ_NO
+			,	NAME
+			,	BIRTH
+			,	EMAIL
+			,	HP
+			,	TEL
+			,	ZIPCD
+			,	ADR
+			,	ADR_DTL
+			,	SMS_RCV_YN
+			,	TEL_RCV_YN
+			,	CTLG_RCV_YN
+			,	EMAIL_RCV_YN
+			,	USE_YN
+			,	DROT_YN
+			,	QSCN_YN
+			,	REG_ID
+			,	REG_IP
+			,	REG_DTM
+			,	MOD_DTM
+			,	CI
+			,	USER_GB
+			,	OLD_AUTH_YN
+			,	SEX
+			,	AGREEMENT_FOR_THIRD_PARTY
+			,	MARKETING_YN
+		FROM MB_MEM_MST
+		WHERE 1=1
+		<choose>
+			<when test="check != null and check != '' ">
+				<if test="check == 'id' || check == 'loginid' ">
+					AND ID = #{id}
+				</if>
+				<if test="check == 'email' ">
+					<if test="id != null and id != '' ">
+						AND ID <![CDATA[ <> ]]> #{id}
+					</if>
+				 	AND EMAIL = #{email}
+				</if>
+				<if test="check == 'ci' ">
+				 	AND CI = #{ci}
+				</if>
+				<if test="check == 'login' ">
+					AND ( ID = #{id} AND PWD = #{pwd} )
+				</if>
+			</when>
+			<otherwise>
+				AND ID = #{id}
+			</otherwise>
+		</choose>
+		  	AND ROWNUM <![CDATA[ < ]]> 2
+	</select>
+
+	<!--
+         쿼리명 : LGBMemJoinDAO.selectMemInfFromMemAndQscnMem
+         설  명 : 회원 정보를 조회한다.(CI값을 가지고 회원, 휴면회원 테이블에서)
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2019.05.29   WJH     최초 생성
+    -->
+	<select id="LGBMemJoinDAO.selectMemInfFromMemAndQscnMem" parameterType="String" resultType="emfMap">
+		SELECT  /* LGBMemJoinDAO.selectMemInfFromMemAndQscnMem */
+				ID
+			,	PWD
+			,	UNQ_NO
+			,	NAME
+			,	BIRTH
+			,	EMAIL
+			,	HP
+			,	TEL
+			,	ZIPCD
+			,	ADR
+			,	ADR_DTL
+			,	SMS_RCV_YN
+			,	TEL_RCV_YN
+			,	CTLG_RCV_YN
+			,	EMAIL_RCV_YN
+			,	USE_YN
+			,	DROT_YN
+			,	QSCN_YN
+			,	REG_ID
+			,	REG_IP
+			,	REG_DTM
+			,	MOD_DTM
+			,	CI
+			,	USER_GB
+			,	OLD_AUTH_YN
+			,	SEX
+			,	AGREEMENT_FOR_THIRD_PARTY
+			,	MARKETING_YN
+		FROM MB_MEM_MST
+		WHERE 1=1
+		<choose>
+			<when test="(ci != null and ci != '') or (id != null and id != '') ">
+				<if test="ci != null and ci != ''">
+					AND CI = #{ci}
+				</if>
+				<if test="id != null and id != ''">
+					AND ID = #{id}
+				</if>
+			</when>
+			<otherwise>
+				AND 1=2
+			</otherwise>
+		</choose>
+		UNION
+		SELECT
+				ID
+			,	PWD
+			,	UNQ_NO
+			,	NAME
+			,	BIRTH
+			,	EMAIL
+			,	HP
+			,	TEL
+			,	ZIPCD
+			,	ADR
+			,	ADR_DTL
+			,	SMS_RCV_YN
+			,	TEL_RCV_YN
+			,	CTLG_RCV_YN
+			,	EMAIL_RCV_YN
+			,	USE_YN
+			,	DROT_YN
+			,	QSCN_YN
+			,	REG_ID
+			,	REG_IP
+			,	REG_DTM
+			,	MOD_DTM
+			,	CI
+			,	USER_GB
+			,	OLD_AUTH_YN
+			,	SEX
+			,	AGREEMENT_FOR_THIRD_PARTY
+			,	MARKETING_YN
+		FROM MB_QSCN_MEM_MST
+		WHERE 1=1
+		<choose>
+			<when test="(ci != null and ci != '') or (id != null and id != '') ">
+				<if test="ci != null and ci != ''">
+					AND CI = #{ci}
+				</if>
+				<if test="id != null and id != ''">
+					AND ID = #{id}
+				</if>
+			</when>
+			<otherwise>
+				AND 1=2
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="LGBMemJoinDAO.insertIntegrationMemInf" parameterType="emfMap">
+		INSERT INTO INTEGRATION_MEMBER@DM_INTEGRATION (
+			ID,
+			INTEGRATION_ID,
+			INTEGRATION_PW,
+			HOMEPAGE_ID,
+			CI,
+			<if test="unqNo != null and unqNo != ''">
+				MEMBER_ID,
+			</if>
+			HOMEPAGE_ONLINE_YN,
+			HOMEPAGE_JOIN_DATE,
+			INTEGRATION_DATE,
+			INTEGRATION_TYPE
+		) VALUES (
+			INTEGRATION_MEMBER_SEQUENCE.nextval@DM_INTEGRATION,
+			#{id},
+			#{pwd},
+			#{id},
+			#{ci},
+			<if test="unqNo != null and unqNo != ''">
+				#{unqNo},
+			</if>
+			'N',
+			SYSDATE,
+			SYSDATE,
+			'N'
+		)
+	</insert>
+
+	<!-- 통합 회원 가입 정보 조회. -->
+	<select id="LGBMemJoinDAO.selectIntegrationMemberInfo" parameterType="emfMap" resultType="emfMap">
+		SELECT  /* LGBMemJoinDAO.selectIntegrationMemberInfo */
+			ID,
+			INTEGRATION_ID,
+			INTEGRATION_PW,
+			HOMEPAGE_ID,
+			MALL_ID,
+			MEMBER_ID,
+			CI,
+			HOMEPAGE_ONLINE_YN,
+			HOMEPAGE_JOIN_DATE,
+			MALL_JOIN_DATE,
+			SECESSION_DATE,
+			SECESSION_DELETE_DIV,
+			INTEGRATION_DATE
+		FROM
+			INTEGRATION_MEMBER@DM_INTEGRATION
+		WHERE 1=1
+			<choose>
+				<when test="ci != null and ci != ''">
+					AND CI = #{ci}
+				</when>
+				<when test="id != null and id != ''">
+					AND HOMEPAGE_ID = #{id}
+				</when>
+			</choose>
+		AND
+    		SECESSION_DATE IS NULL AND SECESSION_DELETE_DIV IS NULL
+	</select>
+
+	<select id="LGBMemJoinDAO.selectIntegrationDeleteMemberInfo" parameterType="String" resultType="emfMap">
+		SELECT
+			ID,
+			INTEGRATION_ID,
+			INTEGRATION_PW,
+			HOMEPAGE_ID,
+			MALL_ID,
+			MEMBER_ID,
+			CI,
+			HOMEPAGE_ONLINE_YN,
+			HOMEPAGE_JOIN_DATE,
+			MALL_JOIN_DATE,
+			SECESSION_DATE,
+			SECESSION_DELETE_DIV,
+			INTEGRATION_DATE
+		FROM
+		INTEGRATION_MEMBER@DM_INTEGRATION
+		WHERE 1=1
+		AND CI = #{ci}
+		AND SECESSION_DATE IS NOT NULL AND SECESSION_DELETE_DIV = 'M'
+	</select>
+
+	<!-- 상조 회원 가입 정보 조회. -->
+	<select id="LGBMemJoinDAO.selectFuneralMemberInfo" parameterType="String" resultType="emfMap">
+		SELECT  /* LGBMemJoinDAO.selectFuneralMemberInfo */
+			ID,
+			MEMBER_ID,
+			GOODS_ID,
+			CI,
+			GOODS_NAME,
+			RESORT_NUM,
+			STATE,
+			ACU_AMT,
+			USE_AMT,
+			CMPLT_DATE,
+			CREATE_DATE,
+			SDP_YN,
+			CREATE_ID,
+			YEN_CHE_FG,
+			MALL_USE_YN
+		FROM
+			MEMBER@DM_DLW_KT
+		WHERE
+			(
+				STATE IN ('1','3','5')
+			OR
+				(STATE='4' AND CMPLT_DATE >= ADD_MONTHS(SYSDATE, -6))
+			)
+		AND
+			CI = #{ci}
+	</select>
+	
+	<!--
+         쿼리명 : LGBMemJoinDAO.insertMemChngPtc
+         설  명 : 회원 변경정보를 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   김필기      최초생성
+    -->
+	<insert id="LGBMemJoinDAO.insertMemChngPtc" parameterType="emfMap">
+		INSERT /* LGBMemJoinDAO.insertMemChngPtc */ 
+		INTO MB_MEM_CHNG_PTC
+		(
+			CHNG_SEQ
+		,	ID
+		,	BFR_EMAIL
+		,	BFR_HP
+		,	BFR_TEL
+		,	BFR_ZIPCD
+		,	BFR_ADR
+		,	BFR_ADR_DTL
+		,	AFT_EMAIL
+		,	AFT_HP
+		,	AFT_TEL
+		,	AFT_ZIPCD
+		,	AFT_ADR
+		,	AFT_ADR_DTL
+		,	PRCS_YN
+		,	REG_ID
+		,	REG_IP
+		,	REG_DTM
+		)		
+		VALUES
+		(
+			#{seq}
+		,	#{id}
+		,	#{bfrEmail}
+		,	#{bfrHp}
+		,	#{bfrTel , jdbcType=VARCHAR}
+		,	#{bfrZipcd}
+		,	#{bfrAdr}
+		,	#{bfrAdrDtl}		
+		,	#{aftEmail}
+		,	#{aftHp}
+		,	#{aftTel , jdbcType=VARCHAR}
+		,	#{aftZipcd}
+		,	#{aftAdr}
+		,	#{aftAdrDtl}
+		,	'N'
+		,	#{regId}
+		,	#{regIp}
+		,	SYSDATE
+		)		
+	</insert>
+
+	<update id="LGBMemJoinDAO.changeIntegrationMemInf" parameterType="emfMap">
+		UPDATE INTEGRATION_MEMBER@DM_INTEGRATION
+		SET
+			INTEGRATION_ID = #{integrationId}
+			,INTEGRATION_PW = #{integrationPw}
+			,MEMBER_ID = #{memberId}
+			<choose>
+				<when test="memberId != null">
+					,HOMEPAGE_ONLINE_YN = 'N'
+				</when>
+				<otherwise>
+					,HOMEPAGE_ONLINE_YN = 'Y'
+				</otherwise>
+			</choose>
+			,INTEGRATION_DATE = SYSDATE
+			,INTEGRATION_TYPE = 'H'
+		WHERE
+			HOMEPAGE_ID = #{homepageId}
+	</update>
+
+	<update id="LGBMemJoinDAO.dropIntegrationInfo" parameterType="emfMap">
+		UPDATE INTEGRATION_MEMBER@DM_INTEGRATION
+		SET
+			SECESSION_DATE = SYSDATE,
+			SECESSION_DELETE_DIV =
+				CASE WHEN SECESSION_DELETE_DIV = 'M' THEN 'A'
+				WHEN SECESSION_DELETE_DIV = 'A' THEN 'A'
+				ELSE 'H' END
+		WHERE
+			INTEGRATION_ID = #{integrationId}
+	</update>
+
+	<update id="LGBMemJoinDAO.updateIntegrationMemPwdInf" parameterType="emfMap">
+		UPDATE INTEGRATION_MEMBER@DM_INTEGRATION
+		SET
+			INTEGRATION_PW = #{pwd}
+		WHERE
+			CI = #{ci}
+	</update>
+	
+	<!--
+         쿼리명 : LGBMemJoinDAO.updateMemPwdInf
+         설  명 : 비밀번호를 변경한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   김필기      최초생성
+    -->	
+	<update id="LGBMemJoinDAO.updateMemPwdInf" parameterType="emfMap">
+		UPDATE /* LGBMemJoinDAO.updateMemPwdInf */ 
+			MB_MEM_MST
+		SET
+			PWD = #{pwd}
+		WHERE 
+			CI = #{ci}
+	</update>
+
+	<update id="LGBMemJoinDAO.updateMemAgreement" parameterType="emfMap">
+		UPDATE /* LGBMemJoinDAO.updateMemAgreement */ 
+			MB_MEM_MST
+		SET AGREEMENT_FOR_THIRD_PARTY = 'Y'
+		  , MOD_DTM = SYSDATE
+		WHERE ID = #{id, jdbcType=VARCHAR}
+	</update>
+
+
+    
+	<!--
+         쿼리명 : LGBMemJoinDAO.selectMemIdEmailCheck
+         설  명 : 비밀번호를 변경한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   김필기      최초생성
+    -->	
+	<select id="LGBMemJoinDAO.selectMemIdEmailCheck" parameterType="emfMap" resultType="int">
+		SELECT SUM(CNT) AS CNT
+		  FROM (
+		        SELECT COUNT(*) AS CNT
+		          FROM MB_MEM_MST
+		         WHERE 1=1
+				<choose>
+					<when test="check != null and check != '' ">
+						<if test="check == 'id' || check == 'loginid' ">
+							AND ID = #{id}
+						</if>
+						<if test="check == 'email' ">
+							<if test="id != null and id != '' ">
+								AND ID <![CDATA[ <> ]]> #{id}	
+							</if>
+						 	AND EMAIL = #{email}
+						</if>
+					</when>
+				</choose>
+		         UNION ALL
+		        SELECT COUNT(*) AS CNT
+		          FROM MB_DROT_MEM_MST
+		         WHERE 1=1
+				<choose>
+					<when test="check != null and check != '' ">
+						<if test="check == 'id' || check == 'loginid' ">
+							AND ID = #{id}
+						</if>
+						<if test="check == 'email' ">
+							<if test="id != null and id != '' ">
+								AND ID <![CDATA[ <> ]]> #{id}	
+							</if>
+						 	AND EMAIL = #{email}
+						</if>
+					</when>
+				</choose>
+		     )
+	</select>
+
+	<!--
+         쿼리명 : LGBMemJoinDAO.selectQscnMemIdEmailCheck
+         설  명 : 비밀번호를 변경한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   김필기      최초생성
+    -->	
+	<select id="LGBMemJoinDAO.selectQscnMemIdEmailCheck" parameterType="emfMap" resultType="int">
+		SELECT SUM(CNT) AS CNT
+		  FROM (
+		        SELECT COUNT(*) AS CNT
+		          FROM MB_QSCN_MEM_MST
+		         WHERE 1=1
+				<choose>
+					<when test="check != null and check != '' ">
+						<if test="check == 'id' || check == 'loginid' ">
+							AND ID = #{id}
+						</if>
+						<if test="check == 'email' ">
+							<if test="id != null and id != '' ">
+								AND ID <![CDATA[ <> ]]> #{id}	
+							</if>
+						 	AND EMAIL = #{email}
+						</if>
+					</when>
+				</choose>
+		     )
+	</select>
+	
+	<!--
+         쿼리명 : LGBMemJoinDAO.selectDrotMemIdEmailCheck
+         설  명 : 비밀번호를 변경한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   김필기      최초생성
+    -->	
+	<select id="LGBMemJoinDAO.selectDrotMemIdEmailCheck" parameterType="emfMap" resultType="int">
+		SELECT SUM(CNT) AS CNT
+		  FROM (
+		        SELECT COUNT(*) AS CNT
+		          FROM MB_DROT_MEM_MST
+		         WHERE 1=1
+				<choose>
+					<when test="check != null and check != '' ">
+						<if test="check == 'id' || check == 'loginid' ">
+							AND ID = #{id}
+						</if>
+						<if test="check == 'email' ">
+							<if test="id != null and id != '' ">
+								AND ID <![CDATA[ <> ]]> #{id}	
+							</if>
+						 	AND EMAIL = #{email}
+						</if>
+					</when>
+				</choose>
+		     )
+	</select>
+
+	<select id="LGBMemJoinDAO.checkAvailableAccount" parameterType="emfMap" resultType="Integer">
+		SELECT	/* LGBMemJoinDAO.checkAvailableAccount */
+			COUNT(ID)
+		FROM
+			INTEGRATION_MEMBER@DM_INTEGRATION
+		WHERE
+			INTEGRATION_ID = #{id}
+		OR
+		<choose>
+			<when test="type eq 'HOMEPAGE'.toString()">
+				MALL_ID = #{id}
+				AND
+			  	HOMEPAGE_ID != #{id}
+			</when>
+			<when test="type eq 'MALL'.toString()">
+				HOMEPAGE_ID = #{id}
+				AND
+				MALL_ID != #{id}
+			</when>
+			<otherwise>
+				MALL_ID = #{id}
+				OR
+				HOMEPAGE_ID = #{id}
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="checkDuplicateEmail" parameterType="emfMap" resultType="Integer">
+		SELECT
+			COUNT(*)
+		FROM
+			MB_MEM_MST
+		WHERE
+			EMAIL = #{email}
+		AND
+			ID != #{id}
+	</select>
+
+</mapper>            

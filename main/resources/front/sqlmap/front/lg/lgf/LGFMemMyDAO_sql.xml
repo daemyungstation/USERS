@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LGFMemMyDAO">
+	<select id="LGFMemMyDAO.getInfoByCI" parameterType="emfMap" resultType="emfMap">
+		SELECT 
+			*
+		FROM 
+			MB_MEM_MST
+		WHERE 
+			CI = 'AcyNWYMULBStGDQb2c/E2rXac+VTpEhhKHA4svCAzqmfBlukxfqbMZJSYQhy1Io6uC4mKywOduKE2iK/XIGc5Q=='
+	</select>
+	
+	<update id="LGFMemMyDAO.updateMemInf" parameterType="emfMap">
+		UPDATE  MB_MEM_MST
+		   SET EMAIL = #{email}
+			   , HP = #{cellPhone} 
+			   , ZIPCD = #{zipCode}
+			   , ADR = #{address}
+			   , ADR_DTL = #{adrDtl}
+			   , MOD_ID = #{modId}
+			   , MOD_IP = #{modIp}
+			   , MOD_DTM = SYSDATE
+         WHERE ID = #{id}
+   	</update>
+</mapper>

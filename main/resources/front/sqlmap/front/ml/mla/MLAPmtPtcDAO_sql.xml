@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLAPmtPtcDAO">
+	
+	<!--
+         쿼리명 : MLAPmtPtcDAO.selectPmtPtcList
+         설  명 : 납입현황 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.15   허진영      최초생성
+        2016.06.10   임동진      수정(해약자 납입상태 안나오게 처리)
+        2016.10.10	 허진영      수정(행사, 해약, 청약철회 등 가입상태가 정상이 아니면 미노출)
+    -->
+	<select id="MLAPmtPtcDAO.selectPmtPtcList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLAPmtPtcDAO.selectPmtPtcList */
+			   B.ACCNT_NO
+			   , FN_COM_NM('01', B.PAY_MTHD) AS PAY_MTHD_NM
+			   , NVL(C.PROD_PRT_NM , C.PROD_NM) AS PROD_NM
+			   , B.DED_NO
+			   , B.JOIN_DT
+			   , C.PROD_AMT
+			   , C.EXPR_NO
+			   , C.MON_PAY_AMT
+		       , C.EXPR_NO -  (SELECT COUNT(SEQ) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS REMAIN_CNT
+			   , (SELECT MAX(PAY_DAY) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS LATEST_PAY_DAY
+/*			   , (SELECT MAX(PAY_AMT) KEEP(DENSE_RANK FIRST ORDER BY PAY_DAY DESC) AS L_PAY_AMT  FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS LATEST_PAY_AMT*/
+			   , (SELECT COUNT(SEQ) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS TRUE_CNT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS TRUE_AMT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG_DTL WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS RELAT_AMT
+			   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG_DTL1 WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS ADD_AMT
+			   , DECODE(FN_ACCNT_STAT(B.ACCNT_NO), 'Y', '정상', 'R', '해약', 'E', '행사', '청약철회') AS ACC_STAT
+			   , FN_YEN_CHE(B.ACCNT_NO) AS PAY_STAT
+			   , C.PROD_DC_CNT 
+	      FROM MEMBER A, MEM_PROD_ACCNT B, PRODUCT C
+		 WHERE A.MEM_NO = B.MEM_NO
+		   AND B.PROD_CD = C.PROD_CD
+		   AND A.DEL_FG = 'N'
+		   AND B.DEL_FG = 'N'
+		   AND A.MEM_NO = #{memNo}
+		   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO)
+		   AND ( FN_ACCNT_STAT(B.ACCNT_NO) = 'Y' OR EXISTS( SELECT 'X' FROM RESCISSION_DAMO WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO AND RESN_CL NOT IN ('02','04')  AND CMS_WDRW_REQ_YN  = 'Y' )  ) -- 결합상품유무
+		 ORDER BY B.REG_DM DESC
+	</select>
+	
+	<!--
+         쿼리명 : MLAPmtPtcDAO.selectPmtPtcDtlList
+         설  명 : 납입현황상세 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.15   허진영      최초생성
+    -->
+	<select id="MLAPmtPtcDAO.selectPmtPtcDtlList" parameterType="emfMap" resultType="emfMap">
+		WITH TBL_PMT_DTL(PMT_GB, NO, PAY_DAY, PAY_AMT, PAY_MTHD, STAT)
+		AS
+		(
+			SELECT 'A' AS PMT_GB
+				   , C.NO
+				   , C.PAY_DAY
+				   , C.PAY_AMT
+				   , C.PAY_MTHD
+				   , C.STAT
+			  FROM MEMBER A, MEM_PROD_ACCNT B, PAY_MNG C
+			 WHERE A.MEM_NO = B.MEM_NO 
+			   AND B.ACCNT_NO = C.ACCNT_NO
+			   AND A.MEM_NO = #{memNo}
+			   AND B.ACCNT_NO = #{accntNo}
+			   AND A.DEL_FG = 'N'
+		       AND B.DEL_FG = 'N'
+			   AND C.DEL_FG = 'N'
+		
+			UNION ALL
+		
+			SELECT 'B' AS PMT_GB
+				   , C.NO
+				   , C.PAY_DAY
+				   , C.PAY_AMT
+				   , C.PAY_MTHD
+				   , C.STAT
+			  FROM MEMBER A, MEM_PROD_ACCNT B, PAY_MNG_DTL C
+			 WHERE A.MEM_NO = B.MEM_NO 
+			   AND B.ACCNT_NO = C.ACCNT_NO
+			   AND A.MEM_NO = #{memNo}
+			   AND B.ACCNT_NO = #{accntNo}
+			   AND A.DEL_FG = 'N'
+		       AND B.DEL_FG = 'N'
+			   AND C.DEL_FG = 'N'
+		
+			UNION ALL
+		
+			SELECT 'C' AS PMT_GB
+				   , C.NO
+				   , C.PAY_DAY
+				   , C.PAY_AMT
+				   , C.PAY_MTHD
+				   , C.STAT
+			  FROM MEMBER A, MEM_PROD_ACCNT B, PAY_MNG_DTL1 C
+			 WHERE A.MEM_NO = B.MEM_NO 
+			   AND B.ACCNT_NO = C.ACCNT_NO
+			   AND A.MEM_NO = #{memNo}
+			   AND B.ACCNT_NO = #{accntNo}
+			   AND A.DEL_FG = 'N'
+		       AND B.DEL_FG = 'N'
+			   AND C.DEL_FG = 'N'
+		)
+		SELECT /* MLAPmtPtcDAO.selectPmtPtcDtlList */
+			   (SELECT PROD_PRT_NM FROM PRODUCT_MODEL_CL_CD WHERE MODEL_CL_CD = (SELECT B.PROD_MODEL_KIND FROM MEMBER A, MEM_PROD_ACCNT B WHERE A.MEM_NO = B.MEM_NO AND A.MEM_NO = #{memNo} AND B.ACCNT_NO = #{accntNo})) AS PROD_NM	
+			   , NO
+			   , PAY_DAY
+			   , NVL((SELECT PAY_AMT FROM TBL_PMT_DTL WHERE PMT_GB = 'A' AND NO = A.NO), 0) AS TRUE_AMT
+			   , NVL((SELECT PAY_AMT FROM TBL_PMT_DTL WHERE PMT_GB = 'B' AND NO = A.NO), 0) AS RELAT_AMT
+			   , NVL((SELECT PAY_AMT FROM TBL_PMT_DTL WHERE PMT_GB = 'C' AND NO = A.NO), 0) AS ADD_AMT
+			   , FN_COM_NM('01', A.PAY_MTHD) AS PAY_MTHD
+			   , STAT
+			   , (SELECT MAX(PAY_DAY) FROM TBL_PMT_DTL) AS MAX_PAY_DAY
+			   , (SELECT MIN(PAY_DAY) FROM TBL_PMT_DTL) AS MIN_PAY_DAY
+		  FROM TBL_PMT_DTL A
+		 GROUP BY NO, PAY_DAY, PAY_MTHD, STAT
+		 ORDER BY NO
+	</select>
+	
+	<!--
+         쿼리명 : MLAPmtPtcDAO.selectPmtPtcInfo
+         설  명 : 가입상품 납입정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.18   김필기      최초생성
+    -->
+	<select id="MLAPmtPtcDAO.selectPmtPtcInfo" parameterType="emfMap" resultType="emfMap">
+		WITH TBL 
+		AS
+		(
+			SELECT A.*
+				   , B.ACCNT_NO
+				   , NVL(C.PROD_PRT_NM , C.PROD_NM) AS PROD_NM
+				   , B.DED_NO
+				   , B.JOIN_DT
+				   , C.PROD_AMT
+				   , C.EXPR_NO
+				   , C.PROD_CD
+				   , C.MON_PAY_AMT
+				   , (SELECT COUNT(SEQ) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS TRUE_CNT
+				   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS TRUE_AMT
+				   , (SELECT COUNT(SEQ) FROM PAY_MNG_DTL WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS RELAT_CNT
+				   , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG_DTL WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS RELAT_AMT
+				   , (SELECT COUNT(SEQ) FROM PAY_MNG_DTL1 WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS ADD_CNT
+			       , (SELECT NVL(SUM(PAY_AMT), 0) FROM PAY_MNG_DTL1 WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS ADD_AMT
+			       , DECODE(FN_ACCNT_STAT(B.ACCNT_NO), 'Y', '정상', 'R', '해약', 'E', '행사', '청약철회') AS ACC_STAT
+				   , FN_YEN_CHE(B.ACCNT_NO) AS PAY_STAT
+				   , E.EMPLE_NO
+				   , E.DEPT_CD 
+				   , E.EMPLE_NM
+			       , C.PROD_DC_CNT				
+			  FROM MEMBER A, MEM_PROD_ACCNT B, PRODUCT C, EMPLOYEE E
+			 WHERE A.MEM_NO = B.MEM_NO
+			   AND B.PROD_CD = C.PROD_CD
+			   AND B.EMPLE_NO = E.EMPLE_NO		   
+			   AND A.DEL_FG = 'N'
+			   AND B.DEL_FG = 'N'
+			   AND A.MEM_NO = #{memNo}
+			   AND B.ACCNT_NO = #{accntNo}
+		), 
+		DTL 
+		AS 
+		(
+			SELECT DTL1.PROD_CD
+				   , DTL1.ST_NO AS ST_NO1, DTL1.END_NO AS END_NO1, DTL1.MONTH_PAY_AMT AS MONTH_PAY_AMT1, DTL1.ALLT_AMT AS ALLT_AMT1, DTL1.ADD_AMT AS ADD_AMT1
+				   , DTL2.ST_NO AS ST_NO2, DTL2.END_NO AS END_NO2, DTL2.MONTH_PAY_AMT AS MONTH_PAY_AMT2, DTL2.ALLT_AMT AS ALLT_AMT2, DTL2.ADD_AMT AS ADD_AMT2
+				   , DTL3.ST_NO AS ST_NO3, DTL3.END_NO AS END_NO3, DTL3.MONTH_PAY_AMT AS MONTH_PAY_AMT3, DTL3.ALLT_AMT AS ALLT_AMT3, DTL3.ADD_AMT AS ADD_AMT3
+			FROM 
+			(
+				SELECT PROD_CD, ST_NO, END_NO, MONTH_PAY_AMT, ALLT_AMT, ADD_AMT
+				  FROM PRODUCT_DTL
+				WHERE SEQ = 1
+			) DTL1
+			LEFT JOIN
+			(
+				SELECT PROD_CD, ST_NO, END_NO, MONTH_PAY_AMT, ALLT_AMT, ADD_AMT
+				  FROM PRODUCT_DTL
+				 WHERE SEQ = 2
+			) DTL2
+			ON DTL1.PROD_CD = DTL2.PROD_CD
+			LEFT JOIN
+			(
+				SELECT PROD_CD, ST_NO, END_NO, MONTH_PAY_AMT, ALLT_AMT, ADD_AMT
+				  FROM PRODUCT_DTL
+				 WHERE SEQ = 3
+			) DTL3
+			ON DTL1.PROD_CD = DTL3.PROD_CD
+		)
+		SELECT /* MLAPmtPtcDAO.selectPmtPtcInfo */
+			   *
+		  FROM TBL, DTL
+		 WHERE TBL.PROD_CD = DTL.PROD_CD	
+	</select>	
+	
+	<!--
+         쿼리명 : MLAPmtPtcDAO.selectDeptInf
+         설  명 : 담당자의 부서를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.18   김필기      최초생성
+    -->
+	<select id="MLAPmtPtcDAO.selectDeptInf" parameterType="emfMap" resultType="emfMap">
+		WITH TREE_QUERY(DEPT_NM, DEPT_CD, HIGH_DEPT_CD, DEPTH_FULLNAME)
+		AS 
+		(
+			SELECT A.DEPT_NM
+				   , A.DEPT_CD
+				   , A.HIGH_DEPT_CD
+				   , A.DEPT_NM AS DEPTH_FULLNAME
+			  FROM DEPARTMENT A
+			 WHERE LVL = 1
+
+			UNION ALL 
+		   
+			SELECT A.DEPT_NM
+				   , A.DEPT_CD
+				   , A.HIGH_DEPT_CD
+				   , B.DEPT_NM || ' > ' || A.DEPT_NM AS DEPTH_FULLNAME
+			  FROM DEPARTMENT A, TREE_QUERY B
+		     WHERE A.HIGH_DEPT_CD = B.DEPT_CD
+		) 
+		SELECT DEPT_CD
+			   , HIGH_DEPT_CD
+			   , DEPTH_FULLNAME 
+		  FROM TREE_QUERY 
+		 WHERE DEPT_CD = #{deptCd}	
+	</select>
+	
+	<!--
+         쿼리명 : MLAPmtPtcDAO.selectProductDtlInf
+         설  명 : 상품 상세정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.18   김필기      최초생성
+    -->
+	<select id="MLAPmtPtcDAO.selectProductDtlInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLAPmtPtcDAO.selectProductDtlInf */
+			   A.PROD_CD
+		       , A.ST_NO AS ST_NO1
+			   , A.END_NO AS END_NO1
+			   , A.MONTH_PAY_AMT AS MONTH_PAY_AMT1
+			   , A.ALLT_AMT AS ALLT_AMT1
+			   , A.ADD_AMT AS ADD_AMT1
+			   , B.ST_NO AS ST_NO2
+			   , B.END_NO AS END_NO2
+			   , B.MONTH_PAY_AMT AS MONTH_PAY_AMT2
+			   , B.ALLT_AMT AS ALLT_AMT2
+			   , B.ADD_AMT AS ADD_AMT2
+			   , C.ST_NO AS ST_NO3
+			   , C.END_NO AS END_NO3
+			   , C.MONTH_PAY_AMT AS MONTH_PAY_AMT3
+			   , C.ALLT_AMT AS ALLT_AMT3
+			   , C.ADD_AMT AS ADD_AMT3
+		  FROM PRODUCT_DTL A, PRODUCT_DTL B, PRODUCT_DTL C
+		 WHERE A.PROD_CD = B.PROD_CD
+		   AND B.PROD_CD = C.PROD_CD
+		   AND A.PROD_CD = #{prodCd}
+		   AND A.SEQ = 1
+		   AND B.SEQ = 2
+		   AND C.SEQ = 3
+	</select>
+	
+</mapper>            

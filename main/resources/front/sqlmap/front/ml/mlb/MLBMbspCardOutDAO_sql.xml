@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLBMbspCardOutDAO">
+	
+	<!--
+         쿼리명 : MLBMbspCardOutDAO.selectMbspCardInf
+         설  명 : 멤버십카드 정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.23   허진영      최초생성
+        2016.06.03   김필기      수정 ( AND dbo.FN_EVENT(#{accntNo}) = '' )
+        2016.06.08   김필기      수정 ( AND dbo.FN_EVENT(#{accntNo}) IN ('', '행사') )
+    -->
+	<select id="MLBMbspCardOutDAO.selectMbspCardInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLBMbspCardOutDAO.selectMbspCardInf */
+			   A.MEM_NM
+			   , B.ACCNT_NO
+			   , B.RESORT_NO
+			   , (SELECT MEMBERSHIP FROM PRODUCT WHERE PROD_CD = B.PROD_CD) AS MBSP_GB
+			   , B.JOIN_DT
+		  FROM MEMBER A, MEM_PROD_ACCNT B
+		 WHERE A.MEM_NO = B.MEM_NO 
+		   AND A.DEL_FG = 'N'
+		   AND B.DEL_FG = 'N'
+		   AND A.MEM_NO = #{memNo}
+		   AND B.ACCNT_NO = #{accntNo}
+		   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO)
+		   AND FN_ACCNT_STAT(B.ACCNT_NO) IN('Y', 'E')
+	</select>
+	
+	<!--
+         쿼리명 : MLBMbspCardOutDAO.selectOcbCardInf
+         설  명 : OCB카드 정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.23   허진영      최초생성
+    -->
+	<select id="MLBMbspCardOutDAO.selectOcbCardInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLBMbspCardOutDAO.selectOcbCardInf */
+			   ACCNT_NO
+  			   , OCB_CD
+  		  FROM OCB_HIST A
+ 		 WHERE USE_YN = 'Y'
+    	   AND ACCNT_NO = #{accntNo}
+    	   AND REG_DM = (SELECT MAX(REG_DM) FROM OCB_HIST WHERE USE_YN = 'Y' AND ACCNT_NO = #{accntNo})
+    	   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = A.ACCNT_NO)
+	</select>
+	
+</mapper>            

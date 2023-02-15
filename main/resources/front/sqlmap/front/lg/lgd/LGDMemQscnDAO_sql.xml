@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lGCMemQscnDAO">
+
+    <select id="lGCMemQscnDAO.changeQscnUserToActiveUser" parameterType="emfMap">
+        INSERT INTO MB_MEM_MST
+        SELECT
+          *
+        FROM
+          MB_QSCN_MEM_MST
+        WHERE
+          ID = #{id}
+        AND
+          ci = #{ci}
+    </select>
+
+    <delete id="lGCMemQscnDAO.deleteQscnUser" parameterType="emfMap">
+      DELETE FROM MB_QSCN_MEM_MST
+      WHERE ID = #{id}
+      AND CI = #{ci}
+    </delete>
+</mapper>

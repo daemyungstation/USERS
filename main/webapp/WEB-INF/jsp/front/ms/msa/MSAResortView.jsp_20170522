@@ -1,0 +1,177 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8"%><%@include file="/WEB-INF/jsp/include/el.jspf" %>
+
+						<div class="chngSrvHead">
+							<img src="/common/images/icon/membersvr1_img1.jpg" alt="" />
+							<div class="txt">
+								<img src="/common/images/icon/membersrv_icon1.png" alt="" />
+								<p>가입 후 5년간 누리는 대명라이프웨이 멤버십</p>
+								<p class="type1">자연과 함께하는 쉼터, <br />대명리조트의 즐거움을 대명라이프웨이에서 누릴 수 있습니다.</p>
+							</div>
+						</div>
+						<p class="mt15" style="color:#333; line-height:24px">대명리조트는 경기, 강원, 충청, 경상, 전라, 제주 등 전국을 아우르는 대규모의 호텔&amp;리조트 리조트 기업으로, 비발디파크의 오션월드/스키월드 등의 시설을 보유한 대한민국 레저산업 분야의 선두주자입니다.</p>
+						<div class="imgInfo mt60">
+							<p class="img"><img src="/common/images/icon/membersvr1_img3.jpg" alt="" /></p>
+							<div class="info">
+								<p class="titTxt">대명 리조트 객실 혜택</p>
+								<p class="mt10"><strong>우대 범위</strong></p>
+								<p class="mt10">패밀리/스위트 객실 <span class="red">비수기 주중</span> 이용시, 무기명 회원가 +1만원 (일~목요일) / 무기명 회원가 +2만원 (금요일) / 연 10박 (회원 본인 한정)</p>
+								<p class="mt10"><strong>이용 안내</strong></p>
+								<p class="dotTxt mt10">
+									예약방법 : 컨택센터(1588-8511)에서 비수기 주중에만 가능하며, 일~목요일은 30일 전, 금요일은 5~15일 전부터 예약 가능합니다.<br />
+									※ 리조트 객실의 이용은 관련 법령에 의한 리조트 정회원 우선 예약 제도에 따라 이용이 제한될 수 있습니다.
+								</p>
+								<p class="dotTxt">성수기 안내 : 여름 성수기 (7월 중순 ~8월 말), 겨울 성수기 (12 월 중순 ~1월 말), 연휴, 휴일 전 일, 토요일은 예약이 제외됩니다.</p>
+								<p class="dotTxt">현장에서 멤버십 카드 제시 후 이용 가능합니다.</p>
+								<p class="dotTxt">회원 본인 모바일 멤버십 카드, 신분증 지참 필수 (미지참 시, 우대 혜택이 적용되지 않습니다.)</p>
+							</div>
+						</div>
+						<div class="imgInfo">
+							<p class="img"><img src="/common/images/icon/membersvr1_img4.jpg" alt="" /></p>
+							<div class="info">
+								<p class="titTxt">오션월드 우대 혜택</p>
+								<p class="mt10"><strong>우대 범위</strong></p>
+								<p class="mt10"><span class="red">비발디파크 오션월드 / 전국 대명리조트 아쿠아월드 / 거제 마리나리조트 오션베이</span><br />최대 35% 우대 혜택 (시즌에 따라 변동)<br />연 10회 (본인 포함 2인)</p>
+								<p class="mt10"><strong>이용 안내</strong></p>
+								<p class="dotTxt mt10">현장에서 멤버십카드 제시 후 이용 가능합니다. </p>
+								<p class="dotTxt">회원 본인 모바일 멤버십 카드, 신분증 지참 필수 (미지참 시, 우대 혜택이 적용되지 않습니다.)</p>
+							</div>
+						</div>
+						<div class="imgInfo">
+							<p class="img"><img src="/common/images/icon/membersvr1_img5.jpg" alt="" /></p>
+							<div class="info">
+								<p class="titTxt">스키월드 우대 혜택</p>
+								<p class="mt10"><strong>우대 범위</strong></p>
+								<p class="mt10"><span class="red">비발디파크 스키월드 (리프트/렌탈)</span> 최대 35% 우대 혜택 (시즌에 따라 변동)<br />연 10회 (본인 포함 2인)</p>
+								<p class="mt10"><strong>이용 안내</strong></p>
+								<p class="dotTxt mt10">현장에서 멤버십카드 제시 후 이용 가능합니다. </p>
+								<p class="dotTxt">회원 본인 모바일 멤버십 카드, 신분증 지참 필수 (미지참 시, 우대 혜택이 적용되지 않습니다.)</p>
+							</div>
+						</div>
+						<p class="titTxt mt60">대명리조트 전국 위치 정보</p>
+						<div class="memMap mt15">
+							<p class="img"><img src="/common/images/icon/membersvr1_img2.jpg" alt="" /></p>
+							<div class="txt">
+								<table summary="">
+									<caption></caption>
+									<colgroup>
+										<col width="35%" />
+										<col width="65%" />
+									</colgroup>
+									<thead>
+										<tr>
+											<th>구분</th>
+											<th>주소</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>쏠비치 양양</td>
+											<td>강원도 양양군 손양면 선사유적로 678</td>
+										</tr>
+										<tr>
+											<td>소노펠리체</td>
+											<td>강원도 홍천군 서면 한치골길 262</td>
+										</tr>
+										<tr>
+											<td>소노빌리지</td>
+											<td>강원도 홍천군 서면 한치골길 262</td>
+										</tr>
+										<tr>
+											<td>비발디파크</td>
+											<td>강원도 홍천군 서면 한치골길 262</td>
+										</tr>
+										<tr>
+											<td>대명리조트 양평</td>
+											<td>경기도 양평군 개군면 신내길 7번길 55</td>
+										</tr>
+										<tr>
+											<td>델피노 골프 앤 리조트</td>
+											<td>강원도 고성군 토성면 미시령옛길 1153</td>
+										</tr>
+										<tr>
+											<td>대명리조트 변산</td>
+											<td>전라북도 부안군 변산면 변산해변로 51</td>
+										</tr>
+										<tr>
+											<td>대명리조트 단양</td>
+											<td>충청북도 단양군 단양읍 삼봉로 187-17</td>
+										</tr>
+										<tr>
+											<td>대명리조트 경주</td>
+											<td>경상북도 경주시 보문로 402-12</td>
+										</tr>
+										<tr>
+											<td>대명리조트 제주</td>
+											<td>제주특별자치도 제주시 조천읍 신북로 577</td>
+										</tr>
+										<tr>
+											<td>엠블호텔 여수</td>
+											<td>전남 여수시 오동도로 111</td>
+										</tr>
+										<tr>
+											<td>엠블호텔 고양</td>
+											<td>경기도 고양시 일산동구 태극로 20</td>
+										</tr>
+										<tr>
+											<td>대명리조트 거제 마리나</td>
+											<td>거제시 일운면 거제대로 2660 (거제시 일운면 소동리 115)</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<div id="faqDiv">
+						
+						</div>
+						
+						<script type="text/javascript">
+						//<![CDATA[
+						           
+							jQuery(document).ready(function(){
+								getPageList();
+							});
+							
+							//리스트 가져오기
+							function getPageList()
+							{	
+								var pageIndex = "";
+								
+								if(arguments.length > 0)
+								{
+									if(arguments[0] == "all")
+									{
+										pageIndex = 1;
+										jQuery("select[name='f']").val("");
+										jQuery("input[name='q']").val("");
+									}
+									else
+									{
+										pageIndex = arguments[0];
+									}
+								}
+								else
+								{
+									pageIndex = 1;
+								}
+								
+								jQuery.post("/membership-service/faq-list.ajax",
+									{
+										"pageIndex" : pageIndex,
+										"f" : jQuery("select[name='f']").val(),
+										"q" : jQuery("input[name='q']").val(),
+										"srvcId" : 236
+									},
+									function(text) 
+									{
+										jQuery("#faqDiv").html("");
+										jQuery("#faqDiv").html(text);
+									},
+									"text"
+								).fail(function () {
+									alert("예기치 않은 오류입니다.");
+								});
+							}
+
+						//]]>
+						</script>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CmmUseDAO">
+
+	<!--
+         쿼리명 : CmmUseDAO.selectCdIdAllList
+         설  명 : 상세 전체 코드
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.19  김필기     최초 생성
+    -->
+	<!--('LGB2B3', 'LGB2B4', 'LGB2B5', 'LGB2B6', 'LGB2B7', 'LGB2B8', 'LGB2B9', 'LGB2B99')-->
+	<select id="CmmUseDAO.selectCmmLinkCodeLGB2B" parameterType="emfMap" resultType="emfMap">
+		SELECT /* CmmUseDAO.selectCmmLinkCodeLGB2B */
+		LOWR_DTL_CD AS CD
+		, HIGHR_DTL_CD
+		, (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = A.LOWR_CD AND CD = A.LOWR_DTL_CD) AS CD_NM
+		, (SELECT CD_ORD FROM CO_CD_DTL WHERE CD_ID = A.LOWR_CD AND CD = A.LOWR_DTL_CD) AS CD_ORD
+		FROM CO_CD_REL A
+		WHERE HIGHR_CD = 'OUTSOURCING_PRDCT'
+		AND HIGHR_DTL_CD IN
+		<foreach collection="codeList" item="code" open="(" separator="," close=")">
+			#{code}
+		</foreach>
+		ORDER BY HIGHR_DTL_CD
+	</select>
+
+	<!--
+         쿼리명 : CmmUseDAO.selectCmmCodeDetail
+         설  명 : 상세 코드
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.19  김필기     최초 생성
+    -->
+	<select id="CmmUseDAO.selectCdIdAllList" resultType="emfMap">
+		SELECT /* CmmUseDAO.selectCdIdAllList */
+			   CD_ID
+			   , CD
+			   , CD_NM
+			   , CD_DSC
+			   , CD_ORD
+		  FROM CO_CD_DTL
+		 WHERE USE_YN = 'Y'
+		 ORDER BY CD_ORD
+	</select>
+
+	<!--
+         쿼리명 : CmmUseDAO.selectCmmCodeDetail
+         설  명 : 링크 코드
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.19  김필기     최초 생성
+    -->
+	<select id="CmmUseDAO.selectCmmCodeDetail" parameterType="emfMap" resultType="emfMap">
+		SELECT /* CmmUseDAO.selectCmmCodeDetail */
+		       CD_ID
+			   , CD
+			   , CD_NM
+			   , CD_DSC
+			   , CD_ORD
+		  FROM CO_CD_DTL
+		 WHERE USE_YN = 'Y'
+		   AND CD_ID = #{cdId}
+		 ORDER BY CD_ORD
+	</select>
+
+	<!--
+         쿼리명 : CmmUseDAO.selectCmmLinkCodeLGB2B
+         설  명 : 링크 코드
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2017. 7.31  이철성     최초 생성
+    -->
+	<select id="CmmUseDAO.selectCmmLinkCode" parameterType="emfMap" resultType="emfMap">
+		SELECT /* CmmUseDAO.selectCmmLinkCode */
+		       LOWR_DTL_CD AS CD
+		       , HIGHR_DTL_CD
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = A.LOWR_CD AND CD = A.LOWR_DTL_CD) AS CD_NM
+			   , (SELECT CD_ORD FROM CO_CD_DTL WHERE CD_ID = A.LOWR_CD AND CD = A.LOWR_DTL_CD) AS CD_ORD
+		  FROM CO_CD_REL A
+		 WHERE HIGHR_CD = #{highrCd}
+		 	<choose>
+		 		<when test="(oscCd == 'LGB2B' or oscCd == 'LGSTAY') and highrCd == 'OUTSOURCING_PRDCT'">
+	 				AND HIGHR_DTL_CD IN
+					<foreach collection="highrDtlCd" item="item" open="(" close=")" separator=",">
+						#{item}
+					</foreach>
+		 		</when>
+		 		<otherwise>
+		 			AND HIGHR_DTL_CD = #{highrDtlCd}
+		 		</otherwise>
+		 	</choose>
+			AND LOWR_CD = #{lowrCd}
+		ORDER BY HIGHR_DTL_CD, CD_ORD
+	</select>
+
+
+	<!--
+         쿼리명 : CmmUseDAO.selectCmmLinkCodeTHEONE
+         설  명 : THEONE 링크 코드
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2017. 7.31  이철성     최초 생성
+    -->
+	<select id="CmmUseDAO.selectCmmLinkCodeTHEONE" parameterType="emfMap" resultType="emfMap">
+		SELECT /* CmmUseDAO.selectCmmLinkCodeTHEONE */
+		       LOWR_DTL_CD AS CD
+		       , HIGHR_DTL_CD
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = A.LOWR_CD AND CD = A.LOWR_DTL_CD) AS CD_NM
+			   , (SELECT CD_ORD FROM CO_CD_DTL WHERE CD_ID = A.LOWR_CD AND CD = A.LOWR_DTL_CD) AS CD_ORD
+		  FROM CO_CD_REL A
+		 WHERE HIGHR_CD = 'OUTSOURCING_PRDCT'
+		   AND HIGHR_DTL_CD IN ('THEONE1', 'THEONE2', 'THEONE3', 'THEONE4')
+		 ORDER BY HIGHR_DTL_CD
+	</select>	
+	
+	
+	<!--
+         쿼리명 : CmmUseDAO.selectCmmCodeDetailInf
+         설  명 : 상세 코드 정보(단일)
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2016.03.17  김필기     최초 생성
+    -->
+	<select id="CmmUseDAO.selectCmmCodeDetailInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* CmmUseDAO.selectCmmCodeDetailInf */
+		       CD_ID
+			   , CD
+			   , CD_NM
+			   , CD_DSC
+			   , CD_ORD
+		  FROM CO_CD_DTL
+		 WHERE USE_YN = 'Y'
+		   AND CD_ID = #{cdId}
+		   AND CD = UPPER(#{cd})
+		 ORDER BY CD_ORD
+	</select>
+
+	<insert id="CmmUseDAO.actionViewAuthLog" parameterType="emfMap">
+	INSERT INTO CO_ADM_LOG
+		(
+			LOG_SEQ
+			, ID
+			, HP
+			, NAME
+			, IP
+			, LOGIN
+			, LOGOUT
+			, ISSUE_DATE
+			, GUBUN
+			, FLAG
+			, PAGE_GUBUN
+		) VALUES (
+			LOG_SEQ.nextval
+			, #{id}
+			, #{hp}
+			, #{name}
+			, #{ip}
+			, ''
+			, ''
+			, SYSDATE
+			, #{gubun}
+			, #{flag}
+			, #{pageGubun}
+		)
+	</insert>
+
+</mapper>            

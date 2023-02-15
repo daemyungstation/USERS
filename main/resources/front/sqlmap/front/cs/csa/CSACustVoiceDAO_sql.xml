@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CSACustVoiceDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="CNTN" column="CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : CSAAlncCnslDAO.insertAlncCnsl
+         설  명 : 제휴 문의를 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.02   허진영      최초생성
+    -->
+	<insert id="CSACustVoiceDAO.insertCustVoice" parameterType="emfMap">
+		INSERT /* CSACustVoiceDAO.insertCustVoice */ INTO CS_CUST_VOICE_MST
+			(CUST_VOICE_SEQ
+			, ID
+			, NAME
+			, HTEL
+			, EMAIL
+			, INQRY_CD
+			, INQRY_DTL_CD
+			, TITL
+			, CNTN
+			, PRCS_CD
+			, REG_ID
+			, REG_IP
+			, REG_DTM
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			)
+		VALUES
+			(#{custVoiceSeq}
+			, #{id}
+			, #{name}
+			, #{htel}
+			, #{email}
+			, #{inqryCd}
+			, #{inqryDtlCd}
+			, #{titl}
+			, #{cntn}
+			, '01'
+			, #{regId, jdbcType=VARCHAR}
+			, #{regIp, jdbcType=VARCHAR}
+			, SYSDATE
+			, #{modId, jdbcType=VARCHAR}
+			, #{modIp, jdbcType=VARCHAR}
+			, SYSDATE
+			)
+	</insert>
+	
+	<!--
+         쿼리명 : CSACustVoiceDAO.selectCustVoice
+         설  명 : 고객의소리 문의 상세를 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.11   허진영     최초 생성
+    -->
+    <select id="CSACustVoiceDAO.selectCustVoice" parameterType="emfMap" resultMap="emfMap">
+        SELECT /* CSACustVoiceDAO.selectCustVoice */      
+               (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'CUST_VOICE_GB' AND CD = A.INQRY_CD) AS INQRY_NM
+               , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'CUST_VOICE_DTL_GB' AND CD = A.INQRY_DTL_CD) AS INQRY_DTL_NM
+               , NAME
+               , EMAIL
+               , TITL
+               , CNTN
+          FROM CS_CUST_VOICE_MST A
+         WHERE CUST_VOICE_SEQ = #{custVoiceSeq}
+   	</select>
+	
+	<!--
+         쿼리명 : CSACustVoiceDAO.selectCustVoiceAdmList
+         설  명 : 고객의 소리 관련 관리자 목록을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.11   허진영     최초 생성
+    -->
+    <select id="CSACustVoiceDAO.selectCustVoiceAdmList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* CSACustVoiceDAO.selectCustVoiceAdmList */ 
+			   NAME
+    	       , EMAIL
+		  FROM CO_ADM_MST
+		 WHERE USE_YN = 'Y' 
+		   AND ROLE_CD = 'ROLE_00003'
+		    
+		UNION
+		    
+		SELECT NAME
+		       , EMAIL
+		  FROM CO_ADM_MST
+		 WHERE USE_YN = 'Y' 
+		   AND ADM_SEQ IN(SELECT ADM_SEQ FROM CO_ADM_MENU_INF WHERE MENU_SEQ = 70)
+   	</select>
+	
+</mapper>            

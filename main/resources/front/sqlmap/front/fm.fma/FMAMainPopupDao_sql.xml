@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="FMAMainPopupDao">
+
+	<resultMap id="emfMap" type="emfMap">
+		<result property="cntn" column="CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+
+	<select id="FMAMainPopupDao.getMainPopupInfo" resultMap="emfMap">
+		SELECT
+			IDX,
+			NAME,
+			CNTN,
+			START_DTM,
+			END_DTM,
+			ALWAYS_YN,
+			TYPE,
+			POST_YN,
+			REG_IP,
+			REG_ID,
+			REG_DTM,
+			MOD_ID,
+			MOD_IP,
+			MOD_DTM,
+			TODAY_YN
+		FROM
+			SM_MAIN_POP_MST
+		WHERE
+			POST_YN = 'Y'
+		AND
+			START_DTM <![CDATA[ < ]]> SYSDATE
+		AND
+			END_DTM <![CDATA[ > ]]> SYSDATE
+		AND ROWNUM <![CDATA[ < ]]> 2
+		ORDER BY IDX DESC
+	</select>
+
+</mapper>

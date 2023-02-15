@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NiceCreditMap">
+    
+    <!-- NICE Safe-Key 발급권유 SMS 발송후 Safe-Key 발급결과 업데이트 : 나이스에서 결과를 넘겨받은 경우 -->
+    <update id="NiceCreditMap.updateNiceSafekeyMobileIssueResult" parameterType="map">
+		UPDATE /* NiceCreditMap.updateNiceSafekeyMobileIssueResult */
+               ps_willvi.NICE_SAFEKEY_SMS_HIS
+           SET ISSUE_DTHMS		= #{issue_dthms,jdbcType=VARCHAR}  						/* 발급완료일시분초 */
+             , SAFEKEY			= #{safekey,jdbcType=VARCHAR}      						/* SAFEKEY */
+             , AUTH_TYPE		= #{auth_type,jdbcType=VARCHAR}      					/* 인증구분 */
+             , AUTH_RESULT_CODE	= #{auth_result_code,jdbcType=VARCHAR}      				/* 인증결과코드 */
+             , RETURN_CODE		= #{return_code,jdbcType=VARCHAR}      					/* 응답코드 */
+             , RETURN_MSG		= #{return_msg,jdbcType=VARCHAR}      					/* 응답메시지 */
+             , CI_VAL			= #{ci,jdbcType=VARCHAR}      							/* CI */
+             , LST_UPD_UID		= #{loginid,jdbcType=VARCHAR}  							/* 최종수정자ID */
+             , LST_UPD_DT 		= SYSDATE								/* 최종수정일시분초 */
+		 WHERE REQ_SEQ		= #{req_seq,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 가상계좌 산출데이터 임시저장 -->
+    <insert id="NiceCreditMap.insertNiceVacctNoti" parameterType="map">
+		INSERT /* NiceCreditMap.insertNiceVacctNoti */
+		  INTO lf_dmuser.NICE_VACCT_NOTI
+		(
+		       TR_DT           	/* 트랜잭션일자 */
+		     , TR_SEQ          	/* 거래일련번호 */
+		     , PAY_METHOD      	/* 지불수단 */
+		     , MID             	/* 상점ID */
+		     , MALL_USER_ID    	/* 회원사 ID */
+		     , AMT             	/* 금액 */
+		     , NAME            	/* 구매자명 */
+		     , GOODS_NAME      	/* 상품명 */
+		     , TID             	/* 거래번호 */
+		     , MOID            	/* 주문번호 */
+		     , AUTH_DATE       	/* 입금일시 (yyMMddHHmmss) */
+		     , RESULT_CODE     	/* 결과코드 ("4110" 경우 입금통보) */
+		     , RESULT_MSG      	/* 결과메시지 */
+		     , VBANK_NUM       	/* 가상계좌번호 */
+		     , FN_CD           	/* 가상계좌 은행코드 */
+		     , VBANK_NAME      	/* 가상계좌 은행명 */
+		     , VBANK_INPUT_NAME	/* 입금자 명 */
+		     , RCPT_TID        	/* 현금영수증 거래번호 */
+		     , RCPT_TYPE       	/* 현금 영수증 구분(0:미발행, 1:소득공제용, 2:지출증빙용) */
+		     , RCPT_AUTH_CODE  	/* 현금영수증 승인번호 */
+		     , ERR_PAY_PROC    	/* ERR_PAY_PROC */
+		     , REG_DM    	    /* 등록일시 */
+		)
+		VALUES
+		(
+		       TO_CHAR(SYSDATE,'YYYYMMDD')
+		     , (SELECT NVL(MAX(TR_SEQ),0)+1 FROM lf_dmuser.NICE_VACCT_NOTI WHERE TR_DT = TO_CHAR(SYSDATE,'YYYYMMDD'))
+		     , #{pay_method,jdbcType=VARCHAR}
+		     , #{mid,jdbcType=VARCHAR}
+		     , #{mall_user_id,jdbcType=VARCHAR}
+		     , #{amt,jdbcType=VARCHAR}
+		     , #{name,jdbcType=VARCHAR}
+		     , #{goods_name,jdbcType=VARCHAR}
+		     , #{tid,jdbcType=VARCHAR}
+		     , #{moid,jdbcType=VARCHAR}
+		     , #{auth_date,jdbcType=VARCHAR}
+		     , #{result_code,jdbcType=VARCHAR}
+		     , #{result_msg,jdbcType=VARCHAR}
+		     , #{vbank_num,jdbcType=VARCHAR}
+		     , #{fn_cd,jdbcType=VARCHAR}
+		     , #{vbank_name,jdbcType=VARCHAR}
+		     , #{vbank_input_name,jdbcType=VARCHAR}
+		     , #{rcpt_tid,jdbcType=VARCHAR}
+		     , #{rcpt_type,jdbcType=VARCHAR}
+		     , #{rcpt_auth_code,jdbcType=VARCHAR}
+		     , #{err_pay_proc,jdbcType=VARCHAR}
+		     , SYSDATE
+		)
+    </insert>   
+    
+    <!-- 이니시스 가상계좌 결과 저장-->    
+    <parameterMap id="InicisInfoMap" type="map"><!-- /*java.util.HashMap*/ -->
+        <parameter property="tid" mode="IN" jdbcType="VARCHAR"  javaType="java.lang.String" />
+        <parameter property="moid" mode="IN" jdbcType="VARCHAR"  javaType="java.lang.String" />
+        <parameter property="bank_cd" mode="IN" jdbcType="INTEGER"  javaType="java.lang.String" />
+        <parameter property="auth_dt" mode="IN" jdbcType="VARCHAR"  javaType="java.lang.String" />
+        <parameter property="auth_time" mode="IN" jdbcType="VARCHAR"  javaType="java.lang.String" />
+        <parameter property="vtr_acc_no" mode="IN" jdbcType="VARCHAR"  javaType="java.lang.String" />
+        <parameter property="memnm" mode="IN" jdbcType="VARCHAR"  javaType="java.lang.String" />
+        <parameter property="pay_amt" mode="IN" jdbcType="VARCHAR"  javaType="java.lang.String" />
+        <parameter property="etc" mode="IN" jdbcType="VARCHAR"  javaType="java.lang.String" />
+    </parameterMap>
+
+    <!-- 임의등록 (청구납입횟수만큼 INSERT) -->
+    <insert id="NiceCreditMap.insertInicisResult" statementType="CALLABLE" parameterMap="InicisInfoMap">
+        {CALL SP_MEMBER_VIRTUAL_INICIS(?,?,?,?,?,?,?,?,?)}
+    </insert>
+</mapper>

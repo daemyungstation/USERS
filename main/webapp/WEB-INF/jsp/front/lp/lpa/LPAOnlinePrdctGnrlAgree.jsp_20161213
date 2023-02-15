@@ -1,0 +1,299 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8"%><%@include file="/WEB-INF/jsp/include/el.jspf" %>
+					
+					<c:set var="terms" value="${rtnMap}"/>
+					
+					<style>
+						.termBox .privacyDiv dt {font-size: 14px !important; }
+					</style>					
+					
+					<div data-controller="CommonController OnlinePrdctAgreeController">
+						<p class="memberTxt taC"><img src="/common/images/txt/member_txt1.gif" alt="약관동의 "></p>
+
+						<div class="allTerm mt40">
+							<button type="button" class="check "  id="allAgree">								
+								<strong>전체 동의합니다.</strong>
+								<img src="/common/images/btn/check_bt.gif" alt="체크">
+							</button>
+							<input type="checkbox" class="agree" style="display:none" />
+						</div>
+
+						<c:if test="${terms.itdpd ne null}">
+						<div class="termDiv mt40" >
+							<p class="tit">1. 상조서비스 회원약관 (필수) </p>
+							<button type="button" class="check checkBtn" id="agree1" >
+								<strong>상조서비스 회원약관을 확인하였습니다.</strong>
+								<img src="/common/images/btn/check_bt.gif" alt="체크">
+							</button>
+							<input type="checkbox" class="agree" style="display:none" />
+
+							<div class="termBox getTerm" style="overflow-y:scroll;  -webkit-overflow-scrolling: touch !important;" data-seq="${terms.itdpd.trsMstSeq}"></div>
+						</div>
+						</c:if>
+
+						<c:if test="${terms.rst ne null}">
+						<div class="termDiv mt60">
+							<p class="tit">2. 대명리조트 회원약관 (필수)</p>
+							<button type="button" class="check checkBtn" id="agree2" >
+								<strong>대명리조트 회원약관을 확인하였습니다.</strong>
+								<img src="/common/images/btn/check_bt.gif" alt="체크">
+							</button>
+							<input type="checkbox" class="agree" style="display:none" />
+
+							<div class="termBox getTerm" style="overflow-y:scroll;  -webkit-overflow-scrolling: touch !important;" data-seq="${terms.rst.trsMstSeq}"></div>
+						</div>
+						</c:if>
+
+						<c:if test="${terms.ocb ne null}">
+						<div class="termDiv mt60">
+							<p class="tit">3. OK캐쉬백 회원약관 (필수)</p>
+							<button type="button" class="check checkBtn" id="agree3" >
+								<strong>OK캐쉬백 회원약관을 확인하였습니다.</strong>
+								<img src="/common/images/btn/check_bt.gif" alt="체크">
+							</button>
+							<input type="checkbox" class="agree" style="display:none" />
+
+							<div class="termBox getTerm" style="overflow-y:scroll;  -webkit-overflow-scrolling: touch !important;" data-seq="${terms.ocb.trsMstSeq}"></div>
+						</div>
+						</c:if>
+
+
+
+						<div class="termDiv mt60">
+							<p class="tit">4. 개인정보의 수집 및 이용동의 (필수)</p>
+							<button type="button" class="check checkBtn" id="agree4" >
+								<strong>약관에 동의합니다.</strong>
+								<img src="/common/images/btn/check_bt.gif" alt="체크">
+							</button>
+							<input type="checkbox" class="agree" style="display:none" />
+
+							<div class="termBox">
+								<p class="txt mt5">본 계약과 관련하여 ㈜대명스테이션이 취득한 회원의 개인정보는 정보통신망 이용촉진 및 정보보호 등에 관한 법률, 개인정보보호법 등 관련 법령에 따라 정보주체의 동의를 얻어야 하는 정보에 해당합니다. 이에 아래와 같이 계약자의 서면동의를 얻고자 하는 바입니다. ㈜대명스테이션은 회원가입 및 상조서비스 제공을 위하여 최소한의 회원정보를 수집하고 있습니다.</p>
+								<p class="txt">㈜대명스테이션은 상조계약의 가입을 위하여 회원님의 개인정보를 아래와 같이 수집, 이용하고자 합니다. 다음의 사항을 충분히 읽어보신 후 동의하여 주시기 바랍니다. </p>
+								<p class="txt">▷ 수집, 이용 받는 자: ㈜대명스테이션</p>
+								<p class="txt mt10">▷ 수집, 이용하려는 개인정보 항목 : 성명, 주민등록번호 앞 7자리(생년월일/성별), 연락처(자택/이동전화), 주소(자택/직장), 이메일, 기타 결제정보 중 CMS정보(은행명 및 계좌번호) 또는 신용카드번호 중 택일</p>
+								<div class="txt mt10">
+									<table summary="">
+										<caption></caption>
+										<colgroup>
+											<col width="50%">
+											<col width="50%">
+										</colgroup>
+										<thead>
+											<tr>
+												<th>개인정보 수집 목적 (내용)</th>
+												<th>수집/이용 기간</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>
+													㉠ ㈜대명스테이션 대명라이프웨이의 회원가입 본인인증<br>
+													㉡ (주)대명스테이션이 제공하는 장례서비스 및 부가서비스를 위한 본인인증<br>
+													㉢ 상조 회원에 대한 공지사항 전달, 각종 청구서 송부, 회원 민원 및 불편사항 처리<br>
+													㉣ 기타 개인 맞춤서비스 제공을 위한 자료로 이용
+												</td>
+												<td>개인정보 수집 및 이용목적 달성 시 또는 회원탈퇴 시까지</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<p class="mt10">※ 회원님께서는 개인정보 수집 및 이용 동의에 거부할 권리가 있습니다. 다만, 이는 ㈜대명스테이션 상조계약 가입에 필요한 사항으로 이를 거부하실 경우, 상조계약의 가입이 어려움을 알려드립니다.</p>
+						</div>
+
+
+						<div class="termDiv mt60">
+							<p class="tit">5. 개인정보 제3자 제공 (필수)</p>
+							<button type="button" class="check checkBtn" id="agree5" >
+								<strong>약관에 동의합니다.</strong>
+								<img src="/common/images/btn/check_bt.gif" alt="체크">
+							</button>
+							<input type="checkbox" class="agree" style="display:none" />
+							
+							<div class="termBox">
+								<p class="tit">가. 상조보증공제조합 </p>
+								<p class="txt">㈜대명스테이션이 소비자피해보상계약을 위하여 아래에 기재된 내용대로 회원님의 개인정보를 상조보증공제조합에 제공합니다.</p>
+								<p class="txt">▷ 제공받는자 : 상조보증공제조합</p>
+								<p class="txt mt10">▷ 제공하는 개인정보 항목 : 성명, 주민등록번호 앞 7자리(생년월일/성별), 연락처(자택/이동전화), 주소(자택/직장), 가입상품, 증서번호, 납입금액, 납입회수, 계약일자 등 기타 상조보증공제조합이 필요하다고 인정하는 사항</p>
+								<div class="txt mt10">
+									<table summary="">
+										<caption></caption>
+										<colgroup>
+											<col width="50%">
+											<col width="50%">
+										</colgroup>
+										<thead>
+											<tr>
+												<th>개인정보 제공 목적(내용)</th>
+												<th>제공/이용기간</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>
+													㉠할부거래에 관한 법률 제27조에 따른 공제계약 및 소비자피해보상
+												</td>
+												<td>상조보증공제조합이 납부금에 대한 담보금을 보유하는 동안 또는 상조보증공제조합과의 공제계약 기간 동안</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<p class="tit mt25">나. 대명그룹 계열사</p>
+								<p class="txt">㈜대명스테이션은 상조계약의 부가서비스인 멤버십서비스 제공을 위하여 회원님의 개인정보를 아래에 기재된 내용대로 제3자에게 제공할 수 있습니다.</p>
+								<p class="txt">▷ 제공하는 개인정보 항목 : 성명, 연락처(자택/이동전화)</p>
+								<p class="txt mt10">▷ 제공/이용 기간 : 제공목적 달성 시 또는 회원탈퇴 시까지</p>
+								<div class="txt mt10">
+									<table summary="">
+										<caption></caption>
+										<colgroup>
+											<col width="50%">
+											<col width="50%">
+										</colgroup>
+										<thead>
+											<tr>
+												<th>개인정보 제공 목적(내용)</th>
+												<th>제공/이용기간</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>㈜대명레저산업</td>
+												<td>멤버십서비스 중 대명리조트 주요 시설의 예약 및 확인</td>
+											</tr>
+											<tr>
+												<td>
+													㈜대명문화공장<br>
+													㈜대명본웨딩<br>
+													㈜대명위드원<br>
+													㈜대명투어몰<br>
+													(주)SK플래닛
+												</td>
+												<td>멤버십서비스의 원활한 제공</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<p class="mt10">※ 회원님께서는 개인정보 처리에 거부할 권리가 있습니다. 다만, 거부하실 경우 ㈜대명스테이션의 멤버십 서비스 제공이 어려움을 알려드립니다.</p>
+						</div>
+
+						<div class="termDiv mt60">
+							<p class="tit">6. 개인정보 처리업무 위탁고지 (필수)</p>
+							<button type="button" class="check checkBtn" id="agree6" >
+								<strong>처리사항을 확인하였습니다.</strong>
+								<img src="/common/images/btn/check_bt.gif" alt="체크">
+							</button>
+							<input type="checkbox" class="agree" style="display:none" />
+
+							<div class="termBox">
+								<p class="txt mt5">아래 업체는 ㈜대명스테이션와 계약된 모든 위탁 업체의 현황입니다. 효율적인 업무 처리를 위하여 고객님의 상품에 해당되는 업체에만 업무수행에 필요한 최소한의 정보만을 제공합니다.</p>
+								<p class="txt">자세한 사항은 ㈜대명스테이션이 운영하는 대명라이프웨이 웹사이트(www.daemyunglifeway.com)의 “개인정보취급방침”에 공개하고 있습니다.</p>
+								<p class="txt">▷ 제공하는 개인정보 항목 : 성명, 주민등록번호 앞 7자리(생년월일/성별), 연락처(자택/이동전화), 주소(자택/직장), 이메일 중 위탁업무에 필요한 정보 </p>
+								<p class="txt mt10">▷ 제공 및 이용기간 : 위탁계약 종료시점까지</p>
+								<div class="txt mt10">
+									<table summary="">
+										<caption></caption>
+										<colgroup>
+											<col width="50%">
+											<col width="50%">
+										</colgroup>
+										<thead>
+											<tr>
+												<th>위탁 받는 자</th>
+												<th>위탁업무의 목적 (내용) </th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>
+													Sk플래닛㈜, ㈜와이비엘
+												</td>
+												<td>멤버쉽카드 발급 및 배송</td>
+											</tr>
+											<tr>
+												<td>
+													엔컴㈜
+												</td>
+												<td>업무용 ERP개발에 따른 유지보수 및 호스팅 서비스</td>
+											</tr>
+											<tr>
+												<td>
+													㈜더북컴퍼니
+												</td>
+												<td>라이프웨이 매거진 제작 및 발송</td>
+											</tr>
+											<tr>
+												<td>
+													신세계드림익스프레스 역삼점
+												</td>
+												<td>회원증서 발송</td>
+											</tr>
+											<tr>
+												<td>
+													NICE 신용평가정보㈜, KCB신용평가정보㈜,KB캐피탈㈜
+												</td>
+												<td>본인인증, 신용정보 조회, 연체정보 등 신용도판단정보</td>
+											</tr>
+											<tr>
+												<td>
+													NICE 정보통신㈜
+												</td>
+												<td>카드납입금 결제</td>
+											</tr>
+											<tr>
+												<td>
+													금융결제원
+												</td>
+												<td>자동이체(CMS) 관련</td>
+											</tr>
+											<tr>
+												<td>
+													A&amp;D 신용정보, KB캐피탈㈜
+												</td>
+												<td>납입금 추심</td>
+											</tr>
+											<tr>
+												<td>
+													KB캐피탈㈜
+												</td>
+												<td>할부대금채권 양도통지서 배송 관련 업무</td>
+											</tr>
+											<tr>
+												<td>
+													씨에스비전㈜, ㈜브랜즈웰, ㈜비투퀄리티
+												</td>
+												<td>고객상담 업무 및 회원등록, 모집, 유지, 관리</td>
+											</tr>
+											<tr>
+												<td>
+													㈜브랜즈웰, ㈜현대H&amp;S, ㈜미디어메이트
+												</td>
+												<td>전자제품 구매/배송 관련 업무</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
+						<div class="termDiv mt60">
+							<p class="tit">7.마케팅 목적의 개인정보 이용에 관한 사항 (선택)</p>
+							<button type="button" class="check checkBtn" id="marketingAgree" >
+								<strong>약관에 동의합니다.</strong>
+								<img src="/common/images/btn/check_bt.gif" alt="체크">
+							</button>
+							<input type="checkbox" style="display:none" />
+
+							<div class="termBox">
+								<p class="txt mt5">㈜대명스테이션이 다양한 신규서비스 및 이벤트 안내 등의 마케팅 목적을 위하여 아래에 기재된 내용대로 회원님의 개인정보를 이용합니다.</p>
+								<p class="txt">▷ 전송방법 : 이동전화 MMS 등, 이메일</p>
+								<p class="txt mt10">▷ 이용기간 : 목적 달성 시까지 또는 회원탈퇴 시까지</p>
+							</div>
+							<p class="mt10">※ 회원님은 동의를 거부할 수 있습니다. 동의 거부 시에는 해당 서비스를 이용하실 수 없습니다.</p>
+						</div>
+
+						<div class="mt30 taR">
+							<a href="./info.do" class="btnRed" id="confirm">확인</a>
+							<a href="javascript:" class="btnRed2">취소</a>
+						</div>
+					</div>				

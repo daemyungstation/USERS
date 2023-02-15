@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NaverTestPromotionDAO">
+	
+	<!--
+         쿼리명 : NaverTestPromotionDAO.insertPv
+         설  명 : 설정 가져오기
+          수정일     수정자              수정내용 
+        ==========   ======           ============== 
+        2019.07.15   이너스커뮤니티      최초생성
+    -->
+	<select id="selectConfig" resultType="emfMap">
+		SELECT
+			PNTEC_STIME
+			,PNTEC_ETIME
+			,PNTEC_NAVER_CHECK
+			,PNTEC_FROMURL_CHECK
+		FROM PR_NAVER_TEST_EVT_CFG
+		WHERE PNTEC_DIVISION = #{pntecDivision}
+		AND ROWNUM = 1
+	</select>
+	
+	<!--
+         쿼리명 : NaverTestPromotionDAO.insertPv
+         설  명 : PV 등록
+          수정일     수정자              수정내용 
+        ==========   ======           ============== 
+        2019.07.15   이너스커뮤니티      최초생성
+    -->
+	<insert id="insertPv" parameterType="emfMap">
+		INSERT INTO PR_NAVER_TEST_PV 
+			(
+			NTEVTPV_SEQ,
+			NTEVTPV_PAGE,
+			NTEVTPV_REFERER,
+			NTEVTPV_REG_DTM,
+			NTEVTPV_REG_IP,
+			NTEVTPV_FROMURL,
+			NTEVTPV_AGENT,
+			NTEVTPV_TYPE,
+			NTEVTPV_DIVISION
+			)
+		VALUES        
+			(
+		 	#{ntevtpvSeq},
+			#{ntevtpvPage, jdbcType=VARCHAR},
+			#{ntevtpvReferer, jdbcType=VARCHAR},
+			SYSDATE,
+			#{ntevtpvRegIp, jdbcType=VARCHAR},
+			#{ntevtpvFromurl, jdbcType=VARCHAR},
+			#{ntevtpvAgent, jdbcType=VARCHAR},
+			#{ntevtpvType, jdbcType=VARCHAR},
+			#{ntevtpvDivision, jdbcType=INTEGER}
+			)
+	</insert>
+	
+	<!--
+         쿼리명 : NaverTestPromotionDAO.insertNaverTestPromotion
+         설  명 : 데이터 등록
+          수정일     수정자              수정내용 
+        ==========   ======           ============== 
+        2019.07.15   이너스커뮤니티      최초생성
+    -->
+	<insert id="insertNaverTestPromotion" parameterType="emfMap">
+		INSERT INTO PR_NAVER_TEST_EVT 
+			(
+			NTEVT_SEQ,
+			NTEVT_NAME,
+			NTEVT_PHONE,
+			TNEVT_AGREE,
+			NTEVT_MARKETING_AGREE,
+			NTEVT_USERID,
+			NTEVT_REG_DTM,
+			NTEVT_REG_IP,
+			NTEVT_FROMURL,
+			NTEVT_AGENT,
+			NTEVT_DIVISION
+			)
+		VALUES        
+			(
+		 	#{ntevtSeq},
+		 	#{ntevtName, jdbcType=VARCHAR},
+		 	#{ntevtPhone, jdbcType=VARCHAR},
+		 	#{tnevtAgree, jdbcType=VARCHAR},
+		 	#{ntevtMarketingAgree, jdbcType=VARCHAR},
+		 	#{ntevtUserid, jdbcType=VARCHAR},
+		 	SYSDATE,
+		 	#{ntevtRegIp, jdbcType=VARCHAR},
+		 	#{ntevtFromurl, jdbcType=VARCHAR},
+		 	#{ntevtAgent, jdbcType=VARCHAR},
+		 	#{ntevtDivision, jdbcType=INTEGER}
+			)
+	</insert>
+	
+</mapper>            

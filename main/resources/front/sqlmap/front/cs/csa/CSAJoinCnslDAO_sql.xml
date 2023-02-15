@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CSAJoinCnslDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="cntn" column="CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : CSAJoinCnslDAO.insertJoinCnsl
+         설  명 : 가임상담 신청을 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.02   허진영      최초생성
+    -->
+	<insert id="CSAJoinCnslDAO.insertJoinCnsl" parameterType="emfMap">
+		INSERT /* CSAJoinCnslDAO.insertJoinCnsl */ INTO CS_JOIN_CNSL_MST
+			(JOIN_CNSL_SEQ
+			, INQRY_CD
+			, NAME
+			, CTEL
+			, EMAIL
+			, TEL_ABLE_DT
+			, TEL_ABLE_STRT_TIME
+			, TEL_ABLE_END_TIME
+			, TITL
+			, CNTN
+			, PRCS_CD
+			, REG_ID
+			, REG_IP
+			, REG_DTM
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			)
+		VALUES
+			(#{joinCnslSeq}
+			, #{inqryCd}
+		<choose>
+			<when test="lgnYn eq 'Y'.toString()">
+				, (SELECT NAME FROM MB_MEM_MST WHERE ID = #{regId})
+				, (SELECT HP FROM MB_MEM_MST WHERE ID = #{regId})
+				<if test="inqryCd == '04'">
+				, #{email, jdbcType=VARCHAR}
+				</if>
+				<if test="inqryCd != '04'">
+				, (SELECT EMAIL FROM MB_MEM_MST WHERE ID = #{regId})
+				</if>
+			</when>
+			<otherwise>
+				, #{name, jdbcType=VARCHAR}
+				, #{ctel, jdbcType=VARCHAR}
+				, #{email, jdbcType=VARCHAR}
+			</otherwise>
+		</choose>
+			, #{telAbleDt, jdbcType=VARCHAR}
+			, #{telAbleStrtTime, jdbcType=VARCHAR}||'00'
+			, #{telAbleEndTime, jdbcType=VARCHAR}||'00'
+			, #{titl, jdbcType=VARCHAR}
+			, #{cntn, jdbcType=CLOB}
+			, '01'
+			, #{regId, jdbcType=VARCHAR}
+			, #{regIp, jdbcType=VARCHAR}
+			, SYSDATE
+			, #{modId, jdbcType=VARCHAR}
+			, #{modIp, jdbcType=VARCHAR}
+			, SYSDATE
+			)
+	</insert>
+	
+	<!--
+         쿼리명 : CSAJoinCnslDAO.selectJoinCnsl
+         설  명 : 가입 상담 상세를 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.02   허진영     최초 생성
+    -->
+    <select id="CSAJoinCnslDAO.selectJoinCnsl" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* CSAJoinCnslDAO.selectJoinCnsl */      
+			   (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'JOIN_INQRY_GB' AND CD = A.INQRY_CD) AS INQRY_NM
+			   , NAME
+			   , EMAIL
+			   , TEL_ABLE_DT
+			   , TEL_ABLE_STRT_TIME
+			   , TEL_ABLE_END_TIME
+			   , TITL
+			   , CNTN
+		  FROM CS_JOIN_CNSL_MST A
+         WHERE JOIN_CNSL_SEQ = #{joinCnslSeq}
+   	</select>
+	
+	<!--
+         쿼리명 : CSAJoinCnslDAO.selectJoinCnslAdmList
+         설  명 : 가입 상담 관련 관리자 목록을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.11   허진영     최초 생성
+    -->
+    <select id="CSAJoinCnslDAO.selectJoinCnslAdmList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* CSAJoinCnslDAO.selectJoinCnslAdmList */ 
+			   NAME
+    	       , EMAIL
+		  FROM CO_ADM_MST
+		 WHERE USE_YN = 'Y' 
+		   AND ROLE_CD = 'ROLE_00002'
+		    
+		UNION
+		    
+		SELECT NAME
+		       , EMAIL
+		  FROM CO_ADM_MST
+		 WHERE USE_YN = 'Y' 
+		   AND ADM_SEQ IN(SELECT ADM_SEQ FROM CO_ADM_MENU_INF WHERE MENU_SEQ = 69)
+   	</select>
+   	
+</mapper>            

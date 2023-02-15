@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLGObtrNotiOutDAO">
+	
+	<!--
+         쿼리명 : MLGObtrNotiOutDAO.selectJoinPrdctList
+         설  명 : 가입상품 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+    -->
+	<select id="MLGObtrNotiOutDAO.selectJoinPrdctList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLGObtrNotiOutDAO.selectJoinPrdctList */
+			   B.ACCNT_NO
+			   , NVL(C.PROD_PRT_NM , C.PROD_NM) AS PROD_NM
+		  FROM MEMBER A, MEM_PROD_ACCNT B, PRODUCT C
+		 WHERE A.MEM_NO = B.MEM_NO
+		   AND B.PROD_CD = C.PROD_CD
+		   AND A.DEL_FG = 'N'
+		   AND B.DEL_FG = 'N'
+		   AND A.MEM_NO = #{memNo}
+		   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO)
+		   AND FN_ACCNT_STAT(B.ACCNT_NO) = 'E'
+		 ORDER BY B.REG_DM DESC
+	</select>
+	
+	<!--
+         쿼리명 : MLGObtrNotiOutDAO.selectJoinPrdctInf
+         설  명 : 가입상품 정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+    -->
+	<select id="MLGObtrNotiOutDAO.selectJoinPrdctInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLGObtrNotiOutDAO.selectJoinPrdctInf */
+			   B.ACCNT_NO
+			   , B.PROD_CD
+		  FROM MEMBER A, MEM_PROD_ACCNT B
+		 WHERE A.MEM_NO = B.MEM_NO
+		   AND A.DEL_FG = 'N'
+		   AND B.DEL_FG = 'N'
+		   AND A.MEM_NO = #{memNo}
+		   AND B.ACCNT_NO = #{accntNo}
+		   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO)
+		   AND FN_ACCNT_STAT(B.ACCNT_NO) = 'E'
+	</select>
+	
+</mapper>            

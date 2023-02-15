@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DmLifeDAO">
+
+	<!--
+         쿼리명 : DmLifeDAO.getPaymentMethod
+         설  명 : 납입방식 목록을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.25   김필기     최초 생성
+    -->
+    <select id="DmLifeDAO.getPaymentMethod" parameterType="emfMap" resultType="emfMap">
+		SELECT /* DmLifeDAO.getPaymentMethod */
+			   PROD_CD 
+			   , PROD_NM
+			   , MON_PAY_AMT
+			   , EXPR_NO
+			   , PROD_AMT
+          FROM PRODUCT
+		 WHERE DEL_FG = 'N'
+		   AND SALE_CL = 'Y'
+		   AND PROD_CD IN 
+		<foreach collection="prodCd" item="item" index="index" separator=", " open="(" close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!--
+         쿼리명 : DmLifeDAO.getEmployeeList
+         설  명 : 담당자를 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   김필기     최초 생성
+    -->
+    <select id="DmLifeDAO.getEmployeeList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* DmLifeDAO.getEmployeeList */
+	      	   TBL.*
+	      	   , FN_COM_NM('06', TBL.POSN_CD) AS POSN_NM
+	    FROM (
+			SELECT ROWNUM AS RNUM, A.*
+	      	FROM (
+	        	SELECT COUNT(*) OVER() AS TOT_CNT
+					   , A.EMPLE_NO
+					   , A.EMPLE_NM
+					   , CASE WHEN LENGTH(A.EMPLE_NM) <![CDATA[<=]]> 2  THEN  SUBSTR(A.EMPLE_NM,0,1) || '*'
+		ELSE SUBSTR(A.EMPLE_NM,0,1) || RPAD('*', LENGTH(A.EMPLE_NM) -2, '*') || SUBSTR(A.EMPLE_NM,-1) END  AS MASK_EMPLE_NM
+					   , A.POSN_CD 
+					   , B.DEPT_NM
+					   , SUBSTR(A.CELL, -4) AS LNUM
+			 	  FROM EMPLOYEE A, DEPARTMENT B
+			  	 WHERE A.DEPT_CD = B.DEPT_CD
+			<if test="q != null and q != ''">
+				<if test="f == 1">
+			 		AND EMPLE_NM LIKE '%' || #{q} || '%'
+				</if>
+			</if>
+			<if test="q != null and q != ''">
+				<if test="f == 101">
+					AND EMPLE_NM = #{q}
+				</if>
+			</if>
+
+				 ORDER BY EMPLE_NO
+			) A
+		) TBL
+	    WHERE RNUM BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}		
+	</select>	
+	
+	<!--
+         쿼리명 : DmLifeDAO.selectComCd
+         설  명 : 공통 코드 목록을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.09   김필기     최초 생성
+    -->	
+	<select id="DmLifeDAO.selectComCd" parameterType="emfMap" resultType="emfMap">
+		SELECT /* DmLifeDAO.selectComCd */
+			   GRP_CD
+			   , COM_CD
+			   , CD_NM
+		  FROM COM_CD
+		 WHERE GRP_CD = #{grpCd}
+	       AND USE_YN = 'Y'
+	       AND COM_CD != '09'
+		 ORDER BY ORDR_TURN 
+	</select>
+	
+	<!--
+         쿼리명 : DmLifeDAO.selectB2BComCd
+         설  명 : 회사 코드 목록을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.23   김필기     최초 생성
+    -->	
+	<select id="DmLifeDAO.selectB2BComCd" parameterType="emfMap" resultType="emfMap">
+		SELECT /* DmLifeDAO.selectB2BComCd */
+			   COM_NM		
+		  FROM B2BCOMCD
+		 WHERE COM_CD = #{b2bCd}
+	</select>	
+	
+	<!--
+         쿼리명 : DmLifeDAO.getSubProduct
+         설  명 : 세부 상품을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.29   김필기     최초 생성
+    -->	
+	<select id="DmLifeDAO.getSubProduct" parameterType="emfMap" resultType="emfMap">
+		SELECT /* DmLifeDAO.getSubProduct */
+			   A.*
+		       , B.*
+			   , C.* 
+		  FROM PRODUCT A, PRODUCT_MODEL_MST B, PRODUCT_MODEL_CL_CD C
+		WHERE A.PROD_CD = #{prodCd} 
+		  AND A.PROD_CD = B.PROD_CD
+		  AND B.PROD_KIND = C.MODEL_CL_CD
+	</select>	
+
+	<!--
+         쿼리명 : DmLifeDAO.selectJoinCert
+         설  명 : 가입증서를 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.13   김필기     최초 생성
+    -->	
+	<select id="DmLifeDAO.selectJoinCert" parameterType="emfMap" resultType="emfMap">
+		SELECT /* DmLifeDAO.selectJoinCert */
+			   * 
+		FROM (
+			SELECT A.MEM_NO
+				   , B.MAIN_CONTRACT
+				   , B.ACCNT_NO
+				   , B.JOIN_DT
+				   , A.MEM_NM
+				   , A.CELL
+				   , A.HOME_ZIP
+				   , A.HOME_ADDR
+				   , A.HOME_ADDR2				  
+				   , NVL(C.PROD_PRT_NM , C.PROD_NM) AS PROD_NM
+				   , (SELECT PROD_JOIN_PRT_NM FROM PRODUCT_MODEL_CL_CD WHERE MODEL_CL_CD = B.PROD_MODEL_KIND) AS PROD_MODEL
+				   , C.PROD_AMT
+                   , C.PROD_AMT - (NVL(B.NEW_CHAN_GUNSU, 0) * C.MON_PAY_AMT) AS DC_PROD_AMT
+				   , C.MON_PAY_AMT
+				   , C.EXPR_NO
+				   , C.PROD_CD
+				   , C.PAY_TYPE
+				   , C.PROD_CL
+                   , C.JOIN_TYPE
+                   , C.JOIN_GIFT_CARD_SORT
+			  FROM MEMBER A, MEM_PROD_ACCNT B, PRODUCT C
+			WHERE A.MEM_NO = B.MEM_NO
+			   AND B.PROD_CD = C.PROD_CD
+			   AND A.DEL_FG = 'N'
+			   AND B.DEL_FG = 'N'			
+		) T1
+		LEFT JOIN 
+		(
+			SELECT PROD_CD AS PROD_CD1
+				   , ST_NO AS ST_NO1
+				   , END_NO AS END_NO1
+				   , MONTH_PAY_AMT AS MONTH_PAY_AMT1
+				   , ALLT_AMT AS ALLT_AMT1
+				   , ADD_AMT AS ADD_AMT1
+			  FROM PRODUCT_DTL
+			 WHERE SEQ = 1
+		) PD1
+		ON T1.PROD_CD = PD1.PROD_CD1
+		LEFT JOIN
+		(
+			SELECT PROD_CD AS PROD_CD2
+			       , ST_NO AS ST_NO2
+				   , END_NO AS END_NO2
+				   , MONTH_PAY_AMT AS MONTH_PAY_AMT2
+				   , ALLT_AMT AS ALLT_AMT2
+				   , ADD_AMT AS ADD_AMT2
+			  FROM PRODUCT_DTL
+			 WHERE SEQ = 2
+		) PD2
+		ON T1.PROD_CD = PD2.PROD_CD2
+		LEFT JOIN
+		(
+			SELECT PROD_CD AS PROD_CD3
+			       , ST_NO AS ST_NO3
+				   , END_NO AS END_NO3
+				   , MONTH_PAY_AMT AS MONTH_PAY_AMT3
+				   , ALLT_AMT AS ALLT_AMT3
+				   , ADD_AMT AS ADD_AMT3
+			  FROM PRODUCT_DTL
+			 WHERE SEQ = 3
+		) PD3
+		ON T1.PROD_CD = PD3.PROD_CD3		
+		LEFT JOIN
+		(
+			SELECT ACCNT_NO
+			       , FN_COM_NM('63', A.BANK_CD) AS BANK_NM
+			       , BANK_ACCNT_NO
+			       , ICHAE_DT
+			  FROM CMS_MEM A
+			 WHERE DEL_FG = 'N'
+		) CMSMEM
+		ON T1.ACCNT_NO = CMSMEM.ACCNT_NO
+		LEFT JOIN
+		(
+			SELECT ACCNT_NO
+			       , CARD_CD
+			       , FN_COM_NM('0120', A.CARD_CD) AS CARD_NM
+			       , CARD_NO
+			       , EXPIRE_DATE
+			       , PAY_DT
+			  FROM CARD_MEM A
+			 WHERE DEL_FG = 'N'
+		) CARDMEM
+		ON T1.ACCNT_NO = CARDMEM.ACCNT_NO
+		WHERE T1.MEM_NO = #{memNo}
+		  AND T1.ACCNT_NO = #{accntNo}
+	</select>	
+	
+	<!--
+         쿼리명 : DmLifeDAO.selectJoinCertAccntNo
+         설  명 : 가입증서를 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.13   김필기     최초 생성
+    -->	
+	<select id="DmLifeDAO.selectJoinCertAccntNo" parameterType="emfMap" resultType="emfMap">
+		SELECT /* DmLifeDAO.selectJoinCertAccntNo */
+			   * 
+		FROM (
+			SELECT A.MEM_NO
+				   , B.MAIN_CONTRACT
+				   , B.ACCNT_NO
+				   , B.JOIN_DT
+				   , A.MEM_NM
+				   , A.CELL
+				   , A.HOME_ZIP
+				   , A.HOME_ADDR
+				   , A.HOME_ADDR2				  
+				   , NVL(C.PROD_PRT_NM , C.PROD_NM) AS PROD_NM
+				   , (SELECT PROD_JOIN_PRT_NM FROM PRODUCT_MODEL_CL_CD WHERE MODEL_CL_CD = B.PROD_MODEL_KIND) AS PROD_MODEL
+				   , C.PROD_AMT
+                   , C.PROD_AMT - (NVL(B.NEW_CHAN_GUNSU, 0) * C.MON_PAY_AMT) AS DC_PROD_AMT
+				   , C.MON_PAY_AMT
+				   , C.EXPR_NO
+				   , C.PROD_CD
+				   , C.PAY_TYPE
+				   , C.PROD_CL
+                   , C.JOIN_TYPE
+                   , C.JOIN_GIFT_CARD_SORT
+			  FROM MEMBER A, MEM_PROD_ACCNT B, PRODUCT C
+			WHERE A.MEM_NO = B.MEM_NO
+			   AND B.PROD_CD = C.PROD_CD
+			   AND A.DEL_FG = 'N'
+			   AND B.DEL_FG = 'N'			
+		) T1
+		LEFT JOIN 
+		(
+			SELECT PROD_CD AS PROD_CD1
+				   , ST_NO AS ST_NO1
+				   , END_NO AS END_NO1
+				   , MONTH_PAY_AMT AS MONTH_PAY_AMT1
+				   , ALLT_AMT AS ALLT_AMT1
+				   , ADD_AMT AS ADD_AMT1
+			  FROM PRODUCT_DTL
+			 WHERE SEQ = 1
+		) PD1
+		ON T1.PROD_CD = PD1.PROD_CD1
+		LEFT JOIN
+		(
+			SELECT PROD_CD AS PROD_CD2
+			       , ST_NO AS ST_NO2
+				   , END_NO AS END_NO2
+				   , MONTH_PAY_AMT AS MONTH_PAY_AMT2
+				   , ALLT_AMT AS ALLT_AMT2
+				   , ADD_AMT AS ADD_AMT2
+			  FROM PRODUCT_DTL
+			 WHERE SEQ = 2
+		) PD2
+		ON T1.PROD_CD = PD2.PROD_CD2
+		LEFT JOIN
+		(
+			SELECT PROD_CD AS PROD_CD3
+			       , ST_NO AS ST_NO3
+				   , END_NO AS END_NO3
+				   , MONTH_PAY_AMT AS MONTH_PAY_AMT3
+				   , ALLT_AMT AS ALLT_AMT3
+				   , ADD_AMT AS ADD_AMT3
+			  FROM PRODUCT_DTL
+			 WHERE SEQ = 3
+		) PD3
+		ON T1.PROD_CD = PD3.PROD_CD3		
+		LEFT JOIN
+		(
+			SELECT ACCNT_NO
+			       , FN_COM_NM('63', A.BANK_CD) AS BANK_NM
+			       , BANK_ACCNT_NO
+			       , ICHAE_DT
+			  FROM CMS_MEM A
+			 WHERE DEL_FG = 'N'
+		) CMSMEM
+		ON T1.ACCNT_NO = CMSMEM.ACCNT_NO
+		LEFT JOIN
+		(
+			SELECT ACCNT_NO
+			       , CARD_CD
+			       , FN_COM_NM('0120', A.CARD_CD) AS CARD_NM
+			       , CARD_NO
+			       , EXPIRE_DATE
+			       , PAY_DT
+			  FROM CARD_MEM A
+			 WHERE DEL_FG = 'N'
+		) CARDMEM
+		ON T1.ACCNT_NO = CARDMEM.ACCNT_NO
+		WHERE T1.ACCNT_NO = #{accntNo}
+	</select>		
+	
+	<!--
+         쿼리명 : DmLifeDAO.selectPrdctDesc
+         설  명 : 상품설명서 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.13   김필기     최초 생성
+        2016.06.20   김필기     수정(AND APP_DM <= #{joinDt})
+    -->	
+	<select id="DmLifeDAO.selectPrdctDesc" parameterType="emfMap" resultType="emfMap">
+		SELECT /* DmLifeDAO.selectPrdctDesc */
+			   TBL.*
+		FROM (
+			SELECT ROWNUM AS RNUM, A.*
+			FROM (
+				SELECT *
+				  FROM CERTF_MNG
+				 WHERE PROD_CD = #{prdctCd}
+				   AND DEL_FG = 'N'
+				   AND APP_DM <![CDATA[<=]]> #{joinDt}
+				 ORDER BY APP_DM DESC
+			) A
+		) TBL
+		WHERE RNUM = 1
+	</select>
+	
+	<!--
+         쿼리명 : DmLifeDAO.selectResnstdInfo
+         설  명 : 해약환급금을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.14   김필기     최초 생성
+    -->	
+	<select id="DmLifeDAO.selectResnstdInfo" parameterType="emfMap" resultType="emfMap">
+	    SELECT /* DmLifeDAO.selectResnstdInfo */
+	    	   NO
+	           , RESN_AMT
+	           , EXPR_NO
+	           , AMT AS MPA
+	           , CASE WHEN PROD_CD IN ('I7','I8','BI','W4','AM') THEN CASE WHEN NO <![CDATA[<=]]> EXPR_NO THEN TO_CHAR(PROD_PCT) ELSE '100%' END
+	                  ELSE CASE WHEN ROUND((RESN_AMT / AMT) * 100, 0) <![CDATA[<]]> 100 OR NO <![CDATA[<=]]> EXPR_NO THEN TO_CHAR(ROUND((RESN_AMT / AMT) * 100,0)) || '%' ELSE '100%' END 
+	                   END PCT
+    	FROM (
+    		SELECT RS.PROD_CD
+           		   , RS.NO 
+           		   , PD.EXPR_NO AS EXPR_NO
+           		   , CASE WHEN RS.NO <![CDATA[<=]]> (PD.EXPR_NO - MPA.NEW_CHAN_GUNSU) THEN (SELECT SUM(AMT) FROM PRODUCT_NO_DATA WHERE PROD_CD = MPA.PROD_CD AND NO <![CDATA[<=]]> RS.NO) 
+                  		  ELSE (SELECT SUM(AMT) FROM PRODUCT_NO_DATA WHERE PROD_CD = MPA.PROD_CD AND NO <![CDATA[<=]]> (EXPR_NO - MPA.NEW_CHAN_GUNSU + 1)) 
+                   		   END AMT
+           		   , (SELECT PCT FROM PRODUCT_NO_DATA WHERE PROD_CD = MPA.PROD_CD AND NO = RS.NO) AS PROD_PCT
+           		   , RS.RESN_AMT
+           	   	   , MPA.NEW_CHAN_GUNSU
+   			  FROM MEM_PROD_ACCNT MPA INNER JOIN PRODUCT PD ON MPA.PROD_CD = PD.PROD_CD 
+                           			  INNER JOIN (SELECT PROD_CD, MODEL_CL_CD, RESN_AMT, NO, APP_DAY 
+                           			  	            FROM RESNSTD_M A, RESNSTD_d B
+                                       			   WHERE A.SEQ = B.MST_SEQ AND A.USE_YN = 'Y') RS ON RS.PROD_CD = MPA.PROD_CD AND RS.MODEL_CL_CD = MPA.PROD_MODEL_KIND 
+  		     WHERE MPA.ACCNT_NO = #{accntNo}
+    	       AND APP_DAY = (SELECT MAX(APP_DAY) FROM RESNSTD_M WHERE USE_YN = 'Y' AND PROD_CD = MPA.PROD_CD AND MODEL_CL_CD = MPA.PROD_MODEL_KIND AND APP_DAY <![CDATA[<=]]> MPA.JOIN_DT)
+  		)
+  		WHERE NO BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}	
+	</select>	
+	
+</mapper>

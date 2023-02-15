@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="COCBoardCommentDAO">
+		
+	<resultMap id="emfMap" type="emfMap">
+		<result property="CONTENTS" column="CONTENTS" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+
+	<!--
+         쿼리명 : COCBoardCommentDAO.selectBoardCommentList
+         설  명 : 게시물에 대한 댓글을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.12   허진영    	 최초생성
+    -->
+	<select id="COCBoardCommentDAO.selectBoardCommentList" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* COCBoardCommentDAO.selectBoardCommentList */
+			   TBL.*
+		FROM (
+			SELECT ROWNUM AS RNUM, T1.*
+			FROM (
+				SELECT COUNT(*) OVER() AS TOT_CNT
+					   , A.* 
+					   , (select CI from MB_MEM_MST where id=A.REGID) as CI
+				  FROM TN_BOARD_COMMENT A
+				 WHERE TABLE_NM = #{tablenm}
+				   AND IDX = #{idx}
+				   AND USE_YN = 'Y'
+				   AND DEL_YN = 'N'
+				 ORDER BY GROUP_ID DESC, RE_DEPTH, REGDATE DESC
+			) T1
+		) TBL
+		WHERE RNUM BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage} 
+	</select>
+	
+	<!--
+         쿼리명 : COCBoardCommentDAO.selectBoardComment
+         설  명 : 게시물에 대한 댓글을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.12   허진영    	 최초생성
+    -->
+	<select id="COCBoardCommentDAO.selectBoardComment" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* COCBoardCommentDAO.selectBoardComment */
+			   A.*
+		  FROM TN_BOARD_COMMENT A
+		 WHERE TABLE_NM = #{tablenm}
+		   AND IDX = #{idx}
+		   AND CIDX = #{cidx}
+		   AND USE_YN = 'Y'
+		   AND DEL_YN = 'N'
+	</select>
+	
+	<!--
+         쿼리명 : COCBoardCommentDAO.insertBoardComment
+         설  명 : 게시글에 대한 댓글을 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.12   허진영    	 최초생성
+    -->
+ 	<insert id="COCBoardCommentDAO.insertBoardComment" parameterType="emfMap">
+ 		INSERT /* COCBoardCommentDAO.insertBoardComment */ INTO TN_BOARD_COMMENT
+			(CIDX
+			, IDX
+			, TABLE_NM
+			, GROUP_ID
+			, RE_DEPTH
+			, CONTENTS
+			, USE_YN
+			, DEL_YN
+			, REGID
+			, REGIP
+			, REGDATE
+			, MODID
+			, MODIP
+			, MODDATE
+			)
+		VALUES        
+			(#{cidx}
+			, #{idx}
+			, #{tablenm}
+			, #{groupId, jdbcType=VARCHAR}
+			, #{reDepth, jdbcType=VARCHAR}
+			, #{contents, jdbcType=VARCHAR}
+			, 'Y'
+            , 'N'
+			, #{regId}
+			, #{regIp}
+            , SYSDATE
+            , #{modId}
+            , #{modIp}
+            , SYSDATE
+			)
+ 	</insert>
+ 	
+	<!--
+         쿼리명 : COCBoardCommentDAO.updateBoardComment
+         설  명 : 게시글에 대한 댓글을 수정한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.12   허진영    	 최초생성
+    -->
+ 	<update id="COCBoardCommentDAO.updateBoardComment" parameterType="emfMap">
+		UPDATE /* COCBoardCommentDAO.updateBoardComment */ TN_BOARD_COMMENT
+		   SET CONTENTS = #{contents}
+		       , MODID = #{modId}
+		       , MODIP = #{modIp}
+			   , MODDATE = SYSDATE
+		 WHERE TABLE_NM = #{tablenm}
+		   AND IDX = #{idx} 
+		   AND CIDX = #{cidx}
+		   AND USE_YN = 'Y'
+		   AND DEL_YN = 'N'
+ 	</update>
+ 	
+	<!--
+         쿼리명 : COCBoardCommentDAO.deleteBoardComment
+         설  명 : 게시글에 대한 댓글을 삭제한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.12   허진영    	 최초생성
+    -->
+	<update id="COCBoardCommentDAO.deleteBoardComment" parameterType="emfMap">
+ 		UPDATE /* COCBoardCommentDAO.deleteBoardComment */ TN_BOARD_COMMENT 
+		   SET USE_YN = 'N'
+			   , DEL_YN = 'Y'
+		 WHERE TABLE_NM = #{tablenm}
+		   AND IDX = #{idx}
+		   AND CIDX = #{cidx}
+		   AND USE_YN = 'Y'
+		   AND DEL_YN = 'N'
+ 	</update>
+ 	
+</mapper>

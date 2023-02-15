@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+    version="2.0">
+
+    <description>JSTL 1.1 Java method library</description>
+    <display-name>JSTL Method</display-name>
+    <tlib-version>1.1</tlib-version>
+    <short-name>egov</short-name>
+
+	<!-- 첫번째 문자열이 빈값이면 두번째 문자열을 리턴한다. -->
+	<function>
+        <description>nvl</description>
+        <name>nvl</name>
+        <function-class>egovframework.com.utl.fcc.service.EgovStringUtil</function-class>
+        <function-signature>java.lang.String nvl(java.lang.String, java.lang.String)</function-signature>
+        <example>${egov:nvl(value, value)}</example>
+    </function>
+    
+    <!-- decode -->
+	<function>
+        <description>decode</description>
+        <name>decode</name>
+        <function-class>egovframework.com.utl.fcc.service.EgovStringUtil</function-class>
+        <function-signature>java.lang.String decode(java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+        <example>${egov:decode(value, value, value, value)}</example>
+    </function>
+    
+    <!-- 문자열 ... 표현-->
+	<function>
+        <description>tldCutString</description>
+        <name>tldCutString</name>
+        <function-class>egovframework.com.utl.fcc.service.EgovStringUtil</function-class>
+        <function-signature>java.lang.String tldCutString(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+        <example>${egov:tldCutString(value, value, value)}</example>
+    </function>
+    
+    <!-- 게시글의 카테고리명 가져오기-->
+	<function>
+        <description>getCategoryParentName</description>
+        <name>getCategoryParentName</name>
+        <function-class>egovframework.com.utl.fcc.service.EgovStringUtil</function-class>
+        <function-signature>java.lang.String getCategoryParentName(java.lang.String)</function-signature>
+        <example>${egov:getCategoryParentName(value)}</example>
+    </function>
+    
+    <!-- 날짜 비교 오늘날짜와 넘긴날짜의 차이를 시간으로 반환 -->
+    <function>
+		<description>diffOfDate</description>
+		<name>diffOfDate</name>
+		<function-class>egovframework.com.utl.fcc.service.EgovStringUtil</function-class>
+		<function-signature>java.lang.Long diffOfDate(java.lang.String)</function-signature>
+		<example>${egov:diffOfDate(start)}</example>
+	</function>
+	
+    <!-- contents 페이지 상태 값 표시 -->
+	<function>
+        <description>contentsStatus</description>
+        <name>contentsStatus</name>
+        <function-class>egovframework.com.utl.fcc.service.EgovStringUtil</function-class> <!--클래스경로까지써주세요-->
+        <function-signature>java.lang.String contentsStatus(java.lang.String)</function-signature>
+        <example>${egov:setContentsStatus(value)}</example>
+    </function>
+    
+    <!-- 날짜값 변경 -->
+    <function>
+        <description>convertDate</description>
+        <name>convertDate</name>
+        <function-class>egovframework.com.utl.fcc.service.EgovDateUtil</function-class>
+        <function-signature>java.lang.String convertDate(java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+        <example>${egov:convertDate(value, value, value, value)}</example>
+    </function>
+    
+    <!-- 날짜의 월 추가 -->
+    <function>
+        <description>addMonth</description>
+        <name>addMonth</name>
+        <function-class>egovframework.com.utl.fcc.service.EgovDateUtil</function-class>
+        <function-signature>java.lang.String addMonth(java.lang.String, java.lang.String)</function-signature>
+        <example>${egov:addMonth(value, value)}</example>
+    </function>
+    
+    <!-- 날짜의 일 추가 -->
+    <function>
+        <description>addDay</description>
+        <name>addDay</name>
+        <function-class>egovframework.com.utl.fcc.service.EgovDateUtil</function-class>
+        <function-signature>java.lang.String addDay(java.lang.String, java.lang.String)</function-signature>
+        <example>${egov:addDay(value, value)}</example>
+    </function>
+    
+ 	<!-- 날짜의 일 변경 -->
+    <function>
+        <description>getDaysDiff</description>
+        <name>getDaysDiff</name>
+        <function-class>egovframework.com.utl.fcc.service.EgovDateUtil</function-class>
+        <function-signature>java.lang.Long getDaysDiff(java.lang.String, java.lang.String)</function-signature>
+        <example>${egov:getDaysDiff(value, value)}</example>
+    </function>   
+    
+    <!-- HTML태그 제거 -->
+    <function>
+        <description>removeHTMLTag</description>
+        <name>removeHTMLTag</name>
+        <function-class>egovframework.com.cmm.EgovWebUtil</function-class>
+        <function-signature>java.lang.String removeHTMLTag(java.lang.String)</function-signature>
+        <example>${egov:removeHTMLTag(value)}</example>
+    </function>
+	<!-- HTML태그 제거 -->      
+</taglib>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="COAMenuDAO">
+
+	<!--
+         쿼리명 : COAMenuDAO.getMenuList
+         설  명 : 메뉴를 가져온다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="COAMenuDAO.getMenuList" parameterType="emfMap" resultType="emfMap">
+		SELECT LEVEL
+		       , MENU_SEQ
+		       , PARNT_SEQ
+		       , ROW_NUMBER() OVER (PARTITION BY PARNT_SEQ ORDER BY LFT_VAL) - 1 AS PSTN
+		       , LFT_VAL
+		       , RHT_VAL
+		       , DPTH
+		       , MENU_GB
+		       , MENU_NM
+		       , USER_LINK
+		       , USER_WND_YN
+		       , KWRD
+		  FROM CO_MENU_MST
+		 WHERE USER_USE_YN = 'Y' 
+		   AND MENU_SEQ != 3
+		 START WITH MENU_SEQ = 3
+	   CONNECT BY PRIOR MENU_SEQ = PARNT_SEQ
+	     ORDER BY LFT_VAL
+	</select>
+	
+	<!--
+         쿼리명 : COAMenuDAO.getParntMenuList
+         설  명 : 부모 메뉴를 가져온다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2015.11.02   허진영      최초생성
+    -->
+	<select id="COAMenuDAO.getParntMenuList" parameterType="java.lang.Integer" resultType="emfMap">
+		<![CDATA[
+			SELECT TBL.*
+			FROM (
+				SELECT MENU_SEQ
+				       , PARNT_SEQ
+				       , ROW_NUMBER() OVER (PARTITION BY PARNT_SEQ ORDER BY LFT_VAL) - 1 AS PSTN
+				       , LFT_VAL
+				       , RHT_VAL
+				       , DPTH
+				       , MENU_GB
+				       , MENU_NM
+				       , USER_LINK
+				       , USER_WND_YN
+				  FROM CO_MENU_MST
+				 WHERE USER_USE_YN = 'Y'
+				   AND DPTH >= 2 
+			) TBL
+			START WITH MENU_SEQ = #{menuSeq}
+	   	  CONNECT BY PRIOR PARNT_SEQ = MENU_SEQ 
+	   		ORDER BY LFT_VAL
+		]]>
+	</select>
+	
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLBMbspCardDAO">
+
+	<!--
+         쿼리명 : MLBMbspCardDAO.selectMbspCardRqst
+         설  명 : 멤버십카드 신청 내역을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.23   허진영      최초생성
+    -->
+	<select id="MLBMbspCardDAO.selectMbspCardRqstCnt" parameterType="emfMap" resultType="java.lang.Integer">
+		SELECT /* MLBMbspCardDAO.selectMbspCardRqstCnt */
+			   COUNT(*)
+		  FROM CM_MBSP_CARD_MST
+		 WHERE ID = #{id}
+		   AND ACCNT_NO = #{accntNo}
+		   AND TO_CHAR(REG_DTM, 'yyyyMMdd') <![CDATA[>]]> TO_CHAR(ADD_MONTHS(SYSDATE, -1), 'yyyyMMdd')
+		 
+	</select>
+	<!--
+         쿼리명 : MLBMbspCardDAO.insertMbspCardRqst
+         설  명 : 멤버십카드 신청을 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.23   허진영      최초생성
+    -->
+	<insert id="MLBMbspCardDAO.insertMbspCardRqst" parameterType="emfMap">
+		INSERT /* MLBMbspCardDAO.insertMbspCardRqst */ INTO CM_MBSP_CARD_MST
+			(RQST_SEQ
+			, ID
+			, ACCNT_NO
+			, ZIPCD
+			, ADR
+			, ADR_DTL
+			, PRCS_CD
+			, REG_ID
+			, REG_IP
+			, REG_DTM
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			)
+		VALUES
+			(#{rqstSeq}
+			, #{id}
+			, #{accntNo}
+			, #{zipcd}
+			, #{adr}
+			, #{adrDtl}
+			, '01'
+			, #{regId}
+			, #{regIp}
+			, SYSDATE
+			, #{modId}
+			, #{modIp}
+			, SYSDATE
+			)
+	</insert>
+	
+</mapper>            

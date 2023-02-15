@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLGObtrNotiSmsDAO">
+	
+	<!--
+         쿼리명 : MLGObtrNotiSmsDAO.insertObtrNotiSms
+         설  명 : 부고알리미를 발송한다.(SMS)
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.05.11   허진영      최초생성
+    -->
+	<insert id="MLGObtrNotiSmsDAO.insertObtrNotiSms" parameterType="emfMap">
+		<choose>
+			<when test="sendType eq 'sms'.toString()">
+				INSERT INTO EM_SMT_TRAN
+					(MT_PR
+					, DATE_CLIENT_REQ
+					, CONTENT
+					, CALLBACK
+					, SERVICE_TYPE
+					, BROADCAST_YN
+					, MSG_STATUS
+					, RECIPIENT_NUM
+					, TRNM_DIV
+					, MEM_NO
+					, ACCNT_NO
+					, PROD_CD
+					)
+				VALUES
+					(SQ_EM_SMT_TRAN_01.NEXTVAL
+					, SYSDATE
+					, #{smsCntn}
+					, #{callback}
+					, '0'
+					, 'N'
+					, '1'
+					, #{hp}
+					, '30'
+					, #{memNo}
+					, #{accntNo}
+					, #{prodCd}
+					)		
+			</when>
+			<otherwise>
+				INSERT INTO EM_MMT_TRAN
+					(MT_PR
+					, DATE_CLIENT_REQ
+					, SUBJECT
+					, CONTENT
+					, ATTACH_FILE_GROUP_KEY
+					, CALLBACK
+					, SERVICE_TYPE
+					, BROADCAST_YN
+					, MSG_STATUS
+					, RECIPIENT_NUM
+					, TRNM_DIV
+					, MEM_NO
+					, ACCNT_NO
+					, PROD_CD
+					)
+				VALUES
+					(SQ_EM_MMT_TRAN_01.NEXTVAL
+					, SYSDATE
+					, ' '
+					, #{smsCntn}
+					, '0'
+					, #{callback}
+					, '3'
+					, 'N'
+					, '1'
+					, #{hp}
+					, '30'
+					, #{memNo}
+					, #{accntNo}
+					, #{prodCd}
+					)		
+			</otherwise>
+		</choose>
+	</insert>
+	
+</mapper>            

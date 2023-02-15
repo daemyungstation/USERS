@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLHPrsnDataChngDAO">
+
+	<!--
+         쿼리명 : MLHPrsnDataChngDAO.selectMemInf
+         설  명 : 회원정보를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.07   허진영      최초생성
+    -->
+	<select id="MLHPrsnDataChngDAO.selectMemInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLHPrsnDataChngDAO.selectMemInf */
+		       A.ID
+			   , A.UNQ_NO
+		 	   , A.NAME
+			   , A.BIRTH
+			   , A.EMAIL
+			   , A.HP
+			   , A.TEL
+			   , A.ZIPCD
+			   , A.ADR
+			   , A.ADR_DTL
+			   , A.SMS_RCV_YN
+			   , A.TEL_RCV_YN
+			   , A.CTLG_RCV_YN
+			   , A.EMAIL_RCV_YN
+			   , A.MARKETING_YN
+			   , A.MARKETING_INFO_YN
+			   , A.AGREEMENT_FOR_THIRD_PARTY
+			   , A.CI
+			   , B.MRRG_YN
+			   , B.CHDRN_GB
+			   , B.INTR_PTC
+			   , B.JOIN_PATH
+			   , B.JOIN_PATH_ETC
+			   , B.PFRN_PTC
+			   , B.PFRN_ETC
+		  FROM MB_MEM_MST A, MB_ETC_INF B
+		 WHERE A.ID = B.ID(+)
+		   AND A.ID = #{id}
+		   AND A.PWD = #{pwd}
+	</select>
+	
+	<!--
+         쿼리명 : MLHPrsnDataChngDAO.updateMemInf
+         설  명 : 회원 정보를 수정한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.10   허진영     최초 생성
+    -->
+    <update id="MLHPrsnDataChngDAO.updateMemInf" parameterType="emfMap">
+		UPDATE /* MLHPrsnDataChngDAO.updateMemInf */ MB_MEM_MST
+		   SET EMAIL = #{email}
+			   , HP = #{cellPhone} 
+			   , TEL = #{phone, jdbcType=VARCHAR}
+			   , ZIPCD = #{zipCode}
+			   , ADR = #{address}
+			   , SMS_RCV_YN = #{smsRcvYn, jdbcType=VARCHAR}
+			   , TEL_RCV_YN = #{telRcvYn, jdbcType=VARCHAR}
+			   , CTLG_RCV_YN = #{ctlgRcvYn, jdbcType=VARCHAR}
+			   , EMAIL_RCV_YN = #{emailRcvYn, jdbcType=VARCHAR}
+			   , MARKETING_YN = #{marketingYn, jdbcType=VARCHAR}
+			   , MARKETING_INFO_YN = #{marketingYn, jdbcType=VARCHAR}
+			   , ADR_DTL = #{adrDtl}
+			   , MOD_ID = #{modId}
+			   , MOD_IP = #{modIp}
+			   , MOD_DTM = SYSDATE
+         WHERE ID = #{id}
+   	</update>
+   	
+   	<!--
+         쿼리명 : MLHPrsnDataChngDAO.updateEtcInf
+         설  명 : 회원 기타 정보를 수정한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.10   허진영     최초 생성
+    -->
+    <update id="MLHPrsnDataChngDAO.updateEtcInf" parameterType="emfMap">
+		UPDATE /* MLHPrsnDataChngDAO.updateEtcInf */ MB_ETC_INF
+		   SET MRRG_YN = #{mrrgYn, jdbcType=VARCHAR}
+			   , CHDRN_GB = #{chdrnGb, jdbcType=VARCHAR}
+			   , INTR_PTC = #{intrPtc, jdbcType=VARCHAR}
+			   , JOIN_PATH = #{joinPath, jdbcType=VARCHAR}
+			   , JOIN_PATH_ETC = #{joinPathEtc, jdbcType=VARCHAR}
+			   , PFRN_PTC = #{pfrnPtc, jdbcType=VARCHAR}
+			   , PFRN_ETC = #{pfrnEtc, jdbcType=VARCHAR}
+			   , MOD_ID = #{modId}
+			   , MOD_IP = #{modIp}
+			   , MOD_DTM = SYSDATE
+         WHERE ID = #{id}
+   	</update>
+   	
+   	<!--
+         쿼리명 : MLHPrsnDataChngDAO.insertMemInfModLog
+         설  명 : 회원 정보 변경 로그를 등록한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.10   허진영     최초 생성
+    -->
+    <insert id="MLHPrsnDataChngDAO.insertMemInfModLog" parameterType="emfMap">
+		INSERT /* MLHPrsnDataChngDAO.insertMemInfModLog */ INTO MB_MEM_CHNG_PTC
+			(CHNG_SEQ
+			, ID
+			, BFR_NAME
+			, BFR_EMAIL
+			, BFR_HP
+			, BFR_TEL
+			, BFR_ZIPCD
+			, BFR_ADR
+			, BFR_ADR_DTL
+			, AFT_NAME
+			, AFT_EMAIL
+			, AFT_HP
+			, AFT_TEL
+			, AFT_ZIPCD
+			, AFT_ADR
+			, AFT_ADR_DTL
+			, PRCS_YN
+			, REG_ID
+			, REG_IP
+			, REG_DTM
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			)
+		SELECT #{chngSeq}
+			   , ID
+			   , NAME
+			   , EMAIL
+			   , HP
+			   , TEL
+			   , ZIPCD
+			   , ADR
+			   , ADR_DTL
+			   , NAME
+			   , #{email}
+			   , #{hp}
+			   , #{tel, jdbcType=VARCHAR}
+			   , #{zipcd}
+			   , #{adr}
+			   , #{adrDtl}
+			   , 'N'
+			   , #{regId}
+			   , #{regIp}
+			   , SYSDATE
+			   , #{modId}
+			   , #{modIp}
+			   , SYSDATE
+		  FROM MB_MEM_MST A
+		 WHERE ID = #{id}
+		   AND EXISTS(SELECT 'X' FROM MB_MEM_MST WHERE ID = A.ID AND (EMAIL != #{email} OR HP != #{hp} OR NVL(TEL, 'N') != NVL(#{tel, jdbcType=VARCHAR}, 'N') OR ZIPCD != #{zipcd} OR ADR != #{adr} OR ADR_DTL != #{adrDtl})) 
+   	</insert>
+   	
+   		<!--
+         쿼리명 : MLHPrsnDataChngDAO.insertSrvcRcvModLog
+         설  명 : 고객서비스 수신동의 변경 로그를 등록한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.10   허진영     최초 생성
+    -->
+    <insert id="MLHPrsnDataChngDAO.insertSrvcRcvModLog" parameterType="emfMap">
+		INSERT /* MLHPrsnDataChngDAO.insertSrvcRcvModLog */ INTO MB_RCV_MOD_LOG
+			(ID
+			, RCV_GB
+			, RCV_YN
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			)
+		SELECT ID
+			   , #{rcvGb}
+			   , <choose>
+					<when test="rcvGb eq 'sms'.toString()">
+						#{smsRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'tel'.toString()">
+						#{telRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'ctlg'.toString()">
+						#{ctlgRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'email'.toString()">
+						#{emailRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'agreementForThirdParty'.toString()">
+						#{agreementForThirdParty, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'marketing'.toString()">
+						#{marketingYn, jdbcType=VARCHAR}
+					</when>
+				</choose>
+			   , #{modId}
+			   , #{modIp}
+			   , SYSDATE
+		  FROM MB_MEM_MST A
+		 WHERE ID = #{id}
+		   AND EXISTS(SELECT 'X' 
+		   			    FROM MB_MEM_MST 
+		   			   WHERE ID = A.ID
+				<choose>
+					<when test="rcvGb eq 'sms'.toString()">
+						AND SMS_RCV_YN != #{smsRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'tel'.toString()">
+						AND TEL_RCV_YN != #{telRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'ctlg'.toString()">
+						AND CTLG_RCV_YN != #{ctlgRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'email'.toString()">
+						AND EMAIL_RCV_YN != #{emailRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'agreementForThirdParty'.toString()">
+						AND AGREEMENT_FOR_THIRD_PARTY != #{agreementForThirdParty, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'marketing'.toString()">
+						AND MARKETING_YN != #{marketingYn, jdbcType=VARCHAR}
+					</when>
+				</choose>) 
+   	</insert>
+	
+	<insert id="MLHPrsnDataChngDAO.insertInitialSrvcRcvModLog" parameterType="emfMap">
+		INSERT /* MLHPrsnDataChngDAO.insertInitialSrvcRcvModLog */ INTO MB_RCV_MOD_LOG
+			(ID
+			, RCV_GB
+			, RCV_YN
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			)
+		SELECT ID
+			   , #{rcvGb, jdbcType=VARCHAR}
+			   , <choose>
+					<when test="rcvGb eq 'sms'.toString()">
+						#{smsRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'tel'.toString()">
+						#{telRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'ctlg'.toString()">
+						#{ctlgRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'email'.toString()">
+						#{emailRcvYn, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'agreementForThirdParty'.toString()">
+						#{agreementForThirdParty, jdbcType=VARCHAR}
+					</when>
+					<when test="rcvGb eq 'marketing'.toString()">
+						#{marketingYn, jdbcType=VARCHAR}
+					</when>
+				</choose>
+			   , #{modId, jdbcType=VARCHAR}
+			   , #{modIp, jdbcType=VARCHAR}
+			   , SYSDATE
+		  FROM MB_MEM_MST A
+		 WHERE ID = #{id, jdbcType=VARCHAR}
+   	</insert>
+   	
+	<!--
+         쿼리명 : MLHPrsnDataChngDAO.updateMemRenameInf
+         설  명 : 개명된 이름을 수정한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.16   김필기     최초 생성
+    -->
+    <update id="MLHPrsnDataChngDAO.updateMemRenameInf" parameterType="emfMap">
+		UPDATE /* MLHPrsnDataChngDAO.updateMemRenameInf */ MB_MEM_MST
+		   SET NAME = #{name}
+			   , MOD_ID = #{modId}
+			   , MOD_IP = #{modIp}
+			   , MOD_DTM = SYSDATE
+         WHERE ID = #{id}
+   	</update>	
+   	
+   	<!--
+         쿼리명 : MLHPrsnDataChngDAO.insertMemRenameModLog
+         설  명 : 회원 정보 변경 로그를 등록한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.10   허진영     최초 생성
+    -->
+    <insert id="MLHPrsnDataChngDAO.insertMemRenameModLog" parameterType="emfMap">
+		INSERT /* MLHPrsnDataChngDAO.insertMemRenameModLog */ INTO MB_MEM_CHNG_PTC
+			(CHNG_SEQ
+			, ID
+			, BFR_NAME
+			, BFR_EMAIL
+			, BFR_HP
+			, BFR_TEL
+			, BFR_ZIPCD
+			, BFR_ADR
+			, BFR_ADR_DTL
+			, BFR_AGREEMENT_FOR_THIRD_PARTY
+			, AFT_NAME
+			, AFT_EMAIL
+			, AFT_HP
+			, AFT_TEL
+			, AFT_ZIPCD
+			, AFT_ADR
+			, AFT_ADR_DTL
+			, AFT_AGREEMENT_FOR_THIRD_PARTY
+			, PRCS_YN
+			, REG_ID
+			, REG_IP
+			, REG_DTM
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			)
+		SELECT #{chngSeq}
+			   , ID
+			   , NAME
+			   , EMAIL
+			   , HP
+			   , TEL
+			   , ZIPCD
+			   , ADR
+			   , ADR_DTL
+			   , AGREEMENT_FOR_THIRD_PARTY
+			   , #{name}
+			   , EMAIL
+			   , HP
+			   , TEL
+			   , ZIPCD
+			   , ADR
+			   , ADR_DTL
+			   , #{agreementForThirdParty}
+			   , 'N'
+			   , #{regId}
+			   , #{regIp}
+			   , SYSDATE
+			   , MOD_ID
+			   , MOD_IP
+			   , SYSDATE
+		  FROM MB_MEM_MST A
+		 WHERE ID = #{id} 
+   	</insert>
+   	   	
+	
+</mapper>            

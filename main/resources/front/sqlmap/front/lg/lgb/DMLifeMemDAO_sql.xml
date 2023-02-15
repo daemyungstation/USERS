@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DMLifeMemDAO">
+	<!--
+         쿼리명 : DMLifeMemDAO.selectDMLifeMemInf
+         설  명 : 회원 정보를 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   김필기     최초 생성
+    -->	
+	<select id="DMLifeMemDAO.selectDMLifeMemInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* DMLifeMemDAO.selectDMLifeMemInf */
+			   TBL.*
+		FROM (
+			SELECT ROWNUM AS RNUM, A.*
+			FROM (
+				SELECT MEM_NO
+					   , MEM_NM
+					   , HUSHLD
+					   , WRPL_NM
+					   , DEPT_NM
+					   , CELL
+					   , HOME_TEL
+					   , WRPL_TEL
+					   , HOME_ZIP
+					   , HOME_ADDR
+					   , HOME_ADDR2
+					   , WRPL_ZIP
+					   , WRPL_ADDR
+					   , WRPL_ADDR2
+					   , EMAIL
+					   , EMAIL_CHK
+					   , SMS_CHK
+					   , CONTC_TM
+					   , CONTC_TM_FROM
+					   , CONTC_TM_TO
+					   , CERTF_RCV_CHK
+					   , BRTH_MON_DAY
+					   , SOL_LUN
+					   , ANNV
+					   , RE_JOIN
+					   , NOTE
+					   , CL
+					   , OLD_MEM_NO
+					   , REG_DM
+					   , REG_MAN
+					   , UPD_DM
+					   , UPD_MAN
+					   , DEL_FG
+					   , ENG_NM
+					   , INSPL_ZIP
+					   , INSPL_ADDR
+					   , INSPL_ADDR2
+					   , IDN_NO_CHK_NOT_USE
+					   , CI_VAL
+					   , IDN_NO
+					   , SEX
+					   , CREDIT_RATING
+					   , addr_update
+					   , CRDT_MNG_NO
+					   , CARD_AUTH
+					   , PRN_SI_NM
+					   , HOME_ZIP_OLD
+					   , WRPL_ZIP_OLD
+					   , BLACK_CONSUMER			
+				  FROM MEMBER
+				 WHERE 1=1
+				<if test="join != null and join != ''">
+					AND MEM_NM = #{name}
+					AND REPLACE(CELL, '-', '') = REPLACE(#{hp}, '-', '')
+					AND BRTH_MON_DAY = REPLACE(#{birth}, '-', '')
+				</if>
+				<if test="gender != null and gender != ''">
+					AND SEX = #{gender}
+				</if>
+				<if test="deleteFlag != null and deleteFlag != ''">
+					AND DEL_FG = #{deleteFlag}
+				</if>
+				 ORDER BY REG_DM DESC
+			) A
+		) TBL
+	</select>	
+	
+</mapper>            

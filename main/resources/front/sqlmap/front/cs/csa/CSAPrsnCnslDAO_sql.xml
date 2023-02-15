@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CSAPrsnCnslDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="cntn" column="CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : CSAPrsnCnslDAO.insertPrsnCnsl
+         설  명 : 제휴 문의를 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.02   허진영      최초생성
+    -->
+	<insert id="CSAPrsnCnslDAO.insertPrsnCnsl" parameterType="emfMap">
+		INSERT /* CSAPrsnCnslDAO.insertPrsnCnsl */ INTO CS_PRSN_CNSL_MST
+			(PRSN_CNSL_SEQ
+			, ID
+			, INQRY_CD
+			, INQRY_DTL_CD
+			, TITL
+			, CNTN
+			, PRCS_CD
+			, REG_ID
+			, REG_IP
+			, REG_DTM
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			)
+		VALUES
+			(#{prsnCnslSeq}
+			, #{id}
+			, #{inqryCd}
+			, #{inqryDtlCd}
+			, #{titl}
+			, #{cntn}
+			, '01'
+			, #{regId}
+			, #{regIp}
+			, SYSDATE
+			, #{modId}
+			, #{modIp}
+			, SYSDATE
+			)
+	</insert>
+	
+	<!--
+         쿼리명 : CSAPrsnCnslDAO.selectPrsnCnsl
+         설  명 : 1:1 상담 상세를 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.07   허진영     최초 생성
+    -->
+    <select id="CSAPrsnCnslDAO.selectPrsnCnsl" parameterType="emfMap" resultMap="emfMap">
+     	SELECT /* CSAPrsnCnslDAO.selectPrsnCnsl */      
+			   (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'PRSN_INQRY_GB' AND CD = A.INQRY_CD) AS INQRY_NM
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'PRSN_INQRY_DTL_GB' AND CD = A.INQRY_DTL_CD) AS INQRY_DTL_NM
+			   , (SELECT NAME FROM MB_MEM_MST WHERE ID = A.ID) AS NAME
+			   , (SELECT EMAIL FROM MB_MEM_MST WHERE ID = A.ID) AS EMAIL
+			   , TITL
+			   , CNTN
+		  FROM CS_PRSN_CNSL_MST A
+         WHERE PRSN_CNSL_SEQ = #{prsnCnslSeq}
+   	</select>
+	
+	<!--
+         쿼리명 : CSAPrsnCnslDAO.selectPrsnCnslAdmList
+         설  명 : 1:1 상담 관련 관리자 목록을 조회한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.11   허진영     최초 생성
+    -->
+    <select id="CSAPrsnCnslDAO.selectPrsnCnslAdmList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* CSAPrsnCnslDAO.selectPrsnCnslAdmList */ 
+			   NAME
+    	       , EMAIL
+		  FROM CO_ADM_MST
+		 WHERE USE_YN = 'Y' 
+		   AND ROLE_CD = 'ROLE_00001'
+		    
+		UNION
+		    
+		SELECT NAME
+		       , EMAIL
+		  FROM CO_ADM_MST
+		 WHERE USE_YN = 'Y' 
+		   AND ADM_SEQ IN(SELECT ADM_SEQ FROM CO_ADM_MENU_INF WHERE MENU_SEQ = 68)
+   	</select>
+   	
+</mapper>            

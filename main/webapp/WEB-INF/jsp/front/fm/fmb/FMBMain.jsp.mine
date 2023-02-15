@@ -1,0 +1,240 @@
+<html lang="ko">
+	<head>
+		<meta charset="utf-8"/>
+		<title>대명아임레디</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi" />
+		<meta name="author" content="http://www.daemyungimready.com" />
+		<meta name="keywords" content="대명아임레디, 라이프케어, 상조/웨딩/여행, 업계 최초 멤버십/결합혜택, 회원가입, 고객센터" />
+		<meta name="description" content="대명아임레디, 라이프케어, 상조/웨딩/여행, 업계 최초 멤버십/결합혜택, 회원가입, 고객센터" />
+		<meta name="format-detection" content ="telephone=no"/>
+		<meta name="naver-site-verification" content="1e3c1710408be91577f020b8af5f265899f170ca"/>
+		<meta property="og:type" content="article" />
+		<meta property="og:site_name" content="대명아임레디"/>
+		<meta property="og:title" content="대명아임레디"/>
+		<meta property="og:description" content="대명아임레디, 라이프케어, 상조/웨딩/여행, 업계 최초 멤버십/결합혜택, 회원가입, 고객센터" />
+		<meta property="og:image" content="http://www.daemyunglifeway.com/common/images/logo.gif" />
+        <link rel="shortcut icon" href="/common/images/favicon_16.ico" type="image/x-icon" />
+        <link rel="icon" href="/common/images/favicon_16.ico" type="image/x-icon" />
+		
+		<link rel="stylesheet" href="/common/css/lifeway_style.css" />
+		<script type="text/javascript" src="/common/js/jquery-1.8.2.min.js"></script>
+		
+				
+		<script>
+		
+		/* 
+			$(document).ready(function(){
+			
+			    $('.section_gate li').on('mouseover', function(){
+			        $(this).addClass("on");
+			        if($(".area_left").hasClass("on")){
+			            lineLeft();
+			        }if($(".area_right").hasClass("on")){
+			            lineRight();
+			        }
+			    }).on('mouseleave', function(){
+			        $(this).removeClass("on");
+			        resetYY()
+			    });
+			
+			});
+			
+			function lineLeft() {
+			    $('.area_left .line1').stop().animate({'height': '390px'}, 50, function(){
+			        $('.area_left .line2').stop().animate({'width': '485px'}, 275, function(){
+			            $('.area_left .line3').stop().animate({'height': '385px'}, 399, function(){
+			                $('.area_left .line4').stop().animate({'width': '480px'}, 275, function(){
+			                    $('.area_left .line5').stop().animate({'height': '48px'}, 50)
+			                });
+			            });
+			        });
+			    });
+			}
+			function lineRight() {
+			    $('.area_right .line1').stop().animate({'height': '390px'}, 50, function(){
+			        $('.area_right .line2').stop().animate({'width': '485px'}, 275, function(){
+			            $('.area_right .line3').stop().animate({'height': '385px'}, 399, function(){
+			                $('.area_right .line4').stop().animate({'width': '480px'}, 275, function(){
+			                    $('.area_right .line5').stop().animate({'height': '48px'}, 50)
+			                });
+			            });
+			        });
+			    });
+			}
+			
+			function resetYY() {
+			    $('.txt .line1').stop().animate({'height': '0'});
+			    $('.txt .line2').stop().animate({'width': '0'});
+			    $('.txt .line3').stop().animate({'height': '0'});
+			    $('.txt .line4').stop().animate({'width': '0'});
+			    $('.txt .line5').stop().animate({'height': '0'});
+			}
+			
+			 */
+			 
+				$(function(){
+					pageW = $(window).width();
+					if (pageW > 980){
+						$(".hp-gate").mouseover(function(){
+							pageW = $(window).width();
+							$(this).addClass("on").css("width",pageW - 480 + "px");
+							$(".mall-gate").removeClass("on").css("width","480px");
+							$(".index-gate").css("background","#a5c2be");
+							$(".mall-gate-intro").addClass("on")
+							$(".mall-gate-link").addClass("on");
+						});
+						$(".hp-gate").mouseleave(function(){
+							pageW = $(window).width();
+							$(this).removeClass("on").css("width","50%");
+							$(".mall-gate").removeClass("on").css("width","50%");
+							$(".index-gate").css("background","#a5c2be");
+							$(".mall-gate-intro").removeClass("on")
+							$(".mall-gate-link").removeClass("on");
+						});
+						
+						$(".mall-gate").mouseover(function(){
+							pageW = $(window).width();
+							$(this).addClass("on").css("width",pageW - 480 + "px");
+							$(".hp-gate").removeClass("on").css("width","480px");
+							$(".index-gate").css("background","#dac09f");
+							$(".hp-gate-intro").addClass("on")
+							$(".hp-gate-link").addClass("on");
+						});
+						$(".mall-gate").mouseleave(function(){
+							pageW = $(window).width();
+							$(this).removeClass("on").css("width","50%");
+							$(".hp-gate").removeClass("on").css("width","50%");
+							$(".index-gate").css("background","#dac09f");
+							$(".hp-gate-intro").removeClass("on")
+							$(".hp-gate-link").removeClass("on");
+						});			
+					}else{
+
+					}
+				});
+				
+				$(window).resize(function(){
+					pageW = $(window).width();
+					if (pageW > 980){
+						$(".hp-gate").off().css("width","50%");
+						$(".mall-gate").off().css("width","50%");
+						$(".hp-gate").mouseover(function(){
+							pageW = $(window).width();
+							$(this).addClass("on").css("width",pageW - 480 + "px");
+							$(".mall-gate").removeClass("on").css("width","480px");
+							$(".index-gate").css("background","#a5c2be");
+						});
+						$(".hp-gate").mouseleave(function(){
+							pageW = $(window).width();
+							$(this).removeClass("on").css("width","50%");
+							$(".mall-gate").removeClass("on").css("width","50%");
+							$(".index-gate").css("background","#a5c2be");
+						});
+						
+						$(".mall-gate").mouseover(function(){
+							pageW = $(window).width();
+							$(this).addClass("on").css("width",pageW - 480 + "px");
+							$(".hp-gate").removeClass("on").css("width","480px");
+							$(".index-gate").css("background","#dac09f");
+						});
+						$(".mall-gate").mouseleave(function(){
+							pageW = $(window).width();
+							$(this).removeClass("on").css("width","50%");
+							$(".hp-gate").removeClass("on").css("width","50%");
+							$(".index-gate").css("background","#dac09f");
+						});
+					}else{
+						$(".index-gate").css("background","#a5c2be");
+						$(".hp-gate").off().css("width","100%");
+						$(".mall-gate").off().css("width","100%");
+					}
+				});
+		</script>
+		<script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+		
+		  ga('create', 'UA-77651223-1', 'auto');
+		  ga('send', 'pageview');
+		</script>
+		<!--네이버 연관채널 소스 -->
+		<span itemscope="" itemtype="http://schema.org/Organization">
+			<link itemprop="url" href="https://www.daemyungimready.com">
+			<a itemprop="sameAs" href="https://www.facebook.com/imreadyDM"></a>
+			<a itemprop="sameAs" href="https://www.instagram.com/daemyungimready"></a>
+			<a itemprop="sameAs" href="https://www.youtube.com/channel/UC7fsSmcs6_llD6Cwo5HipXg"></a>
+		</span>
+<!--네이버 연관채널 소스 -->
+	</head>
+		
+<body>
+<!-- 
+<div class="wrap_gate">
+    <div class="gate_logo">
+        <img src="/common/images/main/img_logo.png" alt="">
+    </div>
+    <ul class="section_gate">
+        <li class="area_left" onclick="location.href='https://www.daemyungimready.com/main/index.do'">
+            <div class="txt">
+                <a>
+                    <p>ìë¡­ê² ì¦ê¸°ë ë¼ì´íì¨ì´</p>
+                    <span>ëëªììë ë<br>ê³µìííì´ì§</span>
+                    <em>ë°ë¡ê°ê¸° <i></i> </em>
+                </a>
+                <span class="line1" style="height:0;"></span>
+                <span class="line2" style="width:0;"></span>
+                <span class="line3" style="height:0;"></span>
+                <span class="line4" style="width:0;"></span>
+            </div>
+        </li>
+        <li class="area_right" onclick="location.href='https://imreadymall.com/member/login.php?url=%2F'">
+            <div class="txt">
+                <a>
+                    <p>ë§¤ì¼ë§¤ì¼ ì´í¹ê° ì¼í!</p>
+                    <span>ëëªììë ë<br>íìì ì©ëª°</span>
+                    <em>ë°ë¡ê°ê¸° <i></i> </em>
+                </a>
+                <span class="line1" style="height:0;"></span>
+                <span class="line2" style="width:0;"></span>
+                <span class="line3" style="height:0;"></span>
+                <span class="line4" style="width:0;"></span>
+            </div>
+        </li>
+    </ul>
+</div>
+ -->
+ 	<!-- 2019.07.02 index 교체 -->
+	<div class="index-gate">
+		<div class="index-gate-logo"><img src="/common/images/main/newIndex_logo.png" alt=""></div>
+		<a href="http://localhost:28080/main/index.do">
+			<div class="hp-gate">
+				<div class="hp-gate-intro">
+					<img src="/common/images/main/newIndex_title03.png" alt="내가 잘 사는법 대명아임레디 공식홈페이지"/>
+				</div>
+				<div class="hp-gate-link">
+					<img src="/common/images/main/newIndex_link.png" alt="바로가기"/>
+				</div>
+				<div class="hp-gate-bg"><img src="/common/images/main/newIndex_bg03.png" alt=""/></div>
+			</div>
+		</a>
+	
+		<a href="https://www.bucketmarket.co.kr/?&utm_source=iamready_hp&utm_medium=display&utm_campaign=iamready&utm_term=July&utm_content=main_direct_banner" target="_blank"> 
+			<div class="mall-gate">
+				<div class="index-gate-logo"><img src="/common/images/main/newIndex_logo_bucket.png" onclick="" alt=""></div>
+				<div class="mall-gate-intro">
+					<img src="/common/images/main/newIndex_title04.png" alt="매일매일 초특가 쇼핑! 대명아임레디 회원전용몰"/>
+				</div>
+				<div class="mall-gate-link">
+					<img src="/common/images/main/newIndex_link.png" alt="바로가기"/>
+				</div>
+				<div class="mall-gate-bg"><img src="/common/images/main/newIndex_bg04.png" alt=""/></div>
+			</div>
+		</a>
+	</div>
+	<!-- EOD : 2019.07.02 index 교체 -->
+ 
+</body>
+</html>

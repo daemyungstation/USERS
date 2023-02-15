@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLCOutMemInfDAO">
+
+	<!--
+         쿼리명 : MLCOutMemInfDAO.selectOutMemInf
+         설  명 : 외부(엔컴) 회원정보 상세를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="MLCOutMemInfDAO.selectOutMemInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLCOutMemInfDAO.selectOutMemInf */
+			   B.ACCNT_NO
+			   , DECODE(FN_ACCNT_STAT(B.ACCNT_NO), 'Y', '정상', 'R', '해약', 'E', '행사', '청약철회') AS ACC_STAT
+			   , FN_YEN_CHE(B.ACCNT_NO) AS PAY_STAT
+			   , (SELECT MIN(PAY_DAY) FROM PAY_MNG WHERE ACCNT_NO = B.ACCNT_NO) AS TRUE_PAY_DT
+		  FROM MEMBER A, MEM_PROD_ACCNT B
+		 WHERE A.MEM_NO = B.MEM_NO
+		   AND A.DEL_FG = 'N'
+		   AND B.DEL_FG = 'N'
+		   AND A.MEM_NO = #{memNo}
+		   AND B.ACCNT_NO = #{accntNo}
+		   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO)
+	</select>
+	
+</mapper>            

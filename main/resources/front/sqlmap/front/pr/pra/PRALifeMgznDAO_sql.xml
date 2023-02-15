@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PRALifeMgznDAO">
+
+	<!--
+         쿼리명 : PRALifeMgznDAO.selectMgznPbtnYrList
+         설  명 : 라이프웨이 매거진 발간년도을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="PRALifeMgznDAO.selectMgznPbtnYrList" resultType="emfMap">
+		SELECT /* PRALifeMgznDAO.selectMgznPbtnYrList */
+			   MGZN_PBTN_YR
+		  FROM PR_MGZN_MST
+		 ORDER BY MGZN_PBTN_YR DESC
+	</select>
+
+	<!--
+         쿼리명 : PRALifeMgznDAO.selectLifeMgznList
+         설  명 : 라이프매거진 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="PRALifeMgznDAO.selectLifeMgzn" parameterType="emfMap" resultType="emfMap">
+		SELECT /* PRALifeMgznDAO.selectLifeMgzn */
+			   MGZN_SEQ
+			   , MGZN_PBTN_YR
+			   , SPR_TITL
+			   , SPR_SUB_TITL
+			   , SPR_CVR_FILE_ID
+			   , SPR_PDF_FILE_ID
+			   , SPR_EBK_URL
+			   , SMMR_TITL
+			   , SMMR_SUB_TITL
+			   , SMMR_CVR_FILE_ID
+			   , SMMR_PDF_FILE_ID
+			   , SMMR_EBK_URL
+			   , ATMN_TITL
+			   , ATMN_SUB_TITL
+			   , ATMN_CVR_FILE_ID
+			   , ATMN_PDF_FILE_ID
+			   , ATMN_EBK_URL
+			   , WNTR_TITL
+			   , WNTR_SUB_TITL
+			   , WNTR_CVR_FILE_ID
+			   , WNTR_PDF_FILE_ID
+			   , WNTR_EBK_URL
+		  FROM PR_MGZN_MST
+		 WHERE MGZN_PBTN_YR = #{mgznPbtnYr}
+	</select>
+	
+</mapper>            

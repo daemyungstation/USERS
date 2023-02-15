@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LGAMemLoginDAO">
+	
+	<!--
+         쿼리명 : LGAMemLoginDAO.updateMemLoginInf
+         설  명 : 최종 로그인 일시를 변경한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   김필기      최초생성
+    -->
+	<update id="LGAMemLoginDAO.updateMemLoginInf" parameterType="emfMap">
+		UPDATE /* LGAMemLoginDAO.updateMemLoginInf */ 
+			MB_MEM_MST
+		SET
+			LAST_LGN_DTM = SYSDATE
+		<if test="qscnYn != '' and qscnYn != null">
+			, QSCN_YN = #{qscnYn}
+		</if>
+		<if test="oldAuthYn != '' and oldAuthYn != null">
+			, OLD_AUTH_YN = #{oldAuthYn}
+		</if>		
+		WHERE 
+			ID = #{id}
+	</update>
+
+	<select id="LGAMemLoginDAO.getMemResortInf" parameterType="emfMap" resultType="emfMap">
+		SELECT MB.ID, MB.CI, MB.NAME, ACCNTDLCC.ACCNT_NO, ACCNTDLCC.RESORT_NO, ACCNTDLCC.JOIN_DT, MB.HP, MB.AGREEMENT_FOR_THIRD_PARTY
+		  FROM MB_MEM_MST MB LEFT  JOIN MEMBER@DMLIFE MBDLCC            ON MB.UNQ_NO     = MBDLCC.MEM_NO
+		                     LEFT  JOIN MEM_PROD_ACCNT@DMLIFE ACCNTDLCC ON MBDLCC.MEM_NO = ACCNTDLCC.MEM_NO
+		 WHERE ID = #{id, jdbcType=VARCHAR}
+		   AND MB.AGREEMENT_FOR_THIRD_PARTY = 'Y'
+	</select>
+
+	<select id="LGAMemLoginDAO.getIntegrationMemberInfo" parameterType="String" resultType="emfMap">
+		SELECT /* LGAMemLoginDAO.getIntegrationMemberInfo */
+			INFO.INTEGRATION_ID,
+			INFO.INTEGRATION_PW,
+			INFO.HOMEPAGE_ID,
+			INFO.HOMEPAGE_PW,
+			INFO.MALL_ID,
+			INFO.MEMBER_ID,
+			INFO.CI,
+			INFO.HOMEPAGE_ONLINE_YN,
+			INFO.HOMEPAGE_JOIN_DATE,
+			INFO.SECESSION_DATE,
+			INFO.SECESSION_DELETE_DIV,
+			NVL(INFO.QSCN_YN, 'N') QSCN_YN,
+			INFO.NAME,
+			INFO.SEX,
+			INFO.BIRTH,
+			INFO.EMAIL,
+			INFO.HP,
+			INFO.OLD_AUTH_YN,
+			TRY.ID LGN_TRY_ID,
+			NVL(TRY.LGN_TRY_CNT, 0) LGN_TRY_CNT,
+			TRY.LAST_LGN_TRY_DTM
+		FROM
+		(
+			SELECT
+				INTEGRATION.INTEGRATION_ID,
+				INTEGRATION.INTEGRATION_PW,
+				INTEGRATION.HOMEPAGE_ID,
+				INTEGRATION.MALL_ID,
+				INTEGRATION.MEMBER_ID,
+				INTEGRATION.CI,
+				INTEGRATION.HOMEPAGE_ONLINE_YN,
+				INTEGRATION.HOMEPAGE_JOIN_DATE,
+				INTEGRATION.SECESSION_DATE,
+				INTEGRATION.SECESSION_DELETE_DIV,
+				QSCN.QSCN_YN,
+				MEM.NAME,
+				MEM.SEX,
+				MEM.BIRTH,
+				MEM.EMAIL,
+				MEM.HP,
+				NVL2(MEM.PWD, MEM.PWD, QSCN.PWD) HOMEPAGE_PW,
+				MEM.OLD_AUTH_YN
+			FROM
+				INTEGRATION_MEMBER@DM_INTEGRATION INTEGRATION
+			LEFT OUTER JOIN
+				MB_QSCN_MEM_MST QSCN
+			ON
+				INTEGRATION.HOMEPAGE_ID = QSCN.ID
+			LEFT OUTER JOIN
+				MB_MEM_MST MEM
+			ON
+				INTEGRATION.HOMEPAGE_ID = MEM.ID
+			WHERE
+				<choose>
+					<when test="type eq 'INTEGRATION'">
+						INTEGRATION_ID = #{id}
+					</when>
+					<otherwise>
+						HOMEPAGE_ID = #{id}
+					</otherwise>
+				</choose>
+			AND SECESSION_DATE IS NULL AND SECESSION_DELETE_DIV IS NULL
+		) INFO
+		LEFT OUTER JOIN
+		(
+			SELECT ID, LGN_TRY_CNT, LAST_LGN_TRY_DTM FROM MB_MEM_LGN_TRY_INFO WHERE ID = #{id}
+		) TRY
+		ON
+		<choose>
+			<when test="type eq 'INTEGRATION'">
+				INFO.INTEGRATION_ID = TRY.ID
+			</when>
+			<otherwise>
+				INFO.HOMEPAGE_ID = TRY.ID
+			</otherwise>
+		</choose>
+
+	</select>
+
+	<update id="LGAMemLoginDAO.updateHomepageMemberInfo" parameterType="emfMap">
+		MERGE INTO MB_MEM_MST
+		USING DUAL
+		ON (ID = #{homepageId})
+		WHEN MATCHED THEN
+		UPDATE SET
+			MOD_ID = #{modId, jdbcType=VARCHAR}
+			,MOD_IP = #{modIp, jdbcType=VARCHAR}
+			,MOD_DTM = SYSDATE
+			,INTR_FIELD = #{intrField, jdbcType=VARCHAR}
+			<if test="type != 'SYNC' and (pwd != null and pwd != '')">
+				,PWD = #{pwd, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (hp != null and hp != '')">
+				,HP = #{hp, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (tel != null and tel != '')">
+				,TEL = #{tel, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (birth != null and birth != '')">
+				,BIRTH = #{birth, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (sex != null and sex != '')">
+				,sex = #{sex, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (email != null and email != '')">
+				,EMAIL = #{email, jdbcType=VARCHAR}
+			</if>
+			<if test="adr != null and adr != ''">
+				,ADR = #{adr, jdbcType=VARCHAR}
+			</if>
+			<if test="adrDtl != null and adrDtl != ''">
+				,ADR_DTL = #{adrDtl, jdbcType=VARCHAR}
+			</if>
+			<if test="zipcd != null and zipcd != ''">
+				,ZIPCD = #{zipcd, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (name != null and name != '')">
+				,NAME = #{name, jdbcType=VARCHAR}
+			</if>
+			<if test="smsRcvYn != null and smsRcvYn !=''">
+				,SMS_RCV_YN = #{smsRcvYn, jdbcType=CHAR}
+			</if>
+			<if test="telRcvYn != null and telRcvYn !=''">
+				,TEL_RCV_YN = #{telRcvYn, jdbcType=CHAR}
+			</if>
+			<if test="emailRcvYn != null and emailRcvYn !=''">
+				,EMAIL_RCV_YN = #{emailRcvYn, jdbcType=CHAR}
+			</if>
+			<if test="ctlgRcvYn != null and ctlgRcvYn !=''">
+				,CTLG_RCV_YN = #{ctlgRcvYn, jdbcType=CHAR}
+			</if>
+			<if test="marketingYn != null and marketingYn !=''">
+				,MARKETING_YN = #{marketingYn, jdbcType=CHAR}
+			</if>
+		WHEN NOT MATCHED THEN
+		INSERT (
+			ID
+			,PWD
+			,UNQ_NO
+			,NAME
+			,SEX
+			,BIRTH
+			,EMAIL
+			,HP
+			,TEL
+			,ZIPCD
+			,ADR
+			,ADR_DTL
+		<!--
+			,SMS_RCV_YN
+			,TEL_RCV_YN
+			,CTLG_RCV_YN
+			,EMAIL_RCV_YN
+			,MARKETING_YN
+			,AGREEMENT_FOR_THIRD_PARTY
+			,MARKETING_INFO_YN
+		-->
+			,USE_YN
+			,LAST_LGN_DTM
+			,DROT_YN
+			,QSCN_YN
+			,USER_GB
+			,OLD_AUTH_YN
+			,CI
+			,REG_ID
+			,REG_IP
+			,REG_DTM
+			,MOD_ID
+			,MOD_IP
+			,MOD_DTM
+			,RETRY
+		) VALUES (
+			#{homepageId, jdbcType=VARCHAR}
+			,#{pwd, jdbcType=VARCHAR}
+			,#{unqNo, jdbcType=VARCHAR}
+			,#{name, jdbcType=VARCHAR}
+			,#{sex, jdbcType=VARCHAR}
+			,#{birth, jdbcType=VARCHAR}
+			,#{email, jdbcType=VARCHAR}
+			,#{hp, jdbcType=VARCHAR}
+			,#{tel, jdbcType=VARCHAR}
+			,#{zipcd, jdbcType=VARCHAR}
+			,#{adr, jdbcType=VARCHAR}
+			,#{adrDtl, jdbcType=VARCHAR}
+		<!--
+			,#{smsRcvYn, jdbcType=VARCHAR}
+			,#{telRcvYn, jdbcType=VARCHAR}
+			,#{ctlgRcvYn, jdbcType=VARCHAR}
+			,#{emailRcvYn, jdbcType=VARCHAR}
+			,#{marketingYn, jdbcType=VARCHAR}
+			,#{marketingYn, jdbcType=VARCHAR}
+			,#{marketingYn, jdbcType=VARCHAR}
+		-->
+			,'Y'
+			,SYSDATE
+			,'N'
+			,'N'
+			,'N'
+			,'N'
+			,#{ci, jdbcType=VARCHAR}
+			,#{modId, jdbcType=VARCHAR}
+			,#{modIp, jdbcType=VARCHAR}
+			,SYSDATE
+			,#{modId, jdbcType=VARCHAR}
+			,#{modIp, jdbcType=VARCHAR}
+			,SYSDATE
+			,0
+		)
+	</update>
+
+	<update id="LGAMemLoginDAO.updateHomepageMemberInfoSso" parameterType="emfMap">
+		UPDATE MB_MEM_MST
+		SET
+			MOD_ID = #{modId, jdbcType=VARCHAR}
+			,MOD_IP = #{modIp, jdbcType=VARCHAR}
+			,MOD_DTM = SYSDATE
+			,INTR_FIELD = #{intrField, jdbcType=VARCHAR}
+			<if test="type != 'SYNC' and (pwd != null and pwd != '')">
+				,PWD = #{pwd, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (hp != null and hp != '')">
+				,HP = #{hp, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (tel != null and tel != '')">
+				,TEL = #{tel, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (birth != null and birth != '')">
+				,BIRTH = #{birth, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (sex != null and sex != '')">
+				,sex = #{sex, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (email != null and email != '')">
+				,EMAIL = #{email, jdbcType=VARCHAR}
+			</if>
+			<if test="adr != null and adr != ''">
+				,ADR = #{adr, jdbcType=VARCHAR}
+			</if>
+			<if test="adrDtl != null and adrDtl != ''">
+				,ADR_DTL = #{adrDtl, jdbcType=VARCHAR}
+			</if>
+			<if test="zipcd != null and zipcd != ''">
+				,ZIPCD = #{zipcd, jdbcType=VARCHAR}
+			</if>
+			<if test="type == 'SYNC' or (name != null and name != '')">
+				,NAME = #{name, jdbcType=VARCHAR}
+			</if>
+			<if test="smsRcvYn != null and smsRcvYn !=''">
+				,SMS_RCV_YN = #{smsRcvYn, jdbcType=CHAR}
+			</if>
+			<if test="telRcvYn != null and telRcvYn !=''">
+				,TEL_RCV_YN = #{telRcvYn, jdbcType=CHAR}
+			</if>
+			<if test="emailRcvYn != null and emailRcvYn !=''">
+				,EMAIL_RCV_YN = #{emailRcvYn, jdbcType=CHAR}
+			</if>
+			<if test="ctlgRcvYn != null and ctlgRcvYn !=''">
+				,CTLG_RCV_YN = #{ctlgRcvYn, jdbcType=CHAR}
+			</if>
+			<if test="marketingYn != null and marketingYn !=''">
+				,MARKETING_YN = #{marketingYn, jdbcType=CHAR}
+			</if>
+		WHERE CI = #{ci}
+	</update>
+
+	<select id="LGAMemLoginDAO.getHomepageMemberInfo" parameterType="emfMap" resultType="emfMap">
+		SELECT
+			MB.ID,
+			MB.PWD,
+			MB.UNQ_NO,
+			MB.NAME,
+			MB.SEX,
+			MB.BIRTH,
+			MB.EMAIL,
+			MB.HP,
+			MB.TEL,
+			MB.ZIPCD,
+			MB.ADR,
+			MB.ADR_DTL,
+			MB.SMS_RCV_YN,
+			MB.TEL_RCV_YN,
+			MB.CTLG_RCV_YN,
+			MB.EMAIL_RCV_YN,
+			MB.USE_YN,
+			MB.LAST_LGN_DTM,
+			MB.DROT_YN,
+			MB.DROT_RSN,
+			MB.DROT_DTM,
+			MB.QSCN_YN,
+			MB.USER_GB,
+			MB.OLD_AUTH_YN,
+			MB.MARKETING_YN,
+			MB.CI,
+			MB.REG_ID,
+			MB.REG_IP,
+			MB.REG_DTM,
+			MB.MOD_ID,
+			MB.MOD_IP,
+			MB.MOD_DTM,
+			MB.TEMP_HP,
+			MB.AGREEMENT_FOR_THIRD_PARTY,
+			MB.MARKETING_INFO_YN,
+			MB.RETRY,
+			MB.INTR_FIELD,
+			ETC.ID ETC_ID,
+			ETC.MRRG_YN,
+			ETC.CHDRN_GB,
+			ETC.INTR_PTC,
+			ETC.JOIN_PATH,
+			ETC.JOIN_PATH_ETC,
+			ETC.PFRN_PTC,
+			ETC.PFRN_ETC,
+			ETC.INTR_FIELD ETC_INTR_FIELD
+		FROM
+			MB_MEM_MST MB
+		LEFT OUTER JOIN
+			MB_ETC_INF ETC
+		ON
+			MB.ID = ETC.ID
+		WHERE 1=1
+		<if test="ci != null and ci != ''">
+			AND MB.CI = #{ci}
+		</if>
+		<if test="id != null and id != ''">
+			AND MB.ID = #{id}
+		</if>
+		<if test="unqNo != null and unqNo != ''">
+			AND MB.UNQ_NO = #{unqNo}
+		</if>
+	</select>
+
+	<update id="LGAMemLoginDAO.updateHomepageMemberEtcInfo" parameterType="emfMap">
+		MERGE INTO MB_ETC_INF
+		USING DUAL
+		ON (ID = #{homepageId})
+		WHEN MATCHED THEN
+		UPDATE
+		SET
+			MOD_DTM = SYSDATE
+			,JOIN_PATH_ETC = #{joinPathEtc, jdbcType=VARCHAR}
+			,PFRN_ETC = #{pfrnEtc, jdbcType=VARCHAR}
+			,MRRG_YN = #{mrrgYn, jdbcType=VARCHAR}
+			,CHDRN_GB = #{chdrnGb, jdbcType=VARCHAR}
+			,INTR_PTC = #{intrPtc, jdbcType=VARCHAR}
+			,JOIN_PATH = #{joinPath, jdbcType=VARCHAR}
+			,PFRN_PTC = #{pfrnPtc, jdbcType=VARCHAR}
+			,MOD_ID = #{modId, jdbcType=VARCHAR}
+			,MOD_IP = #{modIp, jdbcType=VARCHAR}
+			,INTR_FIELD = #{optionintrfield, jdbcType=VARCHAR}
+		WHEN NOT MATCHED THEN
+		INSERT (
+			ID
+			,MRRG_YN
+			,CHDRN_GB
+			,INTR_PTC
+			,JOIN_PATH
+			,JOIN_PATH_ETC
+			,PFRN_PTC
+			,PFRN_ETC
+			,REG_ID
+			,REG_IP
+			,REG_DTM
+			,MOD_ID
+			,MOD_IP
+			,MOD_DTM
+			,INTR_FIELD
+		) VALUES (
+			#{homepageId, jdbcType=VARCHAR}
+			,#{mrrgYn, jdbcType=VARCHAR}
+			,#{chdrnGb, jdbcType=VARCHAR}
+			,#{intrPtc, jdbcType=VARCHAR}
+			,#{joinPath, jdbcType=VARCHAR}
+			,#{joinPathEtc, jdbcType=VARCHAR}
+			,#{pfrnPtc, jdbcType=VARCHAR}
+			,#{pfrnEtc, jdbcType=VARCHAR}
+			,#{modId, jdbcType=VARCHAR}
+			,#{modIp, jdbcType=VARCHAR}
+			,SYSDATE
+			,#{modId, jdbcType=VARCHAR}
+			,#{modIp, jdbcType=VARCHAR}
+			,SYSDATE
+			,#{optionintrfield, jdbcType=VARCHAR}
+		)
+	</update>
+
+	<update id="LGAMemLoginDAO.updateHomepageMemberEtcInfoSso" parameterType="emfMap">
+		UPDATE MB_ETC_INF
+		SET
+			MOD_DTM = SYSDATE
+			,JOIN_PATH_ETC = #{joinPathEtc, jdbcType=VARCHAR}
+			,PFRN_ETC = #{pfrnEtc, jdbcType=VARCHAR}
+			,MRRG_YN = #{mrrgYn, jdbcType=VARCHAR}
+			,CHDRN_GB = #{chdrnGb, jdbcType=VARCHAR}
+			,INTR_PTC = #{intrPtc, jdbcType=VARCHAR}
+			,JOIN_PATH = #{joinPath, jdbcType=VARCHAR}
+			,PFRN_PTC = #{pfrnPtc, jdbcType=VARCHAR}
+			,MOD_ID = #{modId, jdbcType=VARCHAR}
+			,MOD_IP = #{modIp, jdbcType=VARCHAR}
+			,INTR_FIELD = #{optionintrfield, jdbcType=VARCHAR}
+		WHERE CI = #{ci}
+	</update>
+
+	<update id="LGAMemLoginDAO.updateHomepageMemberIndtInfoSso" parameterType="emfMap">
+		UPDATE MB_INDT_INF
+		SET
+			MOD_DTM = SYSDATE
+			, MOD_ID = #{modId, jdbcType=VARCHAR}
+			, MOD_IP = #{modIp, jdbcType=VARCHAR}
+		WHERE CI = #{ci}
+	</update>
+
+	<update id="LGAMemLoginDAO.putHomepageIdToIntegrationMember" parameterType="emfMap">
+		UPDATE INTEGRATION_MEMBER@DM_INTEGRATION
+		SET
+			HOMEPAGE_ID = #{homepageId}
+			,HOMEPAGE_JOIN_DATE = (SELECT REG_DTM FROM MB_MEM_MST WHERE UNQ_NO = #{unqNo})
+		WHERE
+			MEMBER_ID = #{unqNo}
+	</update>
+
+	<update id="LGAMemLoginDAO.putIntegrationMemberInfo" parameterType="emfMap">
+		UPDATE INTEGRATION_MEMBER@DM_INTEGRATION
+		SET
+		<choose>
+			<when test="unqNo != null">
+				HOMEPAGE_ONLINE_YN = 'N'
+			</when>
+			<otherwise>
+				HOMEPAGE_ONLINE_YN = 'Y'
+			</otherwise>
+		</choose>
+		<if test="homepageId != null and homepageId != ''">
+			,HOMEPAGE_ID = #{homepageId}
+			,HOMEPAGE_JOIN_DATE = SYSDATE
+		</if>
+		<if test="unqNo != null and unqNo != ''">
+			,MEMBER_ID = #{unqNo}
+		</if>
+		WHERE
+			INTEGRATION_ID = #{integrationId}
+	</update>
+
+	<update id="LGAMemLoginDAO.syncHomepageIdToSSO" parameterType="emfMap">
+		UPDATE MB_MEM_MST
+		SET
+			ID = #{id},
+			MOD_ID = #{id},
+			MOD_IP = #{ip},
+			MOD_DTM = SYSDATE
+		WHERE
+			ci = #{ci}
+	</update>
+
+</mapper>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLAAcntChngDAO">
+
+	<!--
+         쿼리명 : MLAAcntChngDAO.selectPayDayExceInf
+         설  명 : 결제계좌 변경신청 등록을 위한 유효성 체크.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.21   허진영      최초생성
+    -->
+	<select id="MLAAcntChngDAO.selectPayDayExceInf" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLAAcntChngDAO.selectPayDayExceInf */ 
+		       PAY_DAY1_USE_YN
+		       , PAY_DAY2_USE_YN
+		       , PAY_DAY3_USE_YN
+		       , PAY_DAY4_USE_YN
+		       , PAY_DAY5_USE_YN
+		  FROM CM_ACNT_EXCE_INF
+		 WHERE PROD_CD = #{payInfo.prodCd}
+	</select>
+
+
+	<!--
+         쿼리명 : MLAAcntChngDAO.selectChngRqstCnt
+         설  명 : 결제계좌 변경신청 등록을 위한 유효성 체크.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.04.21   허진영      최초생성
+    -->
+	<select id="MLAAcntChngDAO.selectChngRqstCnt" parameterType="emfMap" resultType="java.lang.Integer">
+		SELECT /* MLAAcntChngDAO.selectChngRqstCnt */ 
+		       COUNT(*)
+		  FROM CM_ACNT_CHNG_PTC
+		 WHERE ID = #{id}
+		   AND ACCNT_NO = #{accntNo}
+		   AND PRCS_YN = 'N'
+	</select>
+
+	<!--
+         쿼리명 : MLAAcntChngDAO.insertAcntChngRqst
+         설  명 : 결제계좌 변경신청을 등록한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.02   허진영      최초생성
+    -->
+	<insert id="MLAAcntChngDAO.insertAcntChngRqst" parameterType="emfMap">
+		INSERT /* MLAAcntChngDAO.insertAcntChngRqst */ INTO CM_ACNT_CHNG_PTC
+			(CHNG_SEQ
+			, ID
+			, ACCNT_NO
+			, BFR_PMT_GB
+			, BFR_BANK_CD
+			, BFR_BANK_NM
+			, BFR_ACNT_NO
+			, BFR_CARD_CD
+			, BFR_CARD_NM
+			, BFR_CARD_NO
+			, BFR_CARD_EXPR_YR
+			, BFR_CARD_EXPR_MM
+			, BFR_PMT_DAY
+			, AFT_PMT_GB
+			, AFT_BANK_CD
+			, AFT_BANK_NM
+			, AFT_ACNT_NO
+			, AFT_CARD_CD
+			, AFT_CARD_NM
+			, AFT_CARD_NO
+			, AFT_CARD_EXPR_YR
+			, AFT_CARD_EXPR_MM
+			, AFT_PMT_DAY
+			, HYCL_ABLE_TIME
+			, PRCS_YN
+			, REG_ID
+			, REG_IP
+			, REG_DTM
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+			)
+		VALUES
+			(#{chngSeq}
+			, #{id}
+			, #{accntNo}
+			, #{payMthd}
+			, #{bfrInfo.bankCd, jdbcType=VARCHAR}
+			, #{bfrInfo.bankNm, jdbcType=VARCHAR}
+			, #{bfrInfo.bankAccntNo, jdbcType=VARCHAR}
+			, #{bfrInfo.cardCd, jdbcType=VARCHAR}
+			, #{bfrInfo.cardNm, jdbcType=VARCHAR}
+			, #{bfrInfo.cardNo, jdbcType=VARCHAR}
+			, #{bfrInfo.cardExprYr, jdbcType=VARCHAR}
+			, #{bfrInfo.cardExprMm, jdbcType=VARCHAR}
+		<choose>
+			<when test="payMthd eq '04'.toString()">
+				, #{bfrInfo.ichaeDt, jdbcType=VARCHAR}
+			</when>
+			<when test="payMthd eq '06'.toString()">
+				, #{bfrInfo.payDt, jdbcType=VARCHAR}
+			</when>
+			<otherwise>
+				, null
+			</otherwise>
+		</choose>
+			, #{pmtGb}
+			, #{bankCd, jdbcType=VARCHAR}
+			, #{bankNm, jdbcType=VARCHAR}
+			, #{acntNo, jdbcType=VARCHAR}
+			, #{cardCd, jdbcType=VARCHAR}
+			, #{cardNm, jdbcType=VARCHAR}
+			, #{cardNo, jdbcType=VARCHAR}
+			, #{cardExprYr, jdbcType=VARCHAR}
+			, #{cardExprMm, jdbcType=VARCHAR}
+			, #{pmtDay}
+			, #{hyclAbleTime}
+			, 'N'
+			, #{regId}
+			, #{regIp}
+			, SYSDATE
+			, #{modId}
+			, #{modIp}
+			, SYSDATE
+			)
+	</insert>
+	
+</mapper>            

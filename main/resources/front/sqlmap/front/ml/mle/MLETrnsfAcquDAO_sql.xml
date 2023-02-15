@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLETrnsfAcquDAO">
+	
+	<!--
+         쿼리명 : MLETrnsfAcquDAO.selectJoinPrdctList
+         설  명 : 가입상품 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.14   허진영      최초생성
+        2016.11.03	 허진영      수정(해약신청 조회시 행사, 해약, 청약철회 등 가입상태가 정상이 아니면 미노출)
+    -->
+	<select id="MLETrnsfAcquDAO.selectJoinPrdctList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLETrnsfAcquDAO.selectJoinPrdctList */
+			   B.ACCNT_NO
+			   , PROD_CL
+			   , NVL(C.PROD_PRT_NM , C.PROD_NM) AS PROD_NM
+			   , B.JOIN_DT
+			   , (SELECT COUNT(SEQ) FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO) AS TRUE_CNT
+			   , DECODE(FN_ACCNT_STAT(B.ACCNT_NO), 'Y', '정상', 'R', '해약', 'E', '행사', '청약철회') AS ACC_STAT
+			   , FN_EMPLE_NM(B.EMPLE_NO) AS EMPLE_NM
+		  FROM MEMBER A, MEM_PROD_ACCNT B, PRODUCT C
+		 WHERE A.MEM_NO = B.MEM_NO
+		   AND B.PROD_CD = C.PROD_CD
+		   AND A.DEL_FG = 'N'
+		   AND B.DEL_FG = 'N'
+		   AND A.MEM_NO = #{memNo}
+		   AND EXISTS(SELECT 'X' FROM PAY_MNG WHERE DEL_FG = 'N' AND ACCNT_NO = B.ACCNT_NO)
+		<if test="cnclRefndYn eq 'Y'.toString()">
+			AND FN_ACCNT_STAT(B.ACCNT_NO) = 'Y'
+		</if>
+		<if test="sbscpWtdrYn eq 'Y'.toString()">
+			AND TO_CHAR(SYSDATE, 'yyyyMMdd') <![CDATA[<]]> (SELECT TO_CHAR(TO_DATE(PAY_DAY, 'yyyyMMdd') + 18, 'yyyyMMdd') FROM PAY_MNG WHERE ACCNT_NO = B.ACCNT_NO AND DEL_FG = 'N' AND NO = 1)
+		</if>
+	     ORDER BY B.REG_DM DESC
+	</select>
+
+</mapper>            

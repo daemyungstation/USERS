@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLFPrsnCnslDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="cntn" column="CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+		<result property="answ" column="ANSW" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : MLFPrsnCnslDAO.selectPrsnCnslList
+         설  명 : 1:1 상담내역 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   허진영      최초생성
+    -->
+	<select id="MLFPrsnCnslDAO.selectPrsnCnslList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLFPrsnCnslDAO.selectPrsnCnslList */
+			   TBL.* 
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'PRSN_INQRY_GB' AND CD = TBL.INQRY_CD) AS INQRY_NM
+      		   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'PROCESS_TYPE' AND CD = TBL.PRCS_CD) AS PRCS_NM
+		FROM (
+			SELECT ROWNUM AS RNUM, A.* 
+			FROM (
+				SELECT COUNT(*) OVER() AS TOT_CNT
+				       , PRSN_CNSL_SEQ
+					   , INQRY_CD
+					   , TITL
+					   , PRCS_CD
+					   , REG_DTM
+				  FROM CS_PRSN_CNSL_MST
+				 WHERE ID = #{id}
+				<if test="q != null and q != ''">
+					<if test="f == 1">
+						<![CDATA[	AND TITL LIKE '%' || #{q} || '%'	]]>
+					</if>
+					<if test="f == 2">
+						<![CDATA[	AND CNTN LIKE '%' || #{q} || '%'	]]>
+					</if>
+				</if>
+				 ORDER BY REG_DTM DESC
+			) A
+		) TBL
+	    WHERE RNUM BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}      
+	</select>
+	
+	<!--
+         쿼리명 : MLFPrsnCnslDAO.selectPrsnCnsl
+         설  명 : 1:1 상담내역 상세를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   허진영      최초생성
+    -->
+	<select id="MLFPrsnCnslDAO.selectPrsnCnsl" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* MLFPrsnCnslDAO.selectPrsnCnsl */      
+			   PRSN_CNSL_SEQ
+			   , ID
+			   , (SELECT NAME FROM MB_MEM_MST WHERE ID = A.ID) AS NAME
+			   , INQRY_CD
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'PRSN_INQRY_GB' AND CD = A.INQRY_CD) AS INQRY_NM
+			   , TITL
+			   , CNTN
+			   , ANSW
+			   , REG_DTM
+		  FROM CS_PRSN_CNSL_MST A
+         WHERE ID = #{id}
+           AND PRSN_CNSL_SEQ = #{prsnCnslSeq}
+	</select>
+	
+	<!--
+         쿼리명 : MLFPrsnCnslDAO.selectPrsnCnslLog
+         설  명 : 1:1 상담내역 상세로그를 조회한다
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.04   허진영     최초 생성
+    -->
+    <select id="MLFPrsnCnslDAO.selectPrsnCnslLog" parameterType="emfMap" resultType="emfMap">
+    	SELECT /* MLFPrsnCnslDAO.selectPrsnCnslLog */
+    		   TBL.*
+    		   , (SELECT NAME FROM CO_ADM_MST WHERE ID = TBL.MOD_ID) AS MOD_NM 
+    	FROM (
+    		SELECT ROW_NUMBER() OVER(ORDER BY MOD_DTM DESC) RNK
+			   	   , MOD_ID
+			   	   , MOD_DTM
+		  	  FROM CS_PRSN_CNSL_LOG
+             WHERE PRSN_CNSL_SEQ = #{prsnCnslSeq}
+               AND TASK_GB = 'A' 
+    	) TBL
+    	WHERE RNK = 1
+   	</select>
+	
+</mapper>            

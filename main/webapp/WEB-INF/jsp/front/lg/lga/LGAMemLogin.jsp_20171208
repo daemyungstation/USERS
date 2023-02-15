@@ -1,0 +1,38 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8"%><%@include file="/WEB-INF/jsp/include/el.jspf" %>
+
+					<div data-controller="LoginController">
+						<form name="frm" method="post" action="./setLogin.do">
+							<input type="hidden" name="vwUrl" value="${vwUrl}" class="notRequired" />
+							<input type="hidden" name="idx" value="${idx}" class="notRequired" />
+							
+						<div class="loginDiv">
+							<div class="inputArea">
+								<div class="areaDiv">
+									<div class="pBox">
+										<div class="inputDiv">
+											<input type="text" id="" name="id" value="" title="아이디" class="lginInput idChk" style="" placeholder="아이디">
+											<input type="password" id="" name="pwd" value="" title="비밀번호" class="lginInput mt5" style="" placeholder="비밀번호">
+										</div>
+										<a href="" id="submit" class="btnRed loginBt">로그인</a>
+										<input type="submit" style="text-indent:-100px; padding:0; border:0; " />
+									</div>
+
+									<div class="srchArea">
+										<p class="txt">아이디, 비밀번호를 잊으셨나요?</p>
+										<div class="bt">
+											<a href="/member/findid/index.do" class="whtBt">아이디 찾기</a>
+											<a href="/member/findpass/index.do" class="whtBt">비밀번호 찾기</a>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="joinArea">
+								<div class="areaDiv">
+									<p class="txt"><strong>아직 대명라이프웨이 회원이 아니신가요?</strong><br>회원이 되시면 다양한 서비스 이용이 가능합니다.</p>
+									<a href="/member/join/agree.do" class="whtBt">회원가입</a>
+								</div>
+							</div>
+						</div>
+						</form>
+					</div>

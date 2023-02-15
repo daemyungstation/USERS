@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SMAPopMngDAO">
+
+	<resultMap id="emfMap" type="emfMap">
+		<result property="cntn" column="CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : SMAPopMngDAO.selectPopList
+         설  명 : 팝업 목록을 조회한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.25  허진영     최초생성
+    -->
+	<select id="SMAPopMngDAO.selectPopList" parameterType="emfMap" resultMap="emfMap">	
+		SELECT /* SMAPopMngDAO.selectPopList */
+			   TBL.*
+		FROM (
+			SELECT ROWNUM AS RNUM, A.*
+			FROM (
+				SELECT COUNT(*) OVER() AS TOT_CNT
+			           , POP_SEQ
+		               , POP_NM
+					   , PTUP_STRT_DTM
+				  	   , PTUP_END_DTM
+				  	   , ODTM_YN
+		               , PTUP_YN
+		               , REG_ID
+					   , REG_DTM
+					   , CNTN
+					   , LINK
+					   , WND_YN
+			      FROM SM_POP_MST
+			     WHERE PTUP_YN = 'Y'
+				   AND (ODTM_YN = 'Y' OR (TO_CHAR(PTUP_STRT_DTM, 'YYYY-MM-DD') <![CDATA[<=]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') AND TO_CHAR(PTUP_END_DTM, 'YYYY-MM-DD') <![CDATA[>=]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD')))
+				 ORDER BY REG_DTM DESC
+			) A
+	    ) TBL
+	    WHERE RNUM BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}
+	</select>
+	
+	<!--
+         쿼리명 : SMAPopMngDAO.selectPop
+         설  명 : 팝업 상세를 조회한다.
+         수정일     수정자     수정내용 
+        ==========  ======  ============== 
+        2015.11.27  허진영     최초생성
+    -->
+	<select id="SMAPopMngDAO.selectPop" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* SMAPopMngDAO.selectPop */ 
+               POP_SEQ
+               , POP_NM
+               , CNTN
+               , PTUP_STRT_DTM
+               , PTUP_END_DTM
+               , ODTM_YN
+               , LINK
+               , WND_YN
+               , PTUP_YN
+		  FROM SM_POP_MST
+		 WHERE POP_SEQ = #{popSeq}
+	</select>
+	
+</mapper>

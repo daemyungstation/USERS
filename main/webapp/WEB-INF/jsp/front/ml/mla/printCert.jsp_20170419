@@ -1,0 +1,1045 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8"%><%@include file="/WEB-INF/jsp/include/el.jspf" %>
+		
+
+		<style>	
+			html { -webkit-text-size-adjus: none; }
+				
+			#wrap {-webkit-overflow-scrolling: touch !important; overflow:auto;}				
+				
+			.popBody { width: 1000px !important; color:#333 !important;}
+			#memCert, #damageCert {position:relative; overflow:hidden; margin-top:40px}
+			#memCert h1, #damageCert h1 {margin-bottom: 15px; color:#222 !important; border: 1px solid #bbb; padding: 3px 0; text-align:center;}
+			
+			#prdctDesc, #refundList {overflow:hidden; font-size:12px;}
+			#prdctDesc h2, #refundList h2 {font-size: 16px; text-align:center; background-color: #CAC8C3; padding: 5px; }
+				
+			#damageCert {margin-bottom: 15px;}
+			#damageCert table td { height: 38px; }
+						
+			#refundList table th, #refundList table td {font-size:10px; text-align:center; padding:0 !important}						
+			#refundList #lists td {vertical-align:top; }
+			#refundList #lists td table td {padding: 0 !important;}
+									
+						
+			table {width: 100%; border:1px solid #000; border-collapse : collapse; }
+			table tr th {padding: 5px 0; border: 1px solid #777; text-align:center;}			
+			table tr td { padding: 2px 0; padding-left: 10px; border: 1px solid #777; }
+			.bg { color:#fff; background-color: #999;}
+			.bg2 { color:#000; background-color: #F1EFE7;}
+			.bg3 { background-color:#F7F7F7}
+			
+			.tit1 { margin-bottom:3px; padding: 3px 0 3px 15px; font-weight:bold;}
+			.borderNon {border:none}
+			.boderTopNon { border-top:none !important;}
+			.boderBottomNon { border-bottom:none !important;}
+			.boderLeftNon { border-left:none !important;}
+			.boderRightNon { border-right:none !important;}
+			.borderColor { border: 1px solid #777; }
+			.theight1 {height:490px;}
+			.theight2 {height:70px;}
+			.theight3 {height:176px;}
+			.theight4 {height:85px;}
+							
+			.txt1 { text-align:center; margin: 25px 0; line-height: 20px; }
+			.txt2 { overflow:hidden; margin-bottom: 10px;}
+			.txt3 {float:left; padding-left: 10px; line-height: 25px; border-left: 3px solid #8E8D8D}
+			
+			.space1 {display:inline-block; width:28px;}
+			.space2 {display:inline-block; width:36px;}
+			.space3 {display:inline-block; width:12px;}
+			.space4 {display:inline-block; width:7px;}
+			.space5 {display:inline-block; width:25px;}
+			
+			#stamp {position:absolute; width:200px; top: -18px; right:0;}
+			#stamp2 {position:absolute; width:200px; bottom: 20px; right:0;}
+			
+			@media print {				
+				#wrap {-webkit-overflow-scrolling: touch !important;}
+				
+				#popup { background:none;}
+				.popHead {display:none;}
+				.popBody {width:710px !important; margin:0 !important; padding-bottom:0 !important; border:none !important; font-size: 8px; line-height: 12px;}
+										
+				#close { display: none}
+				.printBt {display: none}
+				.page { page-break-before: always; padding-top: 8px; }
+				
+				#memCert, #damageCert {overflow:hidden; margin-top:0; }
+				#memCert h1, #damageCert h1 {font-size:12px; margin-bottom: 5px; padding: 2px 0;}
+				#damageCert h1 {margin-bottom: 3px;}
+				
+				#prdctDesc, #refundList {font-size:10px !important; letter-spacing: -1px; }
+				#prdctDesc h2, #refundList h2 {font-size: 10px; padding: 2px; }				
+				
+				table tr th {padding: 2px 0; }
+				
+				.theight1 {height:380px;}
+				.theight2 {height:50px;}
+				.theight3 {height:160px;}
+				.theight4 {height:90px;}
+
+				.txt1 { margin: 5px 0; line-height: 14px; }
+				.txt2 img {width: 110px }
+				.txt3 {line-height: 15px; }
+				
+				#damageCert table td { height: 16px; }
+				
+				.space1 {display:inline-block; width:20px;}
+				.space2 {display:inline-block; width:26px;}
+				.space3 {display:inline-block; width:8px;}
+				.space4 {display:inline-block; width:5px;}
+				.space5 {display:inline-block; width:18px;}
+				
+				#stamp {position:absolute; width:150px; top: -18px; right:0;}
+				#stamp2 {position:absolute; width:150px; bottom: 0px; right:0;}
+			}
+		</style>
+	
+		<c:set var="info" value="${rtnMap.joinCert}" />
+		<c:set var="desc" value="${rtnMap.prdctDesc}" />
+
+		<c:set var="joinDt" value="${egov:convertDate(info.joinDt, 'yyyy-MM-dd HH:mm:ss', 'yyyy-MM-dd', '')}" />
+		<c:set var="arrCell" value="${fn:split(info.cell, '-')}" />
+		
+		<c:forEach var="cell" items="${arrCell}" varStatus="status">		
+			<c:if test="${status.count == 1}"><c:set var="cell1" value="${cell}" /></c:if>
+			<c:if test="${status.count == 2}"><c:set var="cell2" value="${cell}" /></c:if>
+			<c:if test="${status.count == 3}"><c:set var="cell3" value="${cell}" /></c:if>
+		</c:forEach>
+		
+		<c:set var="resnstdInfoMap1" value="${rtnMap.resnstdInfoMap1}" />
+		<c:set var="resnstdInfoMap2" value="${rtnMap.resnstdInfoMap2}" />
+		<c:set var="resnstdInfoMap3" value="${rtnMap.resnstdInfoMap3}" />
+		<c:set var="resnstdInfoMap4" value="${rtnMap.resnstdInfoMap4}" />
+		<c:set var="resnstdInfoMap5" value="${rtnMap.resnstdInfoMap5}" />
+		<c:set var="resnstdInfoMap6" value="${rtnMap.resnstdInfoMap6}" />
+		<c:set var="resnstdInfoMap7" value="${rtnMap.resnstdInfoMap7}" />
+		
+		<c:set var="mpa" value="0" />
+		
+			<div id="wrap" >
+				<div class="popHead">
+					회원증서
+					<a href="javascript:self.close();" id="close"><img src="/common/images/popup/popup_xbt.gif" alt=""></a>
+				</div>
+
+				<div class="popBody">
+					<div class="privacyDiv">	
+						<p class="printBt">
+							<a href="javascript: printWindow();" class="whtBt">프린트</a>
+						</p>
+					</div>
+								
+					<div id="memCert">
+						<h1>회&nbsp;원&nbsp;증&nbsp;서(계약서)</h1>
+
+						<p class="bg taL tit1">□ 기본정보</p>
+						<table style="margin-bottom:3px;">
+							<colgroup>
+								<col width="12%" />
+								<col width="38%" />
+								<col width="12%" />
+								<col width="38%" />
+							</colgroup>
+							<tr>
+								<th class="bg2">회 원 번 호</th>
+								<td>${info.accntNo}</td>
+								<th class="bg2">가 입 일 자</th>
+								<td>${fn:replace(joinDt, "-","/")}</td>
+								
+							</tr>
+							<tr>
+								<th class="bg2">계&nbsp;&nbsp;&nbsp;약&nbsp;&nbsp;&nbsp;자</th>
+								<td>${info.memNm}</td>
+								<th class="bg2">연&nbsp;&nbsp;&nbsp;락&nbsp;&nbsp;&nbsp;처</th>
+								<td>${cell1}-${cell2}-****</td>
+							</tr>
+							<tr>
+								<th class="bg2">주&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;소</th>
+								<td colspan="3">${info.homeAddr} ${info.homeAddr2}</td>
+							</tr>
+						</table>
+						
+						<div style="overflow:hidden; margin-bottom:3px;">
+							<div style="float:left; width:49.8%">
+								<p class="bg taL tit1">□ 상품정보1</p>
+								<table>
+									<colgroup>
+										<col width="12%" />
+										<col width="38%" />
+									</colgroup>
+									<tr>
+										<th class="bg2">상&nbsp;&nbsp;&nbsp;품&nbsp;&nbsp;&nbsp;명</th>
+										<td>${info.prodNm}</td>
+									</tr>
+									<tr>
+										<th class="bg2">상 품 금 액</th>
+										<td>
+											<fmt:formatNumber value="${info.prodAmt}" type="number"/>원
+											<c:if test="${info.payType eq '002'}">
+											
+												<c:choose>
+													<c:when test="${info.alltAmt3 eq null}">
+													(실납입금액 : <fmt:formatNumber value="${info.prodAmt - ((info.endNo1 - info.stNo1 + 1) * info.alltAmt1)}" type="number"/>원)														
+													</c:when>
+													<c:otherwise>
+													(실납입금액 : <fmt:formatNumber value="${info.prodAmt - (((info.endNo1 - info.stNo1 + 1) * info.alltAmt1) + ((info.endNo2 - info.stNo2 + 1) * info.alltAmt))}" type="number"/>원)
+													</c:otherwise>
+												</c:choose>											
+											</c:if>
+										</td>
+									</tr>
+									<tr>
+										<th class="bg2">회차별납입액</th>
+										<td>
+											<fmt:formatNumber value="${info.monPayAmt}" type="number"/>
+											<c:if test="${info.payType eq '002'}">
+											
+												<c:choose>
+													<c:when test="${info.alltAmt3 eq null}">
+													(스페셜 할인 : <fmt:formatNumber value="${info.alltAmt1}" type="number" />원 * ${info.endNo1 - info.stNo1 + 1}회)														
+													</c:when>
+													<c:otherwise>
+													(스페셜 할인 : <fmt:formatNumber value="${info.alltAmt1}" type="number" />원 * ${info.endNo1 - info.stNo1 + 1}회, <fmt:formatNumber value="${info.alltAmt2}" type="number" />원 * ${info.endNo2 - info.stNo2 + 1}회)
+													</c:otherwise>
+												</c:choose>
+											
+											</c:if>
+											
+										</td>
+									</tr>
+									<tr>
+										<th class="bg2">만 기 회 차</th>
+										<td>${info.exprNo}회</td>
+									</tr>
+								</table>
+							</div>
+							
+							<div style="float:right; width:49.8%">
+								<p class="bg taL tit1">□ 상품정보2</p>
+								<table>
+									<colgroup>
+										<col width="12%" />
+										<col width="38%" />
+									</colgroup>
+									<tr>
+										<th class="bg2">상&nbsp;&nbsp;&nbsp;품&nbsp;&nbsp;&nbsp;명</th>
+										<td>${info.prodModel}</td>
+									</tr>
+									<tr>
+										<th class="bg2">계약금액</th>
+										<td>
+											<c:if test="${info.payType eq '002'}">
+											
+												<c:choose>
+													<c:when test="${info.alltAmt3 eq null}">
+													할부원금 : <fmt:formatNumber value="${((info.endNo1 - info.stNo1 + 1) * info.alltAmt1)}" type="number"/>원(VAT포함)														
+													</c:when>
+													<c:otherwise>
+													할부원금 : <fmt:formatNumber value="${(((info.endNo1 - info.stNo1 + 1) * info.alltAmt1) + ((info.endNo2 - info.stNo2 + 1) * info.alltAmt2))}" type="number"/>원(VAT포함)
+													</c:otherwise>
+												</c:choose>											
+											</c:if>
+										</td>
+									</tr>
+									<tr>
+										<th class="bg2">월납입금</th>
+										<td>
+											<c:if test="${info.payType eq '002'}">											
+												<c:choose>
+													<c:when test="${info.alltAmt3 eq null}">
+													월<fmt:formatNumber value="${info.alltAmt1}" type="number" />원 * ${info.endNo1 - info.stNo1 + 1}회														
+													</c:when>
+													<c:otherwise>
+													월<fmt:formatNumber value="${info.alltAmt1}" type="number" />원 * ${info.endNo1 - info.stNo1 + 1}회, <fmt:formatNumber value="${info.alltAmt2}" type="number" />원 * ${info.endNo2 - info.stNo2 + 1}회
+													</c:otherwise>
+												</c:choose>											
+											</c:if>
+										</td>
+									</tr>
+									<tr>
+										<th class="bg2">계약유형</th>
+										<td>
+											<c:if test="${info.payType eq '002'}">36개월 할부매매계약(무이자)</c:if>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+						
+						<p class="bg taL tit1 clearB">□ 결제정보</p>
+						<c:if test="${info.bankNm ne null}">
+						<table>
+							<colgroup>
+								<col width="130px" />
+								<col width="17%" />
+								<col width="130px" />
+								<col width="17%" />
+								<col width="130px" />
+								<col width="17%" />
+							</colgroup>
+							<tr>
+								<th class="bg2">납입방법</th>
+								<td>은행</td>
+								<th class="bg2">회원명</th>
+								<td>${info.memNm}</td>
+								<th class="bg2">은행명</th>
+								<td>${info.bankNm}</td>
+							</tr>
+							<tr>
+								<th class="bg2">계좌번호</th>
+								<td>${fn:substring(info.bankAccntNo, 0, 8)}******</td>
+								<th class="bg2">결제일자</th>
+								<td>${info.ichaeDt}일</td>
+								<th>&nbsp;</th>
+								<td>&nbsp;</td>
+							</tr>
+						</table>							
+						</c:if>
+						
+						<c:if test="${info.cardCd ne null}">
+						<table>
+							<colgroup>
+								<col width="130px" />
+								<col width="17%" />
+								<col width="130px" />
+								<col width="17%" />
+								<col width="130px" />
+								<col width="17%" />
+							</colgroup>
+							<tr>
+								<th class="bg2">납입방법</th>
+								<td>카드</td>
+								<th class="bg2">회원명</th>
+								<td>${info.memNm}</td>
+								<th class="bg2">카드사</th>
+								<td>${info.cardNm}</td>
+							</tr>
+							<tr>
+								<th class="bg2">카드번호</th>
+								<td>${fn:substring(info.cardNo, 0, 8)}******</td>
+								<th class="bg2">결제일자</th>
+								<td>${info.payDt}일</td>
+								<th>&nbsp;</th>
+								<td>&nbsp;</td>
+							</tr>
+						</table>						
+						</c:if>												
+					</div>
+
+					<div class="txt1" >
+						<p>우리회사는 계약자와 해당약관에 의하여 부금상품 계약을 체결하고 그 증거로 이 증서를 드립니다.</p>
+						<p>본 회원은 (주)대명라이프웨이의 회원임을 증명합니다.</p>
+						<p style="margin-top: 5px;">${rtnMap.year}년&nbsp;&nbsp; ${rtnMap.month}월&nbsp;&nbsp; ${rtnMap.day}일</p>
+					</div>
+
+					<div style="position:relative;">
+						<div class="txt2" style="">
+							<p style="float:left; margin-right: 30px"><img src="/common/images/logo.gif" width="180" alt=""></p>
+							<div class="txt3" style="">
+								<p>컨택센터 : 1588-8511 &nbsp;&nbsp;&nbsp;&nbsp; 긴급의전센터 : 1588-2227</p>
+								<p>우) 05836 서울시 송파구 법원로 135 대명타워 www.daemyunglifeway.com</p>
+							</div>
+						</div>
+						<img src="/common/images/icon/stamp.png" id="stamp" style="" />
+					</div>
+					
+					
+					
+					<div id="prdctDesc">
+						<h2 style="margin-bottom:3px;">${info.prodNm} 상품 설명서</h2>
+								
+						<div style="overflow:hidden; margin-bottom:3px;">
+						
+							<div style="float:left;width:49.8%;">
+								<table class="theight1" >
+									<tr>
+										<th colspan="3" class="bg3" style="height:15px;">의전서비스</th>
+									</tr>
+									<tr>
+										<td rowspan="2">관</td>
+										<td>매장</td>
+										<td>${desc.coffin1 }</td>
+									</tr>
+									<tr>
+										<td>화장/탈관</td>
+										<td>${desc.coffin2 }</td>
+									</tr>
+				
+									<tr>
+										<td rowspan="2">수의</td>
+										<td>${desc.shroudM1}</td>
+										<td>${desc.shroudD1}</td>
+									</tr>
+									<tr>
+										<td>${desc.shroudM2}</td>
+										<td>${desc.shroudD2}</td>
+									</tr>
+				
+									<tr>
+										<td rowspan="2" colspan="2">입관/수시용품<br>(종교별 규격폼 제공)</td>
+										<td>${desc.coffinGds1}</td>
+									</tr>
+									<tr>						
+										<td>${desc.coffinGds2}</td>
+									</tr>
+				
+									<tr>
+										<td rowspan="2" colspan="2">빈소/기타용품<br>(필요량 일체제공 및 대여)</td>
+										<td>${desc.mortuaryGds1}</td>
+									</tr>
+									<tr>						
+										<td>${desc.mortuaryGds2}</td>
+									</tr>
+				
+									<tr>
+										<td colspan="2">차량</td>
+										<td style="padding:0;">
+											
+											<table class="borderNon">
+												<tr>
+													<td class="boderTopNon boderLeftNon">이송차량</td>
+													<td class="boderTopNon boderRightNon">${desc.car1}</td>
+												</tr>
+												<tr>
+													<td class="boderLeftNon">리무진</td>
+													<td class="boderRightNon">${desc.car2}</td>
+												</tr>
+												<tr>
+													<td class="boderBottomNon boderLeftNon">유족버스</td>
+													<td class="boderBottomNon boderRightNon">${desc.car3}</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+				
+									<tr>
+										<td rowspan="3">제단<br>장식</td>
+										<td>${desc.flowerM1}</td>
+										<td>${desc.flowerD1}</td>
+									</tr>
+									<tr>
+										<td>${desc.flowerM2}</td>
+										<td>${desc.flowerD2}</td>
+									</tr>
+									<tr>
+										<td>${desc.flowerM3}</td>
+										<td>${desc.flowerD3}</td>
+									</tr>
+				
+									<tr>
+										<td colspan="2">의전용품</td>
+										<td style="padding:0;">
+											
+											<table class="borderNon">
+												<tr>
+													<td class="boderTopNon boderLeftNon">현대식</td>
+													<td class="boderTopNon boderRightNon">${desc.funeralClothes1}</td>
+												</tr>
+												<tr>
+													<td rowspan="2" class="boderLeftNon boderBottomNon">전통식</td>
+													<td class="boderRightNon">${desc.funeralClothes2}</td>
+												</tr>
+												<tr>
+													<td class="boderBottomNon boderRightNon">${desc.funeralClothes3}</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+				
+									<tr>
+										<td rowspan="3">인력</td>
+										<td>${desc.helperM1}</td>
+										<td>${desc.helperD1}</td>
+									</tr>
+									<tr>
+										<td>${desc.helperM2}</td>
+										<td>${desc.helperD2}</td>
+									</tr>
+									<tr>
+										<td>${desc.helperM3}</td>
+										<td>${desc.helperD3}</td>
+									</tr>
+				
+									<tr>
+										<td colspan="2">${desc.etc}</td>
+										<td>${desc.etcVal}</td>
+									</tr>
+								</table>
+							</div>
+				 
+							<div style="float:right; width:49.8%">
+								<table class="theight1" >
+									<tr>
+										<th class="bg3" style="height:15px;">토탈라이프 서비스</th>
+									</tr>
+									<tr>
+										<td style="vertical-align:top; line-height: 13px">
+											${desc.termsSvc}											
+										</td>
+									</tr>
+								</table>
+							</div>												
+						</div>		
+				
+						<div style="overflow:hidden; margin-bottom:5px;">
+							<div style="float:left;width:49.8%;">
+								<p style="margin-bottom:7px">[이용관련 참조사항]</p>
+				
+								<p style="margin-bottom:5px;">▣ 장의상품 상세정보</p>
+								<div class="borderColor theight2" >
+									${desc.termsDtl}
+								</div>
+				
+								<p style="margin-bottom:5px;">▣ 소비자 유의사항</p>
+								<div class="borderColor theight3">
+									${desc.consmNt}
+								</div>
+							</div>
+				
+							<div style="float:right;width:49.8%;">
+								<p style="margin-bottom:7px">[중요정보 고시사항]</p>
+								
+								<p style="margin-bottom:5px;">▣ 환급기준 및 환급시기</p>
+								<div class="borderColor theight2">
+									${desc.refundNt}
+								</div>
+				
+								<p style="margin-bottom:5px;">▣ 총 고객환급의무액, 상조관련 자산 (2014년 12월말 기준)</p>
+								<table>
+									<tr>
+										<th class="bg2">총 고객환급의무액</th>
+										<td>${desc.refundAmt}</td>
+									</tr>
+									<tr>
+										<th class="bg2">상조관련 자선</th>
+										<td>${desc.asset}</td>
+									</tr>
+									<tr>
+										<td colspan="2">* 공인회계사의 회계감사를 받았음(대주회계법인)</td>
+									</tr>									
+								</table>
+				
+								<p style="margin-bottom:5px;">▣ 고객 불입금 관리방법</p>
+								<div class="borderColor theight4" >
+									${desc.consmAmtMng}
+								</div>
+				
+							</div>
+						</div>								
+																
+					</div>
+					
+					<p class="page">&nbsp;</p>
+					
+					<div id="damageCert">
+						<h1>소비자 피해보상 증서</h1>
+						
+						<p class="taL tit1">□ 증서번호(회원번호) : ${info.accntNo}</p>
+						
+						<table>
+							<colgroup>
+								<col width="20%" />
+								<col width="20%" />
+								<col width="*" />
+							</colgroup>
+						
+							<tr>
+								<th rowspan="4" class="bg2">
+									선<span class="space1">&nbsp;</span>불<span class="space1">&nbsp;</span>식<br>할 부 거 래 업 자
+								</th>
+								<th class="bg2">등 록 번 호</th>
+								<td>서울 - 2010 - 제63호</td>
+							</tr>
+							<tr>
+								<th class="bg2">상<span class="space2">&nbsp;</span>호</th>
+								<td>(주)대명스테이션</td>
+							</tr>
+							<tr>
+								<th class="bg2">소<span class="space3">&nbsp;</span>재<span class="space3">&nbsp;</span>지</th>
+								<td>서울시 송파구 법원로 135 대명타워(대표전화 1588-8511)</td>
+							</tr>
+							<tr>
+								<th class="bg2">대<span class="space3">&nbsp;</span>표<span class="space3">&nbsp;</span>자</th>
+								<td colspan="2">권광수</td>
+							</tr>
+							<tr>
+								<th class="bg2">지<span class="space4">&nbsp;</span>급<span class="space4">&nbsp;</span>의<span class="space4">&nbsp;</span>무<span class="space4">&nbsp;</span>자</th>
+								<td colspan="2">상조보증공제조합</td>
+							</tr>
+							<tr>
+								<th class="bg2">피보험자 또는 수혜자</th>
+								<td colspan="2">${info.memNm}</td>
+							</tr>
+							<tr>
+								<th class="bg2">소 비 자 피 해 보 상<br>보 험 계 약 의 종 류</th>
+								<td colspan="2">공제계약</td>
+							</tr>
+							<tr>
+								<th class="bg2">소 비 자 피 해 보 상<br>보험계약 등의 계약기간</th>
+								<td colspan="2">${rtnMap.year}년 1월 1일부터 ${rtnMap.year}년 12월 31일까지(365일간)<br>※ 본계약은 상조보증공제조합과의 계약에 의해 매년 자동 갱신됩니다.</td>
+							</tr>														
+							<tr>
+								<th class="bg2">소 비 자 피 해 보 상 금<br>지<span class="space5">&nbsp;</span>급<span class="space5">&nbsp;</span>사<span class="space5">&nbsp;</span>유</th>
+								<td colspan="2">[할부거래에 관한 법률] 제 27조 제4항 각 호에 해당하는 사실이 발생한 경우</td>
+							</tr>		
+							<tr>
+								<th class="bg2">소비자피해보상 금액</th>
+								<td colspan="2">(선불식 할부거래업자가 소비자로부터 선불식할부계약과 관련되는 재화등의 대금으로서 미리 수령한 금액 - 선불식 할부거래업자가 소비자에게 공급한 재화 등의 가액) X 100분의 50</td>
+							</tr>
+						</table>
+						
+						<div class="txt1" >
+							<p>[할부거래에 관한 법률] 제27조 제1항에 따라 위와 같이 소비자피해보상보험계약 등을 체결하였음을</p>
+							<p> 확인하고, 같은 법 제27조 제6항 및 같은 법 시행규칙 제12조 제1항에 따라 이 증서를 발급합니다.</p>
+							<p style="margin-top: 5px;">${rtnMap.year}년&nbsp;&nbsp; ${rtnMap.month}월&nbsp;&nbsp; ${rtnMap.day}일</p>
+						</div>
+						 
+						<img src="/common/images/icon/stamp.png" id="stamp2" style="" />						
+					</div>	
+					
+					<div id="refundList">
+						<h2 style="margin-bottom:3px;">${info.prodNm} 해약환급금 및 환급율</h2>
+						
+						<table id="lists">
+							<tr>
+								<c:if test="${fn:length(resnstdInfoMap1) > 0}">
+								<td>								
+									<table class="borderNon">
+										<colgroup>
+											<col width="25px" />
+											<col width="*" />
+											<col width="33px" />
+										</colgroup>
+										<tr>								
+											<th class="boderTopNon boderLeftNon bg3">회차</th>
+											<td class="boderTopNon bg3">환급금</td>
+											<td class="boderTopNon boderRightNon bg3">환급율</td>
+										</tr>
+										<c:forEach var="list" items="${resnstdInfoMap1}" varStatus="status">
+											<c:set var="count" value="${status.count}" />
+											<c:set var="last" value="${status.last}" />
+										<tr>
+											<th class="boderLeftNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if> bg3">${list.no}</th>
+											<td class="<c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>"><fmt:formatNumber value="${list.resnAmt}" type="number" maxFractionDigits="0" /></td>
+											<td class="boderRightNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>">
+												${list.pct}
+												<%-- <c:choose>
+													<c:when test="${list.mpa gt 0}">
+														<c:set var="mpa" value="${mpa + list.mpa}" />
+														<c:choose>
+															<c:when test="${mpa lt list.resnAmt}">
+																100.0%
+															</c:when>
+															<c:otherwise>
+																<fmt:formatNumber value="${egov:nvl(list.resnAmt, 0) / mpa * 100}" type="number" minFractionDigits="1" maxFractionDigits="1" />%
+															</c:otherwise>
+														</c:choose>
+													</c:when>
+													<c:otherwise>
+														0.0 %
+													</c:otherwise>
+												</c:choose>
+												--%>
+											</td>
+										</tr>	
+										</c:forEach>																
+									</table>
+									</c:if>
+								</td>
+								
+								<c:if test="${fn:length(resnstdInfoMap2) > 0}">
+								<td>
+									<table class="borderNon">
+										<colgroup>
+											<col width="25px" />
+											<col width="*" />
+											<col width="33px" />
+										</colgroup>
+										<tr>								
+											<th class="boderTopNon boderLeftNon bg3">회차</th>
+											<td class="boderTopNon bg3">환급금</td>
+											<td class="boderTopNon boderRightNon bg3">환급율</td>
+										</tr>
+										<c:forEach var="list" items="${resnstdInfoMap2}" varStatus="status">
+											<c:set var="count" value="${status.count}" />
+											<c:set var="last" value="${status.last}" />
+											
+										<tr>
+											<th class="boderLeftNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if> bg3">${list.no}</th>
+											<td class="<c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>"><fmt:formatNumber value="${list.resnAmt}" type="number" maxFractionDigits="0" /></td>
+											<td class="boderRightNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>">
+												${list.pct}
+												<%-- 
+												<c:choose>
+													<c:when test="${list.mpa gt 0}">
+														<c:set var="mpa" value="${mpa + list.mpa}" />
+														<c:choose>
+															<c:when test="${mpa lt list.mpa}">
+																100.0%
+															</c:when>
+															<c:otherwise>
+																<fmt:formatNumber value="${egov:nvl(list.resnAmt, 0) / mpa * 100}" type="number" minFractionDigits="1" maxFractionDigits="1" />%
+															</c:otherwise>
+														</c:choose>
+													</c:when>
+													<c:otherwise>
+														0.0 %
+													</c:otherwise>
+												</c:choose>
+												--%>
+											</td>
+										</tr>	
+										</c:forEach>																
+																
+									</table>
+								</td>
+								</c:if>
+								
+								<c:if test="${fn:length(resnstdInfoMap3) > 0}">
+								<td>
+									<table class="borderNon">
+										<colgroup>
+											<col width="25px" />
+											<col width="*" />
+											<col width="33px" />
+										</colgroup>
+										<tr>								
+											<th class="boderTopNon boderLeftNon bg3">회차</th>
+											<td class="boderTopNon bg3">환급금</td>
+											<td class="boderTopNon boderRightNon bg3">환급율</td>
+										</tr>
+										<c:forEach var="list" items="${resnstdInfoMap3}" varStatus="status">
+											<c:set var="count" value="${status.count}" />
+											<c:set var="last" value="${status.last}" />
+										<tr>
+											<th class="boderLeftNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if> bg3">${list.no}</th>
+											<td class="<c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>"><fmt:formatNumber value="${list.resnAmt}" type="number" maxFractionDigits="0" /></td>
+											<td class="boderRightNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>">
+												${list.pct}
+												<%--
+												<c:choose>
+													<c:when test="${list.mpa gt 0}">
+														<c:set var="mpa" value="${mpa + list.mpa}" />
+														<c:choose>
+															<c:when test="${mpa lt list.resnAmt}">
+																100.0%
+															</c:when>
+															<c:otherwise>
+																<fmt:formatNumber value="${egov:nvl(list.resnAmt, 0) / mpa * 100}" type="number" minFractionDigits="1" maxFractionDigits="1" />%
+															</c:otherwise>
+														</c:choose>
+													</c:when>
+													<c:otherwise>
+														0.0 %
+													</c:otherwise>
+												</c:choose>
+												--%>
+											</td>
+										</tr>	
+										</c:forEach>																
+																
+									</table>
+								</td>
+								</c:if>
+								<c:if test="${fn:length(resnstdInfoMap4) > 0}">
+								<td>
+									<table class="borderNon">
+										<colgroup>
+											<col width="25px" />
+											<col width="*" />
+											<col width="33px" />
+										</colgroup>
+										<tr>								
+											<th class="boderTopNon boderLeftNon bg3">회차</th>
+											<td class="boderTopNon bg3">환급금</td>
+											<td class="boderTopNon boderRightNon bg3">환급율</td>
+										</tr>
+										<c:forEach var="list" items="${resnstdInfoMap4}" varStatus="status">
+											<c:set var="count" value="${status.count}" />
+											<c:set var="last" value="${status.last}" />
+										<tr>
+											<th class="boderLeftNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if> bg3">${list.no}</th>
+											<td class="<c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>"><fmt:formatNumber value="${list.resnAmt}" type="number" maxFractionDigits="0" /></td>
+											<td class="boderRightNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>">
+												${list.pct}
+												<%-- 
+												<c:choose>
+													<c:when test="${list.mpa gt 0}">
+														<c:set var="mpa" value="${mpa + list.mpa}" />
+														<c:choose>
+															<c:when test="${mpa lt list.resnAmt}">
+																100.0%
+															</c:when>
+															<c:otherwise>
+																<fmt:formatNumber value="${egov:nvl(list.resnAmt, 0) / mpa * 100}" type="number" minFractionDigits="1" maxFractionDigits="1" />%
+															</c:otherwise>
+														</c:choose>
+													</c:when>
+													<c:otherwise>
+														0.0 %
+													</c:otherwise>
+												</c:choose>
+												--%>
+											</td>
+										</tr>	
+										</c:forEach>																
+																
+									</table>
+								</td>
+								</c:if>	
+								<c:if test="${fn:length(resnstdInfoMap5) > 0}">
+								<td>
+									<table class="borderNon">
+										<colgroup>
+											<col width="25px" />
+											<col width="*" />
+											<col width="33px" />
+										</colgroup>
+										<tr>								
+											<th class="boderTopNon boderLeftNon bg3">회차</th>
+											<td class="boderTopNon bg3">환급금</td>
+											<td class="boderTopNon boderRightNon bg3">환급율</td>
+										</tr>
+										<c:forEach var="list" items="${resnstdInfoMap5}" varStatus="status">
+											<c:set var="count" value="${status.count}" />
+											<c:set var="last" value="${status.last}" />
+										<tr>
+											<th class="boderLeftNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if> bg3">${list.no}</th>
+											<td class="<c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>"><fmt:formatNumber value="${list.resnAmt}" type="number" maxFractionDigits="0" /></td>
+											<td class="boderRightNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>">
+												${list.pct}
+												<%-- 
+												<c:choose>
+													<c:when test="${list.mpa gt 0}">
+														<c:set var="mpa" value="${mpa + list.mpa}" />
+														<c:choose>
+															<c:when test="${mpa lt list.resnAmt}">
+																100.0%
+															</c:when>
+															<c:otherwise>
+																<fmt:formatNumber value="${egov:nvl(list.resnAmt, 0) / mpa * 100}" type="number" minFractionDigits="1" maxFractionDigits="1" />%
+															</c:otherwise>
+														</c:choose>
+													</c:when>
+													<c:otherwise>
+														0.0 %
+													</c:otherwise>
+												</c:choose>
+												--%>
+											</td>
+										</tr>	
+										</c:forEach>																
+																
+									</table>
+								</td>
+								</c:if>
+								<c:if test="${fn:length(resnstdInfoMap6) > 0}">
+								<td>
+									<table class="borderNon">
+										<colgroup>
+											<col width="25px" />
+											<col width="*" />
+											<col width="33px" />
+										</colgroup>
+										<tr>								
+											<th class="boderTopNon boderLeftNon bg3">회차</th>
+											<td class="boderTopNon bg3">환급금</td>
+											<td class="boderTopNon boderRightNon bg3">환급율</td>
+										</tr>
+										<c:forEach var="list" items="${resnstdInfoMap6}" varStatus="status">
+											<c:set var="count" value="${status.count}" />
+											<c:set var="last" value="${status.last}" />
+										<tr>
+											<th class="boderLeftNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if> bg3">${list.no}</th>
+											<td class="<c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>"><fmt:formatNumber value="${list.resnAmt}" type="number" maxFractionDigits="0" /></td>
+											<td class="boderRightNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>">
+												${list.pct}
+												<%-- 
+												<c:choose>
+													<c:when test="${list.mpa gt 0}">
+														<c:set var="mpa" value="${mpa + list.mpa}" />
+														<c:choose>
+															<c:when test="${mpa lt list.resnAmt}">
+																100.0%
+															</c:when>
+															<c:otherwise>
+																<fmt:formatNumber value="${egov:nvl(list.resnAmt, 0) / mpa * 100}" type="number" minFractionDigits="1" maxFractionDigits="1" />%
+															</c:otherwise>
+														</c:choose>
+													</c:when>
+													<c:otherwise>
+														0.0 %
+													</c:otherwise>
+												</c:choose>
+												--%>
+											</td>
+										</tr>	
+										</c:forEach>																
+											 					
+									</table>
+								</td>
+								</c:if>
+								<c:if test="${fn:length(resnstdInfoMap7) > 0}" >
+								<td>
+									<table class="borderNon">
+										<colgroup>
+											<col width="25px" />
+											<col width="*" />
+											<col width="33px" />
+										</colgroup>
+										<tr>								
+											<th class="boderTopNon boderLeftNon bg3">회차</th>
+											<td class="boderTopNon bg3">환급금</td>
+											<td class="boderTopNon boderRightNon bg3">환급율</td>
+										</tr>
+										<c:forEach var="list" items="${resnstdInfoMap7}" varStatus="status">
+											<c:set var="count" value="${status.count}" />
+											<c:set var="last" value="${status.last}" />
+										<tr>
+											<th class="boderLeftNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if> bg3">${list.no}</th>
+											<td class="<c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>"><fmt:formatNumber value="${list.resnAmt}" type="number" maxFractionDigits="0" /></td>
+											<td class="boderRightNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>">
+												${list.pct}
+												<%--
+												<c:choose>
+													<c:when test="${list.mpa gt 0}">
+														<c:set var="mpa" value="${mpa + list.mpa}" />
+														<c:choose>
+															<c:when test="${mpa lt list.resnAmt}">
+																100.0%
+															</c:when>
+															<c:otherwise>
+																<fmt:formatNumber value="${egov:nvl(list.resnAmt, 0) / mpa * 100}" type="number" minFractionDigits="1" maxFractionDigits="1" />%
+															</c:otherwise>
+														</c:choose>
+													</c:when>
+													<c:otherwise>
+														0.0 %
+													</c:otherwise>
+												</c:choose>
+												--%>
+											</td>
+										</tr>	
+										</c:forEach>																
+									</table>
+								</td>
+								</c:if>	
+								<c:if test="${fn:length(resnstdInfoMap8) > 0}" >
+								<td>
+									<table class="borderNon">
+										<colgroup>
+											<col width="25px" />
+											<col width="*" />
+											<col width="33px" />
+										</colgroup>
+										<tr>								
+											<th class="boderTopNon boderLeftNon bg3">회차</th>
+											<td class="boderTopNon bg3">환급금</td>
+											<td class="boderTopNon boderRightNon bg3">환급율</td>
+										</tr>
+										<c:forEach var="list" items="${resnstdInfoMap8}" varStatus="status">
+											<c:set var="count" value="${status.count}" />
+											<c:set var="last" value="${status.last}" />
+										<tr>
+											<th class="boderLeftNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if> bg3">${list.no}</th>
+											<td class="<c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>"><fmt:formatNumber value="${list.resnAmt}" type="number" maxFractionDigits="0" /></td>
+											<td class="boderRightNon <c:if test="${count == 32 && last eq true}">boderBottomNon</c:if>">
+												${list.pct}
+												<%--
+												<c:choose>
+													<c:when test="${list.mpa gt 0}">
+														<c:set var="mpa" value="${mpa + list.mpa}" />
+														<c:choose>
+															<c:when test="${mpa lt list.resnAmt}">
+																100.0%
+															</c:when>
+															<c:otherwise>
+																<fmt:formatNumber value="${egov:nvl(list.resnAmt, 0) / mpa * 100}" type="number" minFractionDigits="1" maxFractionDigits="1" />%
+															</c:otherwise>
+														</c:choose>
+													</c:when>
+													<c:otherwise>
+														0.0 %
+													</c:otherwise>
+												</c:choose>
+												--%>
+											</td>
+										</tr>	
+										</c:forEach>																
+									</table>
+								</td>
+								</c:if>									
+							</tr>
+						</table>
+						
+						<div style="margin:5px 0 10px 0;">
+							<p>※ 상조 실 납입액 :
+							 	<c:if test="${info.stNo1 ne null}">${info.stNo1}~${info.endNo1}회차 <fmt:formatNumber value="${info.monthPayAmt1}" type="number" maxFractionDigits="0" />원</c:if>
+							 	<c:if test="${info.stNo2 ne null}"> / ${info.stNo2}~${info.endNo2}회차 <fmt:formatNumber value="${info.monthPayAmt2}" type="number" maxFractionDigits="0" />원</c:if>							 	
+							 	<c:if test="${info.stNo3 ne null}"> / ${info.stNo3}~${info.endNo3}회차 <fmt:formatNumber value="${info.monthPayAmt3}" type="number" maxFractionDigits="0" />원</c:if>
+							</p>
+							<p>
+								※ 아래의 산식은 공정거래위원회 ' 상조 해약환급금 산정기준'을 나타낸 것으로, 본 상품에 대한 만기해약환급금은 ${info.exprNo}회차 만기(납입) 후 익월 1일부터 신청이 가능하며, 해약 시 납입금 누계의 100%인 <fmt:formatNumber value="${info.prodAmt}" type="number" maxFractionDigits="0" />원을 지급합니다.
+								<c:if test="${info.payType eq '002'}">
+									<c:choose>
+										<c:when test="${info.alltAmt3 eq null}">
+										(만기 환급금 <fmt:formatNumber value="${info.prodAmt}" type="currency" /> = 실 상조납입금 <fmt:formatNumber value="${info.prodAmt - ((info.endNo1 - info.stNo1 + 1) * info.alltAmt1)}" type="currency"/> + 만기 축하금 <fmt:formatNumber value="${((info.endNo1 - info.stNo1 + 1) * info.alltAmt1)}" type="currency"/>)														
+										</c:when>
+										<c:otherwise>
+										(만기 환급금 <fmt:formatNumber value="${info.prodAmt}" type="currency" />
+										 = 실 상조납입금 <fmt:formatNumber value="${info.prodAmt - (((info.endNo1 - info.stNo1 + 1) * info.alltAmt1) + ((info.endNo2 - info.stNo2 + 1) * info.alltAmt))}" type="currency"/>
+										  + 만기 축하금 <fmt:formatNumber value="${(((info.endNo1 - info.stNo1 + 1) * info.alltAmt1) + ((info.endNo2 - info.stNo2 + 1) * info.alltAmt2))}" type="currency"/>)
+										</c:otherwise>
+									</c:choose>											
+								</c:if>								
+							</p>
+						</div>
+						
+						<div>
+							<p style="font-weight:bold; margin-bottom:3px;">[해약환급금 산식]</p>
+							<table>
+								<tr>
+									<th class="bg3">정기형</th>
+									<td style="text-align:left; padding-left: 2px !important; line-height: 12px;">${desc.refundMath1}</td>
+								</tr>
+								<tr>
+									<th class="bg3">부정기형</th>
+									<td style="text-align:left; padding: 2px 0 2px 2px !important; line-height: 12px;">${desc.refundMath2}</td>
+								</tr>		
+								<tr>
+									<th colspan="2"  class="bg3" style="padding: 3px 0 !important;">${desc.refundMath3}</th>
+								</tr>						
+							</table>
+						</div>						
+					</div>										
+				</div>			
+			</div>	
+					
+				<object id=factory style="display:none" classid="clsid:1663ed61-23eb-11d2-b92f-008048fdd814" 
+					codebase="/common/smsx.cab#Version=7,7,0,20" >
+				</object>
+				
+				<script>
+					function printWindow(){
+						var version = $.browser.version;
+						
+						if (version == 7.0 || version == 8.0 || version == 9.0 || version == 10.0 || version == 11.0){
+							with ( factory.printing ) 
+							{ 
+								header = ''; 
+								footer = ''; 
+								portrait = true; // true 세로출력 , false 가로출력
+								leftMargin = 0;
+								rightMargin = 0; 
+								topMargin = 0;
+								bottomMargin = 0; 
+								Print(true, window) // 첫번째 인자 : 대화상자표시여부 , 두번째인자 : 출력될 프레임
+							}	
+						}else{
+							print();
+						}
+						
+					}
+				</script>
+				

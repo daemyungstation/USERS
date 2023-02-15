@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLICustVoiceDAO">
+	
+	<resultMap id="emfMap" type="emfMap">
+		<result property="cntn" column="CNTN" javaType="java.lang.String" jdbcType="CLOB" />
+		<result property="answ" column="ANSW" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : MLICustVoiceDAO.selectCustVoiceList
+         설  명 : 고객의 소리 접수내역 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   허진영      최초생성
+    -->
+	<select id="MLICustVoiceDAO.selectCustVoiceList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLICustVoiceDAO.selectCustVoiceList */
+			   TBL.* 
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'CUST_VOICE_GB' AND CD = TBL.INQRY_CD) AS INQRY_NM
+               , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'CUST_VOICE_DTL_GB' AND CD = TBL.INQRY_DTL_CD) AS INQRY_DTL_NM
+               , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'PROCESS_TYPE' AND CD = TBL.PRCS_CD) AS PRCS_NM
+		FROM (
+			SELECT ROWNUM AS RNUM, A.* 
+			FROM (
+                SELECT COUNT(*) OVER() AS TOT_CNT
+                       , CUST_VOICE_SEQ
+                       , INQRY_CD
+                       , INQRY_DTL_CD
+                       , TITL
+                       , PRCS_CD
+                       , REG_DTM
+                  FROM CS_CUST_VOICE_MST
+				 WHERE ID = #{id}
+				<if test="q != null and q != ''">
+					<if test="f == 1">
+						<![CDATA[	AND TITL LIKE '%' || #{q} || '%'	]]>
+					</if>
+					<if test="f == 2">
+						<![CDATA[	AND CNTN LIKE '%' || #{q} || '%'	]]>
+					</if>
+				</if>
+				 ORDER BY REG_DTM DESC
+			) A
+		) TBL
+	    WHERE RNUM BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}      
+	</select>
+	
+	<!--
+         쿼리명 : MLICustVoiceDAO.selectCustVoice
+         설  명 : 고객의 소리 접수내역 상세를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.03   허진영      최초생성
+    -->
+	<select id="MLICustVoiceDAO.selectCustVoice" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* MLICustVoiceDAO.selectCustVoice */      
+			   CUST_VOICE_SEQ
+			   , ID
+			   , NAME
+			   , HTEL
+			   , EMAIL
+			   , INQRY_CD
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'CUST_VOICE_GB' AND CD = A.INQRY_CD) AS INQRY_NM
+			   , INQRY_DTL_CD
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'CUST_VOICE_DTL_GB' AND CD = A.INQRY_DTL_CD) AS INQRY_DTL_NM
+			   , TITL
+			   , CNTN
+			   , ANSW
+			   , REG_DTM
+		  FROM CS_CUST_VOICE_MST A
+         WHERE ID = #{id}
+           AND CUST_VOICE_SEQ = #{custVoiceSeq}
+	</select>
+	
+	<!--
+         쿼리명 : MLICustVoiceDAO.selectCustVoiceLog
+         설  명 : 고객의 소리 접수내역 상세로그를 조회한다
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.04   허진영     최초 생성
+    -->
+    <select id="MLICustVoiceDAO.selectCustVoiceLog" parameterType="emfMap" resultType="emfMap">
+    	SELECT /* MLICustVoiceDAO.selectCustVoiceLog */
+    		   TBL.*
+    		   , (SELECT NAME FROM CO_ADM_MST WHERE ID = TBL.MOD_ID) AS MOD_NM 
+    	FROM (
+    		SELECT ROW_NUMBER() OVER(ORDER BY MOD_DTM DESC) RNK
+			   	   , MOD_ID
+			   	   , MOD_DTM
+		  	  FROM CS_CUST_VOICE_LOG
+             WHERE CUST_VOICE_SEQ = #{custVoiceSeq}
+               AND TASK_GB = 'A' 
+    	) TBL
+    	WHERE RNK = 1
+   	</select>
+	
+</mapper>            

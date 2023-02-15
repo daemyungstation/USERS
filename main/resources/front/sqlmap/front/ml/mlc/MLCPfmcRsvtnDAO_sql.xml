@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MLCPfmcRsvtnDAO">
+	
+	<resultMap id="emfMap" type="emf.core.vo.EmfMap">
+		<result property="REQN" column="REQN" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	
+	<!--
+         쿼리명 : MLCPfmcRsvtnDAO.selectPfmcRsvtnList
+         설  명 : 공연예약 목록을 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="MLCPfmcRsvtnDAO.selectPfmcRsvtnList" parameterType="emfMap" resultType="emfMap">
+		SELECT /* MLCPfmcRsvtnDAO.selectPfmcRsvtnList */
+			   TBL.* 
+			   , (SELECT PFMC_NM FROM CM_PFMC_MST WHERE PFMC_SEQ = TBL.PFMC_SEQ) AS PFMC_NM
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'RSVTN_PRCS_STTS' AND CD = TBL.PRCS_CD) AS RSVTN_PRCS_STTS
+			   , (SELECT MAX(MOD_DTM) FROM CM_PFMC_RSVTN_LOG WHERE RSVTN_SEQ = TBL.RSVTN_SEQ AND PRCS_CD = '00') AS CNCL_DTM
+		FROM (	
+			SELECT ROWNUM AS RNUM, A.* 
+			FROM (
+				SELECT COUNT(*) OVER() AS TOT_CNT
+					   , RSVTN_SEQ
+					   , ACCNT_NO
+					   , PFMC_SEQ
+					   , LAST_RSVTN_DTM
+					   , PRCS_CD
+					   , REG_DTM
+				  FROM CM_PFMC_RSVTN_MST
+				 WHERE ID = #{id}
+				 ORDER BY REG_DTM DESC
+			) A
+		) TBL
+		WHERE RNUM BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}
+	</select>
+	
+	<!--
+         쿼리명 : MLCPfmcRsvtnDAO.selectPfmcRsvtn
+         설  명 : 공연예약 상세를 조회한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.02.26   허진영      최초생성
+    -->
+	<select id="MLCPfmcRsvtnDAO.selectPfmcRsvtn" parameterType="emfMap" resultMap="emfMap">
+		SELECT /* MLCPfmcRsvtnDAO.selectPfmcRsvtn */
+			   A.PFMC_SEQ
+			   , A.PFMC_GB
+			   , A.PFMC_NM
+			   , A.PLCE
+			   , A.CAST
+			   , A.VWNG_GRD
+			   , A.PRDC_CO
+			   , A.PFMC_STRT_DT
+			   , A.PFMC_END_DT
+			   , A.PFMC_TIME
+			   , A.TCKT_PRC
+			   , A.DSCNT_PCT
+			   , A.RSVTN_MNS
+			   , A.PRCTN
+			   , A.ATCH_FILE_ID
+			   , B.RSVTN_SEQ
+			   , B.ID
+			   , B.ACCNT_NO
+			   , (SELECT NAME FROM MB_MEM_MST WHERE ID = B.ID) AS NAME
+			   , (SELECT EMAIL FROM MB_MEM_MST WHERE ID = B.ID) AS EMAIL
+			   , B.ACCNT_NO
+			   , B.SEAT_CNT
+			   , B.SEAT_GB
+			   , B.FST_RSVTN_DTM
+			   , B.SECN_RSVTN_DTM
+			   , B.LAST_RSVTN_DTM
+			   , B.REQN
+			   , B.PRCS_CD
+			   , (SELECT CD_NM FROM CO_CD_DTL WHERE CD_ID = 'RSVTN_PRCS_STTS' AND CD = B.PRCS_CD) AS RSVTN_PRCS_STTS
+		  FROM CM_PFMC_MST A, CM_PFMC_RSVTN_MST B
+		 WHERE A.PFMC_SEQ = B.PFMC_SEQ
+		   AND B.ID = #{id}
+		   AND B.RSVTN_SEQ = #{rsvtnSeq}
+	</select>
+	
+	<!--
+         쿼리명 : MLCPfmcRsvtnDAO.updatePfmcRsvtnCancel
+         설  명 : 공연예약을 취소한다.
+          수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.02   허진영      최초생성
+    -->
+	<update id="MLCPfmcRsvtnDAO.updatePfmcRsvtnCancel" parameterType="emfMap">
+		UPDATE /* MLCPfmcRsvtnDAO.updatePfmcRsvtnCancel */ CM_PFMC_RSVTN_MST
+		   SET PRCS_CD = '00'
+		       , MOD_ID = #{modId}
+		       , MOD_IP = #{modIp}
+		       , MOD_DTM = SYSDATE
+		 WHERE ID = #{id}
+		   AND RSVTN_SEQ = #{rsvtnSeq}
+	</update>
+	
+	<!--
+         쿼리명 : MLCPfmcInfDAO.insertRsvtnPrcsLog
+         설  명 : 공연예약 처리현황 로그를 등록한다.
+       	  수정일     수정자      수정내용 
+        ==========   ======   ============== 
+        2016.03.24   허진영      최초생성
+    -->   
+   	<insert id="MLCPfmcRsvtnDAO.insertRsvtnPrcsLog" parameterType="emfMap">
+        INSERT /* MLCPfmcRsvtnDAO.insertRsvtnPrcsLog */ INTO CM_PFMC_RSVTN_LOG
+        	(RSVTN_SEQ
+			, PRCS_CD
+			, MOD_ID
+			, MOD_IP
+			, MOD_DTM
+        	)
+        VALUES
+        	(#{rsvtnSeq}
+        	, '00'
+           	, #{modId}
+          	, #{modIp}
+           	, SYSDATE
+        	)
+   </insert>
+	
+</mapper>            
